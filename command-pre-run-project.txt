@@ -1,0 +1,8 @@
+npm i
+npm i vue3-google-oauth2
+npm i vue3-storage
+npm i vue3-route@next
+npm i bootstrap
+npm i @popperjs/core
+npm i axios
+npm i --save mitt
