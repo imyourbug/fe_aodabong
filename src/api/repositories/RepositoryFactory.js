@@ -1,7 +1,7 @@
-import VideoRepository from "@/api/repositories/youtube/VideoRepository";
+import CategoryRepository from "@/api/repositories/categories/CategoryRepository";
 
 const repositories = {
-    video: VideoRepository
+    category: CategoryRepository
 };
 
 export const RepositoryFactory = {

@@ -1,15 +1,14 @@
 <template>
-  <ListVideo />
-  
+  <ListCategories />
 </template>
 
 <script>
-import ListVideo from '@/views/videos/ListVideo.vue';
+import ListCategories from "@/views/categories/ListCategories.vue";
 
 export default {
-  name: 'Home',
+  name: "Home",
   components: {
-    ListVideo,
+    ListCategories,
   },
 };
 </script>

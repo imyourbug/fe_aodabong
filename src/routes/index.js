@@ -44,7 +44,7 @@ const router = createRouter({ history: createWebHistory(), routes });
 // Middleware
 router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth)) {
-        if (!localStorage.getItem('name')) {
+        if (!localStorage.getItem('email')) {
             next('/login');
         } else {
             next();

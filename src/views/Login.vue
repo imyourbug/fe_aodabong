@@ -21,9 +21,9 @@
                     type="text"
                     class="form-control"
                     name="email"
-                    value=""
                     placeholder="Email"
                     id="email"
+                    v-model="email"
                   />
                 </div>
 
@@ -34,8 +34,8 @@
                     class="form-control"
                     name="password"
                     placeholder="Mật khẩu"
-                    value=""
                     id="password"
+                    v-model="password"
                   />
                 </div>
                 <div class="row">
@@ -50,6 +50,7 @@
                       "
                       name="submit"
                       value="Đăng nhập"
+                      @click="handleLogin"
                     />
                     <!--  <button type="button" class="btn btn-primary btn-md btn-block waves-effect text-center m-b-20"><i class="fa fa-lock"></i> Signup Now </button> -->
                   </div>
@@ -97,6 +98,12 @@ import { inject } from "vue";
 
 export default {
   name: "Login",
+  data() {
+    return {
+      email: "",
+      password: "",
+    };
+  },
   created() {
     localStorage.clear();
   },
@@ -121,6 +128,15 @@ export default {
         // Change name
         console.log(googleUser);
         this.emitter.emit("change-name");
+        this.$router.push({ path: "/home" });
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async handleLogin() {
+      try {
+        // save user login
+        this.saveUser();
         this.$router.push({ path: "/home" });
       } catch (e) {
         console.log(e);
