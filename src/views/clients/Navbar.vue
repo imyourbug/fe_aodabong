@@ -30,11 +30,7 @@
           @click.prevent="handleSignOut"
           class="btn-logout"
           v-if="isLogged"
-          ><img
-            class="nav-avatar"
-            :src="avatar_user"
-          />
-          &ensp;Đăng xuất</a
+          ><img class="nav-avatar" :src="avatar_user" /> &ensp;Đăng xuất</a
         >
       </div>
     </div>
@@ -107,6 +103,7 @@ a.text-menu-header:hover {
 }
 .menu-header {
   padding: 2% 2%;
+  text-align: center;
   border-bottom: 1px solid rgb(233, 227, 227);
 }
 .navbar-block-right {

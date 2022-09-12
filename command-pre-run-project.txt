@@ -6,3 +6,4 @@ npm i bootstrap
 npm i @popperjs/core
 npm i axios
 npm i --save mitt
+npm i --save url-loader

@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import Navbar from "@/views/Navbar.vue";
+import Navbar from "@/views/clients/Navbar.vue";
 export default {
   name: "Header",
   components: {

@@ -1,9 +1,10 @@
 // export default router
 import { createRouter, createWebHistory } from 'vue-router'
-import Login from "../views/Login.vue";
-import About from "../views/About.vue";
-import Home from "@/views/Home.vue";
-import Register from "@/views/Register.vue";
+import Login from "@/views/clients/Login.vue";
+import About from "@/views/clients/About.vue";
+import Home from "@/views/clients/Home.vue";
+import ProductDetail from "@/views/clients/ProductDetail.vue";
+import Register from "@/views/clients/Register.vue";
 
 const routes = [
     {
@@ -14,14 +15,14 @@ const routes = [
             requiresAuth: true
         },
     },
-    // {
-    //     path: '/products/:menu_id',
-    //     name: 'Product-Menu',
-    //     component: GroupProduct,
-    //     meta: {
-    //         requiresAuth: true
-    //     },
-    // },
+    {
+        path: '/products/detail/:id',
+        name: 'ProductDetail',
+        component: ProductDetail,
+        meta: {
+            requiresAuth: true
+        },
+    },
     {
         path: '/about',
         name: 'About',

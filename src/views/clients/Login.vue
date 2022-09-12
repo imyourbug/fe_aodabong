@@ -39,7 +39,7 @@
                   />
                 </div>
                 <div class="row">
-                  <div class="col-md-12">
+                  <div class="col-md-12 block-btn">
                     <input
                       type="submit"
                       class="
@@ -63,7 +63,7 @@
                 </div>
 
                 <div class="row">
-                  <div class="col-md-12">
+                  <div class="col-md-12 block-btn">
                     <a
                       class="
                         btn btn-lg btn-google btn-block
@@ -126,7 +126,6 @@ export default {
         // save user login
         this.saveUser(googleUser);
         // Change name
-        console.log(googleUser);
         this.emitter.emit("change-name");
         this.$router.push({ path: "/home" });
       } catch (e) {
@@ -228,6 +227,7 @@ body {
   font-size: 15px;
   padding: 10px 19px;
   cursor: pointer;
+  /* transition: all 0.3s ease; */
 }
 
 .m-b-20 {
@@ -270,6 +270,10 @@ body {
 .or-label {
   flex-grow: 1;
   margin: 0 15px;
+  text-align: center;
+}
+
+.block-btn {
   text-align: center;
 }
 </style>
