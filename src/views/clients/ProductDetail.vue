@@ -1,11 +1,20 @@
 <template>
-  <div class="block-head-2">
-    <div class="head-text">
-      <a href="">Trang chủ</a> >><a href=""> Sản phẩm </a> >>
-    </div>
-  </div>
   <div class="block-content">
     <div class="container">
+      <div class="row">
+        <div class="block-head-2">
+          <div class="head-text">
+            <a href="" style="color: #ed1a29">Trang chủ</a> >><a
+              style="color: #ed1a29"
+              href=""
+            >
+              Sản phẩm
+            </a>
+            >>
+            {{ data.product.name }}
+          </div>
+        </div>
+      </div>
       <div class="row">
         <div class="col-6">
           <div class="detail-pro">
@@ -26,17 +35,70 @@
           <p class="text-1"></p>
           <form method="POST" action="/add-cart">
             <div class="block-soluong">
-              <label>Số lượng: </label>
-              <input type="button" onclick="" value="-" class="button" />
-              <input
-                class="soluong"
-                type="text"
-                value="1"
-                id="quantity"
-                readonly
-                name="quantity"
-              />
-              <input type="button" onclick="" value="+" class="button" />
+              <h3>{{ data.product.name }}</h3>
+              <div class="row">
+                <div class="col-3"><label>Trong kho:</label>&ensp;</div>
+                <div class="col-9">{{ unit_in_stock }}</div>
+              </div>
+              <br />
+              <div class="row">
+                <div class="col-3"><label>Kích cỡ</label>&ensp;</div>
+                <div class="col-9" v-if="sizes && sizes.length > 0">
+                  <label
+                    class="radio"
+                    v-for="(size, key) in sizes"
+                    v-bind:key="key"
+                    @click="show"
+                  >
+                    <input
+                      type="radio"
+                      name="size"
+                      :value="size.size"
+                      v-model="new_size"
+                    />
+                    <span>{{ size.size }}</span
+                    >&ensp;
+                  </label>
+                </div>
+              </div>
+              <br />
+              <div class="row">
+                <div class="col-3"><label>Màu sắc</label>&ensp;</div>
+                <div class="col-9" v-if="colors && colors.length > 0">
+                  <label
+                    class="radio"
+                    v-for="(color, key) in colors"
+                    v-bind:key="key"
+                    @click="show"
+                  >
+                    <input
+                      type="radio"
+                      name="color"
+                      :value="color.code_color"
+                      v-model="new_color"
+                    />
+                    <span>{{ color.name }}</span
+                    >&ensp;
+                  </label>
+                </div>
+              </div>
+              <br />
+              <div class="row">
+                <div class="col-3"><label>Số lượng: </label>&ensp;</div>
+                <div class="col-9">
+                  <input type="button" onclick="" value="-" class="button" />
+                  <input
+                    class="soluong"
+                    type="text"
+                    value="1"
+                    id="quantity"
+                    readonly
+                    name="quantity"
+                  />
+                  <input type="button" onclick="" value="+" class="button" />
+                </div>
+              </div>
+              <br />
             </div>
             <br />
             <div class="btn-giohang">
@@ -44,10 +106,8 @@
                 <i class="fas fa-cart-plus"></i>&ensp;Thêm vào giỏ
               </button>
             </div>
-            <input type="hidden" value="{{ $product->id }}" name="product_id" />
+            <input type="hidden" value="" name="product_id" />
           </form>
-
-          <a href="#" class="text-2">Liên hệ</a>
           <hr />
           <div class="text-3">
             Giá Hàng Có Sẵn: <label>80k - 120k - 160k và 220k</label>
@@ -117,28 +177,55 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
-import { ref } from "vue";
+import { reactive, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 
 const clientRepository = RepositoryFactory.get("client");
+const colorRepository = RepositoryFactory.get("color");
+const sizeRepository = RepositoryFactory.get("size");
 
-export default {
-  name: "ProductDetail",
-  setup() {
-    const product = ref([]);
+const data = ref([]);
+const sizes = ref([]);
+const colors = ref([]);
+const new_size = ref("");
+const new_color = ref("");
+const unit_in_stock = ref(0);
 
-    let id = useRouter().currentRoute.value.params.id;
+const reload = async () => {
+  // get size
+  await sizeRepository.getAllSizes().then((response) => {
+    sizes.value = response.data.sizes;
+  });
+  // get color
+  await colorRepository.getAllColors().then((response) => {
+    colors.value = response.data.colors;
+  });
+  // get detail product
+  let id = useRouter().currentRoute.value.params.id;
+  await clientRepository.getDetailProduct(id).then((response) => {
+    data.value = response.data.data;
+  });
+  // get unit in stock
+  getUnitInStock("", "", data.value.details);
+};
 
-    clientRepository.getDetailProduct(id).then((response) => {
-      product.value = response.data.data.product;
-      console.log(product);
-    });
-    return {
-      product,
-    };
-  },
+reload();
+
+const getUnitInStock = (size = "", color = "", details) => {
+  details.forEach((item) => {
+    console.log(item);
+    if (item.code_color === color && item.code_size === size) {
+      unit_in_stock.value = item.unit_in_stock;
+    } else unit_in_stock.value = 0;
+  });
+};
+//
+const show = () => {
+  console.log("Color", new_color.value, "size", new_size);
+  console.log("Size", new_size);
+  getUnitInStock(new_color.value, new_size.value, data.value.details);
 };
 </script>
 
@@ -444,54 +531,55 @@ td.txt-end {
   height: 400px;
 }
 /*  */
-.select-size,
-.select-color {
-  background-color: #fff;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  /* padding: 0 20px ; */
-  border-radius: 10px;
-}
-.select-size {
-  width: 230px;
-}
-.select-color {
-  width: max-content;
-}
-.select-size span,
-.select-color span {
-  font-size: 20px;
-  text-align: center;
-}
-.select-size .form,
-.select-color .form {
-  display: flex;
+.card {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
+  float: left;
+  font-family: "Lato", Arial, sans-serif;
+  font-size: 16px;
+  margin: 10px 1%;
+  max-width: 310px;
+  min-width: 250px;
+  overflow: hidden;
+  position: relative;
+  text-align: left;
+  width: 100%;
 }
 
-.select-size .form label,
-.select-color .form label {
-  height: 30px;
-  width: 100px;
-  border: 3px solid #d3d2d2;
-  display: block;
-  color: #dbdbdb;
-  margin-right: 5px;
-  text-align: center;
-  line-height: 29px;
-  border-radius: 4px;
+.ratings i {
+  font-size: 14px;
+  margin-right: 2px;
+}
+
+.p-description {
+  font-size: 12px;
+  margin-top: 11px;
+}
+
+label.radio {
   cursor: pointer;
-  font-weight: 800;
-  padding-bottom: 30px;
-}
-.select-size .form input,
-.select-color .form input {
-  appearance: none;
 }
 
-.select-size .form input:checked + label,
-.select-color .form input:checked + label {
-  border-color: #2a93ec;
-  color: #2a93ec;
+label.radio input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+label.radio span {
+  padding: 3px 9px;
+  border: 1px solid #8f37aa;
+  display: inline-block;
+  color: #8f37aa;
+  border-radius: 5px;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+label.radio input:checked + span {
+  border-color: #8f37aa;
+  background-color: #8f37aa;
+  color: #fff;
 }
 </style>
