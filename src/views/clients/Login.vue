@@ -1,154 +1,123 @@
 <template>
   <section class="login-block">
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-sm-12">
-          <form
-            class="md-float-material form-material"
-            action="#"
-            method="POST"
-          >
-            <div class="auth-box card">
-              <div class="card-block">
-                <div class="row">
-                  <div class="col-md-12">
-                    <h3 class="text-center heading">ĐĂNG NHẬP</h3>
-                  </div>
-                </div>
-                <div class="form-group form-primary">
-                  <input
-                    required
-                    type="text"
-                    class="form-control"
-                    name="email"
-                    placeholder="Email"
-                    id="email"
-                    v-model="email"
-                  />
-                </div>
-
-                <div class="form-group form-primary">
-                  <input
-                    required
-                    type="password"
-                    class="form-control"
-                    name="password"
-                    placeholder="Mật khẩu"
-                    id="password"
-                    v-model="password"
-                  />
-                </div>
-                <div class="row">
-                  <div class="col-md-12 block-btn">
-                    <input
-                      type="submit"
-                      class="
-                        btn btn-primary btn-md btn-block
-                        waves-effect
-                        text-center
-                        m-b-20
-                      "
-                      name="submit"
-                      value="Đăng nhập"
-                      @click="handleLogin"
-                    />
-                    <!--  <button type="button" class="btn btn-primary btn-md btn-block waves-effect text-center m-b-20"><i class="fa fa-lock"></i> Signup Now </button> -->
-                  </div>
-                </div>
-
-                <div class="or-container">
-                  <div class="line-separator"></div>
-                  <div class="or-label">or</div>
-                  <div class="line-separator"></div>
-                </div>
-
-                <div class="row">
-                  <div class="col-md-12 block-btn">
-                    <a
-                      class="
-                        btn btn-lg btn-google btn-block
-                        text-uppercase
-                        btn-outline
-                      "
-                      @click="handleSignIn"
-                      href="#"
-                      ><img
-                        src="https://img.icons8.com/color/16/000000/google-logo.png"
-                      />
-                      Đăng nhập bằng Google</a
-                    >
-                  </div>
-                </div>
-                <br />
-                <p class="text-inverse text-center">
-                  Chưa có tài khoản?
-                  <router-link to="/register">Đăng ký</router-link>
-                </p>
-              </div>
+    <div class="form-login">
+      <div class="md-float-material form-material">
+        <div class="card-block">
+          <div class="row">
+            <div class="col-md-12">
+              <h3 class="text-center heading">ĐĂNG NHẬP</h3>
             </div>
-          </form>
+          </div>
+          <div class="form-group form-primary">
+            <input
+              required
+              type="text"
+              class="form-control"
+              name="email"
+              placeholder="Email"
+              id="email"
+            />
+          </div>
+
+          <div class="form-group form-primary">
+            <input
+              required
+              type="password"
+              class="form-control"
+              name="password"
+              placeholder="Mật khẩu"
+              id="password"
+            />
+          </div>
+          <div class="row">
+            <div class="col-md-12 block-btn">
+              <input
+                type="submit"
+                class="
+                  btn btn-primary btn-md btn-block
+                  waves-effect
+                  text-center
+                  m-b-20
+                "
+                name="submit"
+                value="Đăng nhập"
+                @click="handleLogin"
+              />
+              <!--  <button type="button" class="btn btn-primary btn-md btn-block waves-effect text-center m-b-20"><i class="fa fa-lock"></i> Signup Now </button> -->
+            </div>
+          </div>
+
+          <div class="or-container">
+            <div class="line-separator"></div>
+            <div class="or-label">or</div>
+            <div class="line-separator"></div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12 block-btn">
+              <a
+                class="
+                  btn btn-lg btn-google btn-block
+                  text-uppercase
+                  btn-outline
+                "
+                @click="logInByGoogle"
+                href="#"
+                ><img
+                  src="https://img.icons8.com/color/16/000000/google-logo.png"
+                />
+                Đăng nhập bằng Google</a
+              >
+            </div>
+          </div>
+          <br />
+          <p class="text-inverse text-center">
+            Chưa có tài khoản?
+            <router-link to="/register">Đăng ký</router-link>
+          </p>
         </div>
       </div>
     </div>
   </section>
 </template>
+<script setup>
+import { inject, defineEmits } from "vue";
+import { useRouter } from "vue-router";
 
-<script>
-import { inject } from "vue";
+const router = useRouter();
 
-export default {
-  name: "Login",
-  data() {
-    return {
-      email: "",
-      password: "",
-    };
-  },
-  created() {
-    localStorage.clear();
-  },
-  setup() {
-    const Vue3GoogleOauth = inject("Vue3GoogleOauth");
+const Vue3GoogleOauth = inject("Vue3GoogleOauth");
 
-    const unSave = () => {
-      localStorage.clear();
-    };
+const emit = defineEmits(["changeCartQuantity", "change-name"]);
 
-    unSave();
-    return {
-      Vue3GoogleOauth,
-    };
-  },
-  methods: {
-    async handleSignIn() {
-      try {
-        const googleUser = await this.$gAuth.signIn();
-        // save user login
-        this.saveUser(googleUser);
-        // Change name
-        this.emitter.emit("change-name");
-        this.$router.push({ path: "/home" });
-      } catch (e) {
-        console.log(e);
-      }
-    },
-    async handleLogin() {
-      try {
-        // save user login
-        this.saveUser();
-        this.$router.push({ path: "/home" });
-      } catch (e) {
-        console.log(e);
-      }
-    },
-    saveUser(user) {
-      localStorage.setItem("id", user.getBasicProfile().getId());
-      localStorage.setItem("name", user.getBasicProfile().getName());
-      localStorage.setItem("email", user.getBasicProfile().getEmail());
-      localStorage.setItem("access_token", user.Cc.access_token);
-      localStorage.setItem("avatar_user", user.getBasicProfile().getImageUrl());
-    },
-  },
+const unSave = () => {
+  localStorage.removeItem("user");
+};
+
+const logInByGoogle = async () => {
+  try {
+    const googleUser = await Vue3GoogleOauth.instance.signIn();
+    // save user login
+    saveUser(googleUser);
+    // Change name
+    // emit("change-name");
+    router.push({ path: "/home" });
+    console.log(googleUser);
+  } catch (e) {
+    console.log(e);
+  }
+};
+const logOut = () => {};
+const saveUser = (user) => {
+  let account = [];
+  account.push({
+    id: user.getBasicProfile().getId(),
+    name: user.getBasicProfile().getName(),
+    email: user.getBasicProfile().getEmail(),
+    access_token: user.Cc.access_token,
+    url: user.getBasicProfile().getImageUrl(),
+  });
+  localStorage.setItem("user", JSON.stringify(account));
 };
 </script>
 
@@ -160,13 +129,17 @@ body {
 
 .login-block {
   margin: 30px auto;
+  display: flex;
+  justify-content: center;
 }
 
 .login-block .auth-box {
   margin: 20px auto 0;
   max-width: 450px !important;
 }
-
+.form-login {
+  width: 25%;
+}
 .card {
   border-radius: 5px;
   -webkit-box-shadow: 0 0 5px 0 rgba(43, 43, 43, 0.1),

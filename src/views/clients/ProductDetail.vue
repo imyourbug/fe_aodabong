@@ -4,14 +4,12 @@
       <div class="row">
         <div class="block-head-2">
           <div class="head-text">
-            <a href="" style="color: #ed1a29">Trang chủ</a> >><a
-              style="color: #ed1a29"
-              href=""
+            <router-link to="/home" style="color: #ed1a29"
+              >Trang chủ</router-link
             >
-              Sản phẩm
-            </a>
+            >><a style="color: #ed1a29" href=""> Sản phẩm </a>
             >>
-            {{ data.product.name }}
+            {{ data.name }}
           </div>
         </div>
       </div>
@@ -33,81 +31,87 @@
         </div>
         <div class="col-6">
           <p class="text-1"></p>
-          <form method="POST" action="/add-cart">
-            <div class="block-soluong">
-              <h3>{{ data.product.name }}</h3>
-              <div class="row">
-                <div class="col-3"><label>Trong kho:</label>&ensp;</div>
-                <div class="col-9">{{ unit_in_stock }}</div>
-              </div>
-              <br />
-              <div class="row">
-                <div class="col-3"><label>Kích cỡ</label>&ensp;</div>
-                <div class="col-9" v-if="sizes && sizes.length > 0">
-                  <label
-                    class="radio"
-                    v-for="(size, key) in sizes"
-                    v-bind:key="key"
-                    @click="show"
-                  >
-                    <input
-                      type="radio"
-                      name="size"
-                      :value="size.size"
-                      v-model="new_size"
-                    />
-                    <span>{{ size.size }}</span
-                    >&ensp;
-                  </label>
-                </div>
-              </div>
-              <br />
-              <div class="row">
-                <div class="col-3"><label>Màu sắc</label>&ensp;</div>
-                <div class="col-9" v-if="colors && colors.length > 0">
-                  <label
-                    class="radio"
-                    v-for="(color, key) in colors"
-                    v-bind:key="key"
-                    @click="show"
-                  >
-                    <input
-                      type="radio"
-                      name="color"
-                      :value="color.code_color"
-                      v-model="new_color"
-                    />
-                    <span>{{ color.name }}</span
-                    >&ensp;
-                  </label>
-                </div>
-              </div>
-              <br />
-              <div class="row">
-                <div class="col-3"><label>Số lượng: </label>&ensp;</div>
-                <div class="col-9">
-                  <input type="button" onclick="" value="-" class="button" />
+          <div class="block-soluong">
+            <h3>{{ data.name }}</h3>
+            <br />
+            <div class="row">
+              <div class="col-3"><label>Kích cỡ</label>&ensp;</div>
+              <div class="col-9" v-if="sizes && sizes.length > 0">
+                <label
+                  class="radio"
+                  v-for="(size, key) in sizes"
+                  v-bind:key="key"
+                >
                   <input
-                    class="soluong"
-                    type="text"
-                    value="1"
-                    id="quantity"
-                    readonly
-                    name="quantity"
+                    type="radio"
+                    name="size"
+                    :value="size"
+                    v-model="choice.new_size"
+                    @click="getUnitInStock"
                   />
-                  <input type="button" onclick="" value="+" class="button" />
-                </div>
+                  <span>{{ size }}</span
+                  >&ensp;
+                </label>
               </div>
-              <br />
             </div>
             <br />
-            <div class="btn-giohang">
-              <button class="giohang" type="submit" id="add">
-                <i class="fas fa-cart-plus"></i>&ensp;Thêm vào giỏ
-              </button>
+            <div class="row">
+              <div class="col-3"><label>Màu sắc</label>&ensp;</div>
+              <div class="col-9" v-if="colors && colors.length > 0">
+                <label
+                  class="radio"
+                  v-for="(color, key) in colors"
+                  v-bind:key="key"
+                >
+                  <input
+                    type="radio"
+                    name="color"
+                    :value="color"
+                    v-model="choice.new_color"
+                    @click="getUnitInStock"
+                  />
+                  <span>{{ getNameByHexColor(color.toString()) }}</span
+                  >&ensp;
+                </label>
+              </div>
             </div>
-            <input type="hidden" value="" name="product_id" />
-          </form>
+            <br />
+            <div class="row">
+              <div class="col-3"><label>Số lượng: </label>&ensp;</div>
+              <div class="col-9">
+                <input
+                  type="button"
+                  @click="decreaseQuantity"
+                  value="-"
+                  class="button"
+                />
+                <input
+                  class="soluong"
+                  type="text"
+                  :value="choice.quantity"
+                  id="quantity"
+                  readonly
+                  name="quantity"
+                />
+                <input
+                  type="button"
+                  @click="increaseQuantity"
+                  value="+"
+                  class="button"
+                />
+                &ensp;
+                <label>{{ unit_in_stock }} sản phẩm có sẵn</label>
+              </div>
+            </div>
+            <br />
+            <div>
+              <button class="giohang" id="add" @click="addProductToCard">
+                <i class="fas fa-cart-plus"></i>&ensp;Thêm vào giỏ</button
+              >&emsp;
+              <button class="giohang" id="add" @click="buyNow">Mua ngay</button
+              >&emsp;
+            </div>
+          </div>
           <hr />
           <div class="text-3">
             Giá Hàng Có Sẵn: <label>80k - 120k - 160k và 220k</label>
@@ -179,61 +183,159 @@
 
 <script setup>
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
-import { reactive, ref } from "vue";
+import { defineEmits, reactive, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import ntc from "ntc-hi-js";
 
 const clientRepository = RepositoryFactory.get("client");
-const colorRepository = RepositoryFactory.get("color");
-const sizeRepository = RepositoryFactory.get("size");
+const router = useRouter();
+const emit = defineEmits(["changeCartQuantity"]);
 
+const id_product = router.currentRoute.value.params.id;
 const data = ref([]);
 const sizes = ref([]);
 const colors = ref([]);
-const new_size = ref("");
-const new_color = ref("");
 const unit_in_stock = ref(0);
+const choice = reactive({
+  new_size: "",
+  new_color: "",
+  quantity: unit_in_stock.value === 0 ? 0 : 1,
+});
+
+// get name color
+const getNameByHexColor = (hexCode) => {
+  return ntc.name(hexCode, "en").color.name;
+};
 
 const reload = async () => {
-  // get size
-  await sizeRepository.getAllSizes().then((response) => {
-    sizes.value = response.data.sizes;
-  });
-  // get color
-  await colorRepository.getAllColors().then((response) => {
-    colors.value = response.data.colors;
-  });
   // get detail product
-  let id = useRouter().currentRoute.value.params.id;
-  await clientRepository.getDetailProduct(id).then((response) => {
-    data.value = response.data.data;
+  await clientRepository.getDetailProduct(id_product).then((response) => {
+    data.value = response.data.data.product;
+    console.log(data.value);
   });
+  // get sizes and colors
+  let size = [];
+  let color = [];
+  data.value.product_details.forEach((item) => {
+    size.push(item.code_size);
+    color.push(item.code_color);
+  });
+  sizes.value = size.filter((v, i, a) => a.indexOf(v) === i);
+  colors.value = color.filter((v, i, a) => a.indexOf(v) === i);
   // get unit in stock
-  getUnitInStock("", "", data.value.details);
+  getUnitInStock();
 };
 
 reload();
 
-const getUnitInStock = (size = "", color = "", details) => {
-  details.forEach((item) => {
-    console.log(item);
-    if (item.code_color === color && item.code_size === size) {
-      unit_in_stock.value = item.unit_in_stock;
-    } else unit_in_stock.value = 0;
+// get unit in stock
+const getUnitInStock = () => {
+  console.log("color", choice.new_color);
+  console.log("size", choice.new_size);
+  choice.quantity = 1;
+  let correctItem;
+  data.value.product_details.forEach((item) => {
+    if (
+      item.code_color === choice.new_color &&
+      item.code_size === choice.new_size
+    ) {
+      correctItem = item;
+    }
   });
+  if (correctItem) {
+    unit_in_stock.value = correctItem.unit_in_stock;
+  } else unit_in_stock.value = 0;
+  // console.log(unit_in_stock.value);
 };
-//
-const show = () => {
-  console.log("Color", new_color.value, "size", new_size);
-  console.log("Size", new_size);
-  getUnitInStock(new_color.value, new_size.value, data.value.details);
+// decrease quantity
+const decreaseQuantity = () => {
+  if (unit_in_stock.value > 0 && choice.quantity > 1) {
+    choice.quantity--;
+  }
+};
+// increase quantity
+const increaseQuantity = () => {
+  if (unit_in_stock.value > 0 && choice.quantity < unit_in_stock.value) {
+    choice.quantity++;
+  }
+};
+// add product to carts
+const addProductToCard = () => {
+  if (!choice.new_size || !choice.new_color) {
+    alert("Chưa chọn đủ thông tin sản phẩm");
+    return false;
+  }
+  if (unit_in_stock.value === 0) {
+    alert("Sản phẩm đã hết");
+    return false;
+  }
+  // get carts in localStorage
+  let carts = [];
+  let count = 0;
+  if (localStorage.getItem("carts")) {
+    carts = JSON.parse(localStorage.getItem("carts"));
+    console.log(carts);
+  }
+  // update quantity if exists product in carts
+  if (carts.length > 0) {
+    carts.forEach((item) => {
+      if (
+        item.id_product == id_product &&
+        item.code_color === choice.new_color &&
+        item.code_size === choice.new_size
+      ) {
+        count++;
+        if (item.quantity + choice.quantity <= unit_in_stock.value) {
+          item.quantity += choice.quantity;
+          alert("Thêm sản phẩm vào giỏ hàng thành công");
+        } else {
+          alert("Sản phẩm trong giỏ hàng đã đạt số lượng tối đa");
+          return false;
+        }
+      }
+    });
+  }
+  //
+  if (count === 0) {
+    carts.push({
+      id_product: id_product,
+      code_color: choice.new_color,
+      code_size: choice.new_size,
+      quantity: choice.quantity,
+      thumb: data.value.thumb,
+    });
+    alert("Thêm sản phẩm vào giỏ hàng thành công");
+  }
+  localStorage.setItem("carts", JSON.stringify(carts));
+  // emit send cart quantity
+  emit("changeCartQuantity", carts.length);
+
+  return true;
+};
+// buy now
+const buyNow = () => {
+  if (addProductToCard());
+  {
+    router.push({
+      path: "/carts",
+    });
+  }
+};
+// remove product from carts
+const removeProduct = (id) => {
+  let storageProducts = JSON.parse(localStorage.getItem("carts"));
+  let products = storageProducts.filter((product) => product.id !== id);
+  localStorage.setItem("carts", JSON.stringify(products));
 };
 </script>
 
-<style>
+<style scoped>
+a {
+  text-decoration: none;
+}
 .block-head-2 {
-  background-color: rgb(246, 249, 252);
   align-items: center;
-  padding: 10px 0px 10px 80px;
+  padding: 10px 0px 0px 10px;
 }
 
 .block-head-2 a {
@@ -243,10 +345,12 @@ const show = () => {
 .block-head-2 a:hover {
   text-decoration: underline;
 }
-
+.head-text {
+  padding: 15px 0px;
+}
 /* .block-content */
 .block-content {
-  margin: 30px 80px 0px 80px;
+  margin: 0 10%;
   box-shadow: 0px 4px 8px 0px rgb(207, 200, 200);
 }
 
@@ -282,25 +386,23 @@ const show = () => {
   margin-left: 15%;
 }
 
-.btn-giohang .giohang {
+.giohang {
   color: white;
   background-color: #2e3094;
   padding: 5px 10px 5px 10px;
   border-radius: 5px;
-  margin-left: 15%;
   border: none;
 }
 
-.btn-giohang .giohang:hover {
+.giohang:hover {
   background-color: #ed1a29;
 }
 
-.btn-giohang p.thongbao {
+p.thongbao {
   margin-left: 15%;
   font-size: 20px;
   font-weight: bold;
 }
-
 .text-1 {
   font-weight: bold;
   font-size: 25px;

@@ -24,7 +24,10 @@
         <router-link class="btn-login" to="/login" v-if="!isLogged"
           >Đăng nhập</router-link
         >
-        <i class="fa-solid fa-bell nav-icon" v-if="isLogged"></i>&emsp;
+        <router-link to="/carts" v-if="isLogged"
+          ><i class="fa-solid fa-cart-shopping"></i
+          ><sup class="cart-quantity">{{ carts.length }}</sup></router-link
+        >&emsp; <i class="fa-solid fa-bell nav-icon" v-if="isLogged"></i>&emsp;
         <a
           href="#"
           @click.prevent="handleSignOut"
@@ -36,22 +39,25 @@
     </div>
   </div>
 </template>
-
+<!-- 
 <script>
 export default {
   name: "Navbar",
   data() {
     return {
-      user_name: "",
       avatar_user: "",
       isLogged: false,
       key_word: "",
+      carts: [],
     };
   },
   created() {
     this.reload();
   },
   mounted() {
+    // this.emitter.on("changeQuantit", () => {
+    //   this.reload();
+    // });
     this.emitter.on("change-name", () => {
       this.reload();
     });
@@ -62,7 +68,6 @@ export default {
         await this.$gAuth.signOut();
         this.unSaveUser();
         this.isLogged = false;
-        this.user_name = "";
 
         this.$router.push({ path: "/login" });
       } catch (error) {
@@ -86,32 +91,88 @@ export default {
       this.isLogged = localStorage.name ? true : false;
       this.user_name = localStorage.name ?? "";
       this.avatar_user = localStorage.avatar_user ?? "";
+      this.carts = JSON.parse(localStorage.getItem("carts")) ?? [];
     },
   },
 };
+</script> -->
+
+<script setup>
+import {
+  ref,
+  onMounted,
+  defineEmits,
+  inject,
+  onActivated,
+  onBeforeMount,
+} from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+const Vue3GoogleOauth = inject("Vue3GoogleOauth");
+
+const emit = defineEmits(["search-video"]);
+
+const avatar_user = ref("");
+const isLogged = ref(false);
+const key_word = ref("");
+const carts = ref([]);
+const handleSignOut = async () => {
+  try {
+    await Vue3GoogleOauth.instance.signOut();
+    unSaveUser();
+    isLogged.value = false;
+
+    router.push({ path: "/login" });
+  } catch (error) {
+    console.log(error);
+  }
+};
+const unSaveUser = () => {
+  localStorage.removeItem("user");
+};
+const searchVideo = () => {
+  if (key_word.value.trim()) {
+    // Send key_word to ListVideo component
+    emit("search-video", key_word.value);
+
+    router.push({
+      path: `/videos/search/${key_word.value}`,
+    });
+  }
+};
+const reload = () => {
+  isLogged.value = JSON.parse(localStorage.getItem("user")) ? true : false;
+  carts.value = JSON.parse(localStorage.getItem("carts")) ?? [];
+  if (isLogged.value) {
+    avatar_user.value = JSON.parse(localStorage.getItem("user"))[0].url ?? "";
+  }
+};
+
+onMounted(() => {
+  emit("change-name", () => {
+    reload();
+  });
+  console.log("run emit");
+});
+
+reload();
+
+const mounted = () => {};
 </script>
 
-<style>
+<style scoped>
 a {
   text-decoration: none !important;
+  color: black;
 }
-a.text-menu-header {
-  color: whitesmoke !important;
-}
-a.text-menu-header:hover {
-  color: green !important;
+a:hover {
+  color: black;
 }
 .menu-header {
   padding: 2% 2%;
   text-align: center;
   border-bottom: 1px solid rgb(233, 227, 227);
-}
-.navbar-block-right {
-  float: right;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  justify-content: center;
 }
 .logo {
   width: 200px;
@@ -120,9 +181,8 @@ a.text-menu-header:hover {
   padding-top: 10px;
 }
 .block-user {
-  padding-top: 15px;
+  padding-top: 10px;
 }
-a.txt-user-name,
 .btn-login,
 .btn-logout {
   color: black;
@@ -133,6 +193,12 @@ a.txt-user-name,
   border-radius: 50%;
 }
 .nav-icon {
-  font-size: 20px;
+  font-size: 22px;
+}
+sup.cart-quantity {
+  color: #ed1a29;
+  border-radius: 50%;
+  padding: 1px 4px;
+  font-size: 14px;
 }
 </style>

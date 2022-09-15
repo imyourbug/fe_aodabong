@@ -4,6 +4,7 @@ import Login from "@/views/clients/Login.vue";
 import About from "@/views/clients/About.vue";
 import Home from "@/views/clients/Home.vue";
 import ProductDetail from "@/views/clients/ProductDetail.vue";
+import Cart from "@/views/clients/Cart.vue";
 import Register from "@/views/clients/Register.vue";
 
 const routes = [
@@ -19,6 +20,14 @@ const routes = [
         path: '/products/detail/:id',
         name: 'ProductDetail',
         component: ProductDetail,
+        meta: {
+            requiresAuth: true
+        },
+    },
+    {
+        path: '/carts',
+        name: 'Cart',
+        component: Cart,
         meta: {
             requiresAuth: true
         },
@@ -45,7 +54,7 @@ const router = createRouter({ history: createWebHistory(), routes });
 // Middleware
 router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth)) {
-        if (!localStorage.getItem('email')) {
+        if (!localStorage.getItem('user')) {
             next('/login');
         } else {
             next();

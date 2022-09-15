@@ -5,7 +5,6 @@
 </template>
 
 <script>
-import Login from "@/views/clients/Login.vue";
 import Navbar from "@/views/clients/Navbar.vue";
 import About from "@/views/clients/About.vue";
 import Home from "@/views/clients/Home.vue";
@@ -17,7 +16,6 @@ export default {
   name: "App",
   components: {
     Navbar,
-    Login,
     About,
     Home,
     Error,
