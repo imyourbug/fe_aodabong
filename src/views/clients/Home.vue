@@ -27,17 +27,24 @@
               v-for="(product, key) in group.products"
               v-bind:key="key"
             >
-              <div class="block-product" @click="detailProduct(product.id)">
-                <a> <img src="@/assets/khai.png" /></a>
-                <a>
-                  <p>{{ product.name }}</p>
-                </a>
-                {{ product.price_sale ?? product.price }}
-                <br />
-                <br />
-                <a class="detail"> Chi tiết</a>
-                <br />&ensp;
-              </div>
+              <router-link :to="`/products/detail/${product.id}`">
+                <div class="block-product">
+                  <a> <img src="@/assets/khai.png" /></a>
+                  <a>
+                    <p>{{ product.name }}</p>
+                  </a>
+                  {{ formatCash(product.price_sale ?? product.price) }}đ
+                  <sup v-if="product.price_sale"
+                    ><small style="text-decoration: line-through; opacity: 0.6"
+                      >{{ formatCash(product.price) }}đ</small
+                    ></sup
+                  >
+                  <br />
+                  <br />
+                  <a class="detail"> Chi tiết</a>
+                  <br />&ensp;
+                </div>
+              </router-link>
             </div>
           </div>
         </div>
@@ -47,72 +54,61 @@
   </main>
 </template>
 
-<script>
+<script setup>
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
 import { ref } from "vue";
 
 const clientRepository = RepositoryFactory.get("client");
 
-export default {
-  name: "Home",
-  setup() {
-    const groups = ref([]);
-    clientRepository
-      .getAllProductGroup()
-      .then((response) => {
-        groups.value = response.data.data;
-        console.log(groups);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+const groups = ref([]);
+const reload = () => {
+  clientRepository
+    .getAllProductGroup()
+    .then((response) => {
+      groups.value = response.data.data;
+      console.log(groups);
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+};
 
-    return {
-      groups,
-    };
-  },
-  methods: {
-    displayPrice(price, price_sale) {
-      if (price_sale != 0) {
-        return (
-          "Giá: " +
-          this.formatCash(price) +
-          'đ&ensp;< sup style = "text-decoration: line-through; opacity:0.6" > ' +
-          this.formatCash(price_sale) +
-          "đ</sup>"
-        );
-      }
-      return "Giá: " + price + "đ";
-    },
+reload();
 
-    formatCash(str) {
-      return str
-        .toString()
-        .split("")
-        .reverse()
-        .reduce((prev, next, index) => {
-          return (index % 3 ? next : next + ".") + prev;
-        });
-    },
+const formatCash = (str) => {
+  return str
+    .toString()
+    .split("")
+    .reverse()
+    .reduce((prev, next, index) => {
+      return (index % 3 ? next : next + ".") + prev;
+    });
+};
 
-    detailProduct(id) {
-      this.$router.push({
-        path: "/products/detail/" + id,
-        params: {
-          id: id,
-        },
-      });
+const detailProduct = (id) => {
+  this.$router.push({
+    path: "/products/detail/" + id,
+    params: {
+      id: id,
     },
-    groupProduct(id) {
-      this.$router.push({
-        path: "/categories/" + id,
-      });
-    },
-  },
+  });
+};
+const groupProduct = (id) => {
+  this.$router.push({
+    path: "/categories/" + id,
+  });
 };
 </script>
 
-<style>
+<style scoped>
+a {
+  text-decoration: none;
+}
+
+.album {
+  margin: 0px 145px;
+}
+
 .block-text-1 {
   border-bottom: 1px solid #ed1a29;
   display: flex;

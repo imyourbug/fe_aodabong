@@ -1,7 +1,7 @@
 import Repository from '@/api/repositories/Repository';
 
 const baseDomain = 'http://localhost:8000';
-const baseUrl = `${baseDomain}/api/users`;
+const baseUrl = `${baseDomain}/api/clients`;
 
 // const access_token = localStorage.getItem('access_token') ?? '';
 
@@ -11,5 +11,8 @@ export default {
     },
     getDetailProduct(id) {
         return Repository.get(`${baseUrl}/product/${id}`);
+    },
+    getAllDetailProduct() {
+        return Repository.get(`${baseUrl}/details/list`);
     },
 }

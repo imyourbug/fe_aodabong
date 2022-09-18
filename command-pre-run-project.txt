@@ -9,3 +9,5 @@ npm i --save mitt
 npm i --save url-loader
 //name that color
 npm i ntc-hi-js
+npm i vue3-select2-component --save
+npm i vue-toasted --save

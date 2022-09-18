@@ -37,59 +37,45 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "Footer",
-};
+<script setup>
 </script>
 
-<style>
+<style scoped>
 a {
   text-decoration: none;
 }
 .block-about {
   color: white;
   background-image: linear-gradient(to right, rgb(6, 46, 122), rgb(51, 1, 116));
-  padding: 80px;
+  padding: 80px 155px;
   text-align: left;
 }
-/* .in-about {
-    justify-content: space-between;
-    display: flex;
-    color: white;
-}
-.in-about a {
-    color: white;
-}
-.in-about a:hover {
-    text-decoration: underline;
-}*/
 div .text-head {
-    font-size: 22px;
-    text-align: center;
+  font-size: 22px;
+  text-align: center;
 }
 .list-mxh {
-    text-align: center;
+  text-align: center;
 }
 .list-mxh .fab {
-    border-radius: 50%;
-    font-size: 40px;
-    padding: 10px;
-    color: white;
+  border-radius: 50%;
+  font-size: 40px;
+  padding: 10px;
+  color: white;
 }
 .list-mxh .fab:hover {
-    transition: 0.6s;
-    box-shadow: 1px 1px 1px 1px white;
+  transition: 0.6s;
+  box-shadow: 1px 1px 1px 1px white;
 }
 .about-mid ul {
-    padding-left: 18px;
+  padding-left: 18px;
 }
 .block-end {
-    background-color: #393a44;
+  background-color: #393a44;
 }
 .block-end .end-text {
-    text-align: center;
-    color: rgb(150, 140, 140);
-    padding: 5px 0px 5px 0px;
-} 
+  text-align: center;
+  color: rgb(150, 140, 140);
+  padding: 5px 0px 5px 0px;
+}
 </style>

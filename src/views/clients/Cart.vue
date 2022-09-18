@@ -14,100 +14,95 @@
             BẠN
           </div>
         </div>
-        <table cellspacing="0" class="table-product">
+        <table
+          cellspacing="0"
+          class="table-product"
+          v-if="carts && carts.length > 0"
+        >
           <thead class="tbl-text-head">
             <tr>
               <th>Sản phẩm</th>
               <th>Đơn giá</th>
+              <th>Size</th>
+              <th>Màu</th>
               <th>Số lượng</th>
               <th>Thành tiền</th>
               <th>Thao tác</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td class="col-img"><img src="" /></td>
+            <tr v-for="(product, key) in carts" v-bind:key="key">
+              <td class="col-img">
+                <img :src="product.thumb" />&emsp; {{ product.name }}
+              </td>
               <td class="col-dongia">
-                <input
-                  type="text"
-                  value=""
-                  id="dongia"
-                  class="money"
-                  readonly="readonly"
-                />
+                {{ formatCash(product.unit_price) }}<sup>đ</sup>
+              </td>
+              <td class="col-size">
+                {{ product.code_size }}
+              </td>
+              <td class="col-color">
+                {{ getNameByHexColor(product.code_color) }}
               </td>
               <td class="col-soluong">
-                <input type="button" onclick="" value="-" class="button" />
                 <input
-                  class="soluong"
-                  type="text"
-                  value=""
-                  id=""
-                  name=""
-                  readonly
+                  @click="decreaseQuantity(product.id_detail, product.quantity)"
+                  type="button"
+                  value="-"
+                  class="button"
                 />
-                <input type="button" onclick="" value="+" class="button" />
+                {{ product.quantity }}
+                <input
+                  @click="increaseQuantity(product.id_detail, product.quantity)"
+                  type="button"
+                  value="+"
+                  class="button"
+                />
               </td>
               <td class="col-thanhtien">
-                <input type="text" value="" id="" class="money" readonly />
-                <input type="hidden" value="0" id="money" readonly />
+                {{ formatCash(product.unit_price * product.quantity)
+                }}<sup>đ</sup>
               </td>
               <td class="col-thaotac">
                 <div class="in-thaotac">
-                  <a
-                    onclick="return confirm('Bạn có muốn xóa?')"
-                    href=""
+                  <button class="delete-product">
+                    <i
+                      @click="removeProduct(product.id_detail)"
+                      class="fas fa-trash-alt"
+                    ></i>
+                  </button>
+                  &emsp;
+                  <router-link
+                    :to="`/products/detail/${product.id_product}`"
                     class="info-product"
                   >
-                    <i style="color: #ed1a29" class="fas fa-trash-alt"></i> </a
-                  >&emsp;
-                  <a href="" class="info-product">
                     <i class="fas fa-info-circle"></i>
-                  </a>
+                  </router-link>
                 </div>
               </td>
             </tr>
             <tr style="border: none">
-              <td colspan="4" style="text-align: right; padding: 10px 0px">
-                <input
-                  class="btn-update"
-                  type="submit"
-                  value="Cập nhật"
-                  formaction="/update-cart"
-                />
-              </td>
-            </tr>
-            <tr style="border: none">
-              <td colspan="5">
+              <td colspan="6">
                 <div class="total">
-                  Tổng tiền:
-                  <input
-                    type="text"
-                    value=""
-                    id="tongtien"
-                    class="tongtien"
-                    readonly="readonly"
-                    name="tongtien"
-                  />
+                  Tổng tiền: {{ formatCash(totalMoney()) }}<sup>đ</sup>
                 </div>
               </td>
             </tr>
           </tbody>
         </table>
-        <div class="row-end-money">
+        <div class="row-end-money" v-else>
           <span>Giỏ hàng hiện chưa có sản phẩm nào :(</span>
-          <input type="hidden" name="tongtien" />
         </div>
       </div>
       <br />
       <div class="button-home">
-        <a class="btn-home" href="/">
+        <router-link class="btn-home" to="/home">
           <i class="fas fa-arrow-left"></i> Tiếp tục mua hàng
-        </a>
+        </router-link>
       </div>
       <br />
     </div>
-    <div class="content-bot">
+    <div class="content-bot" v-if="carts && carts.length > 0">
       <div class="out-texthead">
         <div class="text-head">
           <i class="fas fa-dolly-flatbed"></i>&ensp;THÔNG TIN GIAO HÀNG
@@ -174,31 +169,42 @@
             <tr>
               <td><label>Voucher</label></td>
               <td class="col-voucher">
-                <select
-                  onchange=""
-                  id="select"
-                  class="select2"
-                  style="width: 100%"
-                >
-                  <option value="">Không</option>
-                  <option value=""></option>
-                </select>
+                <Select2
+                  v-model="voucher"
+                  :options="vouchers"
+                  :settings="{ settingOption: value, settingOption: value }"
+                  @select="selectVoucher($event)"
+                />
+                <h4>{{ value }}</h4>
               </td>
             </tr>
             <tr>
               <td>Phí vận chuyển</td>
-              <td class="col-infor2">30.000đ</td>
+              <td class="col-infor2">30.000<sup>đ</sup></td>
             </tr>
             <tr>
               <td>Mã giảm giá</td>
               <td class="col-infor2">
-                <input readonly value="0" id="discount" />đ
+                {{
+                  voucherSelected.discount
+                    ? formatCash(
+                        (voucherSelected.discount / 100) * totalMoney()
+                      )
+                    : 0
+                }}<sup>đ</sup>
               </td>
             </tr>
             <tr class="tongtien">
               <td><label>Tổng thanh toán</label></td>
               <td class="col-infor2">
-                <input readonly value="0" id="total" />đ
+                {{
+                  voucherSelected.discount
+                    ? formatCash(
+                        (1 - voucherSelected.discount / 100) * totalMoney() +
+                          30000
+                      )
+                    : 0
+                }}<sup>đ</sup>
               </td>
             </tr>
           </table>
@@ -310,16 +316,132 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import ntc from "ntc-hi-js";
+import Select2 from "vue3-select2-component";
+import { ref, inject } from "vue";
+import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
+
+// const toasted = inject("Toasted");
+
+const clientRepository = RepositoryFactory.get("client");
+const voucherRepository = RepositoryFactory.get("voucher");
 
 const carts = ref([]);
+const data = ref([]);
+const vouchers = ref([]);
+const voucherSelected = ref([]);
 
-const reload = () => {
-  carts.value = JSON.parse(localStorage.getItem("carts") ?? []);
-  console.log(carts.value);
+// const changeVoucher = (voucher) => {
+//   console.log(voucher);
+// };
+const selectVoucher = (voucher) => {
+  voucherSelected.value = voucher;
+  console.log(voucherSelected.value);
+};
+
+const reload = async () => {
+  await clientRepository.getAllDetailProduct().then((response) => {
+    data.value = response.data.data;
+  });
+  //
+  await voucherRepository.getAllVouchers().then((response) => {
+    let data = [];
+    response.data.data.forEach((item) => {
+      data.push({
+        // text is require to show value in screen
+        // id is require to select an option
+        id: item.id,
+        text: item.name,
+        discount: item.discount,
+      });
+    });
+    vouchers.value = data;
+  });
+  //
+  carts.value = JSON.parse(localStorage.getItem("carts"));
 };
 
 reload();
+
+// decrease quantity
+const decreaseQuantity = (id_detail, quantity) => {
+  if (quantity > 1) {
+    carts.value.forEach((item) => {
+      if (item.id_detail === id_detail) {
+        item.quantity -= 1;
+      }
+    });
+  } else {
+    if (confirm("Bạn muốn xóa sản phẩm này khỏi giỏ hàng?")) {
+      removeProduct(id_detail);
+      return;
+    }
+  }
+  localStorage.setItem("carts", JSON.stringify(carts.value));
+  reload();
+};
+
+// increase quantity
+const increaseQuantity = (id_detail, quantity) => {
+  if (quantity < getQuantity(id_detail)) {
+    carts.value.forEach((item) => {
+      if (item.id_detail === id_detail) {
+        item.quantity += 1;
+      }
+    });
+  } else {
+    alert("Bạn đã đạt mức tối đa số lượng sản phẩm này");
+    // toasted.error("Bạn đã đạt mức tối đa số lượng sản phẩm này");
+  }
+  localStorage.setItem("carts", JSON.stringify(carts.value));
+  reload();
+};
+
+// get name color
+const getNameByHexColor = (hexCode) => {
+  return ntc.name(hexCode, "en").color.name;
+};
+
+// get quantity by id_detail
+const getQuantity = (id_detail) => {
+  let unit_in_stock = 0;
+  data.value.forEach((item) => {
+    if (item.id === id_detail) {
+      unit_in_stock = item.unit_in_stock;
+    }
+  });
+
+  return unit_in_stock;
+};
+
+// total money
+const totalMoney = () => {
+  let total = 0;
+  carts.value.forEach((item) => {
+    total += item.quantity * item.unit_price;
+  });
+  return total;
+};
+
+// format cash
+const formatCash = (str) => {
+  return str
+    .toString()
+    .split("")
+    .reverse()
+    .reduce((prev, next, index) => {
+      return (index % 3 ? next : next + ".") + prev;
+    });
+};
+
+// remove product from carts
+const removeProduct = (id) => {
+  let storageProducts = JSON.parse(localStorage.getItem("carts"));
+  let products = storageProducts.filter((product) => product.id_detail !== id);
+  localStorage.setItem("carts", JSON.stringify(products));
+
+  reload();
+};
 </script>
 
 <style scoped>
@@ -372,7 +494,6 @@ td img {
   height: 80px;
   padding: 10px;
 }
-.col-dongia,
 .col-thaotac {
   width: 320px;
   align-items: center;
@@ -387,18 +508,27 @@ td img {
   width: 320px;
   padding-left: 30px;
 }
-.col-soluong,
-.col-thanhtien {
+.col-thanhtien,
+.col-dongia {
   width: 230px;
-  text-align: center;
+  text-align: right;
+  padding-right: 50px;
+}
+.col-soluong,
+.col-color {
+  width: 200px;
+  text-align: left;
+  padding-left: 40px;
+}
+.col-voucher {
+  width: 80%;
 }
 td .button,
 td button {
   border: none;
   background-color: #ed1a29;
   color: white;
-  width: 30px;
-  height: 30px;
+  padding: 0px 12px;
   border-radius: 5px;
   font-size: 20px;
 }
@@ -415,9 +545,14 @@ td button {
   padding: 40px 0px;
 }
 
+button.delete-product {
+  padding: 0px 8px;
+  background-color: #ed1a29;
+  color: white;
+}
 a.info-product {
   color: #2e3094;
-  font-size: 25px;
+  font-size: 30px;
 }
 /*  */
 .total {
@@ -449,19 +584,20 @@ a.info-product {
   display: flex;
   justify-content: space-between;
 }
-.out-texthead .text-head {
+.text-head {
   font-size: 20px;
   padding: 5px 0px 5px 10px;
   background-color: #ed1a29;
   width: 40%;
   color: white;
+  text-align: left;
 }
 /* content-bot */
 .information {
   padding-left: 10px;
 }
 .information .text-hint {
-  padding: 15px 0px 15px 0px;
+  padding: 25px 0px 15px 0px;
 }
 .information input {
   padding-left: 10px;
@@ -570,4 +706,4 @@ textarea {
   text-align: right;
   font-weight: bold;
 }
-</style>>
+</style>
