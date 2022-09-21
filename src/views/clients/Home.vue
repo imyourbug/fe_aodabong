@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <main v-if="groups && groups.length > 0">
     <div class="group-product" v-for="(group, key) in groups" v-bind:key="key">
       <div
         class="album bg-light"
@@ -27,18 +27,18 @@
               v-for="(product, key) in group.products"
               v-bind:key="key"
             >
-              <router-link :to="`/products/detail/${product.id}`">
+              <router-link :to="`/products/detail/${product.product.id}`">
                 <div class="block-product">
                   <a> <img src="@/assets/khai.png" /></a>
                   <a>
                     <p>{{ product.name }}</p>
                   </a>
-                  {{ formatCash(product.price_sale ?? product.price) }}đ
-                  <sup v-if="product.price_sale"
-                    ><small style="text-decoration: line-through; opacity: 0.6"
-                      >{{ formatCash(product.price) }}đ</small
-                    ></sup
-                  >
+                  {{ formatCash(product.min_price) }}đ
+                  {{
+                    product.max_price > product.min_price
+                      ? ` - ${product.max_price}đ`
+                      : ""
+                  }}
                   <br />
                   <br />
                   <a class="detail"> Chi tiết</a>
@@ -66,7 +66,7 @@ const reload = () => {
     .getAllProductGroup()
     .then((response) => {
       groups.value = response.data.data;
-      console.log(groups);
+      console.log(groups.value);
     })
     .catch((e) => {
       console.log(e);

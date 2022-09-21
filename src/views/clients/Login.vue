@@ -81,14 +81,13 @@
   </section>
 </template>
 <script setup>
-import { inject, defineEmits } from "vue";
+import { inject } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
+const emitter = inject("emitter");
 
 const Vue3GoogleOauth = inject("Vue3GoogleOauth");
-
-const emit = defineEmits(["changeCartQuantity", "change-name"]);
 
 const unSave = () => {
   localStorage.removeItem("user");
@@ -100,9 +99,9 @@ const logInByGoogle = async () => {
     // save user login
     saveUser(googleUser);
     // Change name
-    // emit("change-name");
+    emitter.emit("changeName");
+    //
     router.push({ path: "/home" });
-    console.log(googleUser);
   } catch (e) {
     console.log(e);
   }

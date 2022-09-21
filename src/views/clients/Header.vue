@@ -53,25 +53,27 @@
 </template>
 
 <script setup>
-import {
-  ref,
-  onMounted,
-  defineEmits,
-  inject,
-  onActivated,
-  onBeforeMount,
-} from "vue";
+import { ref, inject } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
 const Vue3GoogleOauth = inject("Vue3GoogleOauth");
-
-const emit = defineEmits(["search-video"]);
+const emitter = inject("emitter");
 
 const avatar_user = ref("");
 const isLogged = ref(false);
 const key_word = ref("");
 const carts = ref([]);
+
+emitter.on("changeName", () => {
+  reload();
+});
+
+emitter.on("changeQuantity", () => {
+  console.log("run change quantity");
+  reload();
+});
+
 const handleSignOut = async () => {
   try {
     await Vue3GoogleOauth.instance.signOut();
@@ -90,7 +92,7 @@ const unSaveUser = () => {
 const searchVideo = () => {
   if (key_word.value.trim()) {
     // Send key_word to ListVideo component
-    emit("search-video", key_word.value);
+    emitter.emit("search-video", key_word.value);
 
     router.push({
       path: `/videos/search/${key_word.value}`,
@@ -105,16 +107,7 @@ const reload = () => {
   }
 };
 
-onMounted(() => {
-  emit("change-name", () => {
-    reload();
-  });
-  console.log("run emit");
-});
-
 reload();
-
-const mounted = () => {};
 </script>
 
 <style scoped>
@@ -149,7 +142,7 @@ a:hover {
   padding: 0px 15px 0px 15px;
 }
 .menu-header {
-  padding: 0% 1% 1% 1%;
+  padding: 0 15px 15px 15px;
   text-align: center;
   border-bottom: 1px solid rgb(233, 227, 227);
 }

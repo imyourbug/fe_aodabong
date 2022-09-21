@@ -1,132 +1,135 @@
 <template>
   <section class="login-block">
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-sm-12">
-          <form
-            class="md-float-material form-material"
-            action="#"
-            method="POST"
-          >
-            <div class="auth-box card">
-              <div class="card-block">
-                <div class="row">
-                  <div class="col-md-12">
-                    <h3 class="text-center heading">ĐĂNG KÝ</h3>
-                  </div>
-                </div>
-                <div class="form-group form-primary">
-                  <input
-                    required
-                    type="text"
-                    class="form-control"
-                    name="email"
-                    value=""
-                    placeholder="Email"
-                    id="email"
-                  />
-                </div>
-
-                <div class="form-group form-primary">
-                  <input
-                    required
-                    type="password"
-                    class="form-control"
-                    name="password"
-                    placeholder="Mật khẩu"
-                    value=""
-                    id="password"
-                  />
-                </div>
-
-                <div class="form-group form-primary">
-                  <input
-                    required
-                    type="text"
-                    class="form-control"
-                    name="re_password"
-                    value=""
-                    placeholder="Nhập lại mật khẩu"
-                    id="re_password"
-                  />
-                </div>
-                <div class="row">
-                  <div class="col-md-12">
-                    <input
-                      type="submit"
-                      class="
-                        btn btn-primary btn-md btn-block
-                        waves-effect
-                        text-center
-                        m-b-20
-                      "
-                      name="submit"
-                      value="Đăng ký"
-                    />
-                    <!--  <button type="button" class="btn btn-primary btn-md btn-block waves-effect text-center m-b-20"><i class="fa fa-lock"></i> Signup Now </button> -->
-                  </div>
-                </div>
-
-                <div class="or-container">
-                  <div class="line-separator"></div>
-                  <div class="or-label">or</div>
-                  <div class="line-separator"></div>
-                </div>
-
-                <div class="row">
-                  <div class="col-md-12">
-                    <a
-                      class="
-                        btn btn-lg btn-google btn-block
-                        text-uppercase
-                        btn-outline
-                      "
-                      @click="handleSignIn"
-                      href="#"
-                      ><img
-                        src="https://img.icons8.com/color/16/000000/google-logo.png"
-                      />
-                      Đăng nhập bằng Google</a
-                    >
-                  </div>
-                </div>
-                <br />
-                <p class="text-inverse text-center">
-                  Đã có tài khoản?
-                  <router-link to="/login">Đăng nhập</router-link>
-                </p>
-              </div>
+    <div class="form-login">
+      <div class="md-float-material form-material">
+        <div class="card-block">
+          <div class="row">
+            <div class="col-md-12">
+              <h3 class="text-center heading">ĐĂNG KÝ</h3>
             </div>
-          </form>
+          </div>
+          <div class="form-group form-primary">
+            <input
+              required
+              type="text"
+              v-model="account.name"
+              class="form-control"
+              placeholder="Tên hiển thị"
+            />
+          </div>
+          <div class="form-group form-primary">
+            <input
+              required
+              type="text"
+              v-model="account.email"
+              class="form-control"
+              placeholder="Email"
+            />
+          </div>
+
+          <div class="form-group form-primary">
+            <input
+              required
+              type="password"
+              v-model="account.password"
+              class="form-control"
+              placeholder="Mật khẩu"
+            />
+          </div>
+          <div class="form-group form-primary">
+            <input
+              required
+              type="password"
+              class="form-control"
+              v-model="account.repassword"
+              placeholder="Nhập lại mật khẩu"
+            />
+          </div>
+          <div class="row">
+            <div class="col-md-12 block-btn">
+              <input
+                class="
+                  btn btn-primary btn-md btn-block
+                  waves-effect
+                  text-center
+                  m-b-20
+                "
+                readonly
+                value="Đăng ký"
+                @click="handleRegister"
+              />
+              <!--  <button type="button" class="btn btn-primary btn-md btn-block waves-effect text-center m-b-20"><i class="fa fa-lock"></i> Signup Now </button> -->
+            </div>
+          </div>
+
+          <div class="or-container">
+            <div class="line-separator"></div>
+            <div class="or-label">or</div>
+            <div class="line-separator"></div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12 block-btn">
+              <a
+                class="
+                  btn btn-lg btn-google btn-block
+                  text-uppercase
+                  btn-outline
+                "
+                @click="logInByGoogle"
+                href="#"
+                ><img
+                  src="https://img.icons8.com/color/16/000000/google-logo.png"
+                />
+                Đăng nhập bằng Google</a
+              >
+            </div>
+          </div>
+          <br />
+          <p class="text-inverse text-center">
+            Đã có tài khoản?
+            <router-link to="/login">Đăng nhập</router-link>
+          </p>
         </div>
       </div>
     </div>
   </section>
 </template>
 
-<script>
-export default {
-  name: "Register",
-  created() {
-    localStorage.clear();
-  },
-  setup() {
+<script setup>
+import { reactive, ref } from "vue";
+import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
+import { useRouter } from "vue-router";
 
-    return {
-    };
-  },
-  methods: {
-    async handleRegister() {
-      try {
-      } catch (e) {
-        console.log(e);
-      }
-    },
-  },
+const router = useRouter();
+const accountRepository = RepositoryFactory.get("account");
+
+const account = reactive({
+  name: "",
+  email: "",
+  password: "",
+  repassword: "",
+});
+
+const error = ref([]);
+
+const handleRegister = () => {
+  console.log(account);
+  accountRepository.register(account).then((response) => {
+    if (response.data.status === 1) {
+      alert(response.data.error.message);
+    } else {
+      alert("Đăng ký thành công");
+      router.push({
+        path: "/login",
+      });
+    }
+
+    console.log(response.data);
+  });
 };
 </script>
 
-<!-- Add 'scoped' attribute to limit CSS to this component only -->
 <style scoped>
 body {
   background-color: #f2f7fb;
@@ -134,13 +137,17 @@ body {
 
 .login-block {
   margin: 30px auto;
+  display: flex;
+  justify-content: center;
 }
 
 .login-block .auth-box {
   margin: 20px auto 0;
   max-width: 450px !important;
 }
-
+.form-login {
+  width: 25%;
+}
 .card {
   border-radius: 5px;
   -webkit-box-shadow: 0 0 5px 0 rgba(43, 43, 43, 0.1),
@@ -201,6 +208,7 @@ body {
   font-size: 15px;
   padding: 10px 19px;
   cursor: pointer;
+  /* transition: all 0.3s ease; */
 }
 
 .m-b-20 {
@@ -243,6 +251,10 @@ body {
 .or-label {
   flex-grow: 1;
   margin: 0 15px;
+  text-align: center;
+}
+
+.block-btn {
   text-align: center;
 }
 </style>

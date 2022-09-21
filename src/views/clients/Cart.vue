@@ -121,38 +121,78 @@
             <input
               id="ten"
               type="text"
+              v-model="customer.name"
               placeholder="Tên đầy đủ của bạn"
               required
             />
             <p>*</p>
+            &emsp;
+            <div v-if="error && error.length > 0">
+              <span
+                v-for="(e, key) in error"
+                v-bind:key="key"
+                class="invalid"
+                >{{ e.type === "name" ? e.message : "" }}</span
+              >
+            </div>
           </div>
           <div class="input-text">
             <input
               id="email"
               type="email"
+              v-model="customer.email"
               placeholder="Email của bạn"
               required
             />
             <p>*</p>
+            &emsp;
+            <div v-if="error && error.length > 0">
+              <span
+                v-for="(e, key) in error"
+                v-bind:key="key"
+                class="invalid"
+                >{{ e.type === "email" ? e.message : "" }}</span
+              >
+            </div>
           </div>
           <div class="text-hint">* Địa chỉ nhận hàng</div>
           <div class="input-text">
             <input
               id="sonha"
               type="text"
+              v-model="customer.address"
               placeholder="Số nhà, đường, (tòa nhà), phường/xã..."
               required
             />
             <p>*</p>
+            &emsp;
+            <div v-if="error && error.length > 0">
+              <span
+                v-for="(e, key) in error"
+                v-bind:key="key"
+                class="invalid"
+                >{{ e.type === "address" ? e.message : "" }}</span
+              >
+            </div>
           </div>
           <div class="input-text">
             <input
               id="sdt"
               type="number"
               placeholder="Số điện thoại"
+              v-model="customer.phone"
               required
             />
             <p>*</p>
+            &emsp;
+            <div v-if="error && error.length > 0">
+              <span
+                v-for="(e, key) in error"
+                v-bind:key="key"
+                class="invalid"
+                >{{ e.type === "phone" ? e.message : "" }}</span
+              >
+            </div>
           </div>
           <div class="text-hint">* Ghi chú</div>
           <textarea
@@ -160,8 +200,10 @@
             rows="2"
             cols="60"
             placeholder="Giao cho tôi vào giờ hành chính"
-          ></textarea
-          ><br />
+            v-model="customer.note"
+          ></textarea>
+          <!-- <span>{{ errorMessage }}</span> -->
+          <br />
         </div>
         <div class="information col-5">
           <br />
@@ -209,7 +251,7 @@
             </tr>
           </table>
           <br />
-          <button onclick="openForm()" class="btn-buy">
+          <button @click="checkOut" class="btn-buy">
             <i class="fas fa-dollar-sign"></i> Thanh toán
           </button>
         </div>
@@ -318,18 +360,63 @@
 <script setup>
 import ntc from "ntc-hi-js";
 import Select2 from "vue3-select2-component";
-import { ref, inject } from "vue";
+import { useField } from "vee-validate";
+import { ref, inject, reactive } from "vue";
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
 
 // const toasted = inject("Toasted");
 
 const clientRepository = RepositoryFactory.get("client");
 const voucherRepository = RepositoryFactory.get("voucher");
+const emitter = inject("emitter");
 
 const carts = ref([]);
 const data = ref([]);
 const vouchers = ref([]);
 const voucherSelected = ref([]);
+const customer = reactive({
+  name: "",
+  email: "",
+  address: "",
+  phone: "",
+  note: "",
+});
+
+const error = ref([]);
+
+// validate
+const validate = () => {
+  let check = true;
+  if (!customer.name.trim()) {
+    error.value.push({
+      type: "name",
+      message: "Chưa nhập tên",
+    });
+    check = false;
+  }
+  if (!customer.email.trim()) {
+    error.value.push({
+      type: "email",
+      message: "Chưa nhập email",
+    });
+    check = false;
+  }
+  if (!customer.address.trim()) {
+    error.value.push({
+      type: "address",
+      message: "Chưa nhập địa chỉ",
+    });
+    check = false;
+  }
+  if (!customer.phone) {
+    error.value.push({
+      type: "phone",
+      message: "Chưa nhập số điện thoại",
+    });
+    check = false;
+  }
+  return check;
+};
 
 // const changeVoucher = (voucher) => {
 //   console.log(voucher);
@@ -374,6 +461,8 @@ const decreaseQuantity = (id_detail, quantity) => {
   } else {
     if (confirm("Bạn muốn xóa sản phẩm này khỏi giỏ hàng?")) {
       removeProduct(id_detail);
+      // change count quantity cart
+      emitter.emit("changeQuantity");
       return;
     }
   }
@@ -441,6 +530,14 @@ const removeProduct = (id) => {
   localStorage.setItem("carts", JSON.stringify(products));
 
   reload();
+};
+
+// checkout
+const checkOut = () => {
+  if (validate()) {
+    error.value = [];
+  }
+  console.log(customer);
 };
 </script>
 
@@ -606,6 +703,11 @@ a.info-product {
 }
 .information p {
   color: red;
+}
+.invalid {
+  color: #ed1a29;
+  font-size: 14px;
+  align-items: center;
 }
 .input-text {
   display: flex;

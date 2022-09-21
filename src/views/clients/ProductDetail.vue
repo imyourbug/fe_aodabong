@@ -34,6 +34,10 @@
           <div class="block-soluong">
             <h3>{{ data.name }}</h3>
             <div v-if="data.product_details && data.product_details.length > 0">
+              <div class="price">
+                {{ formatCash(choice.price) }}<sup>đ</sup>
+              </div>
+              <br />
               <div class="row">
                 <div class="col-3"><label>Kích cỡ</label>&ensp;</div>
                 <div class="col-9" v-if="sizes && sizes.length > 0">
@@ -190,13 +194,13 @@
 
 <script setup>
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
-import { defineEmits, reactive, ref } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import { reactive, ref, inject } from "vue";
+import { useRouter } from "vue-router";
 import ntc from "ntc-hi-js";
 
 const clientRepository = RepositoryFactory.get("client");
 const router = useRouter();
-const emit = defineEmits(["changeCartQuantity"]);
+const emitter = inject("emitter");
 
 const id_product = parseInt(router.currentRoute.value.params.id);
 const data = ref([]);
@@ -207,6 +211,7 @@ const choice = reactive({
   id_detail: -1,
   new_size: "",
   new_color: "",
+  price: 0,
   quantity: unit_in_stock.value === 0 ? 0 : 1,
 });
 
@@ -215,22 +220,23 @@ const getNameByHexColor = (hexCode) => {
   return ntc.name(hexCode, "en").color.name;
 };
 
-const reload = async () => {
+const reload = () => {
   // get detail product
-  await clientRepository.getDetailProduct(id_product).then((response) => {
+  clientRepository.getDetailProduct(id_product).then((response) => {
     data.value = response.data.data.product;
+    // console.log(data.value);
+    // get sizes and colors
+    let size = [];
+    let color = [];
+    data.value.product_details.forEach((item) => {
+      size.push(item.code_size);
+      color.push(item.code_color);
+    });
+    sizes.value = size.filter((v, i, a) => a.indexOf(v) === i);
+    colors.value = color.filter((v, i, a) => a.indexOf(v) === i);
+    // get unit in stock
+    getUnitInStock();
   });
-  // get sizes and colors
-  let size = [];
-  let color = [];
-  data.value.product_details.forEach((item) => {
-    size.push(item.code_size);
-    color.push(item.code_color);
-  });
-  sizes.value = size.filter((v, i, a) => a.indexOf(v) === i);
-  colors.value = color.filter((v, i, a) => a.indexOf(v) === i);
-  // get unit in stock
-  getUnitInStock();
 };
 
 reload();
@@ -249,6 +255,7 @@ const getUnitInStock = () => {
   });
   if (correctItem) {
     choice.id_detail = correctItem.id;
+    choice.price = correctItem.price_sale ?? correctItem.price;
     unit_in_stock.value = correctItem.unit_in_stock;
   } else unit_in_stock.value = 0;
 };
@@ -307,15 +314,15 @@ const addProductToCart = () => {
       code_color: choice.new_color,
       code_size: choice.new_size,
       quantity: choice.quantity,
-      unit_price: data.value.price_sale ?? data.value.price,
+      unit_price: choice.price,
       thumb: data.value.thumb,
       name: data.value.name,
     });
     alert("Thêm sản phẩm vào giỏ hàng thành công");
   }
   localStorage.setItem("carts", JSON.stringify(carts));
-  // emit send cart quantity
-  // emit("changeCartQuantity", carts.length);
+  // change count quantity cart
+  emitter.emit("changeQuantity");
 
   return true;
 };
@@ -326,6 +333,16 @@ const buyNow = () => {
       path: "/carts",
     });
   }
+};
+// format money
+const formatCash = (str) => {
+  return str
+    .toString()
+    .split("")
+    .reverse()
+    .reduce((prev, next, index) => {
+      return (index % 3 ? next : next + ".") + prev;
+    });
 };
 </script>
 
@@ -385,7 +402,10 @@ a {
 .block-soluong {
   margin-left: 15%;
 }
-
+.price {
+  color: #ed1a29;
+  font-size: 25px;
+}
 .giohang {
   color: white;
   background-color: #2e3094;
