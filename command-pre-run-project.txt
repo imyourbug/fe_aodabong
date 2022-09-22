@@ -10,5 +10,5 @@ npm i --save url-loader --save
 npm i ntc-hi-js --save
 npm i vue3-select2-component --save
 npm i vue-toasted --save
-npm i vee-validate --save
-npm i mitt
+npm i mitt --save
+npm i @vuelidate/core @vuelidate/validators --save

@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/js/bootstrap.js';
 import gAuthPlugin from 'vue3-google-oauth2';
 import Select2 from 'vue3-select2-component';
+import VeeValidate from 'vee-validate';
 // import Toasted from 'vue-toasted';
 import mitt from 'mitt';
 
@@ -20,6 +21,7 @@ app.use(gAuthPlugin, {
   scope: 'email',
   prompt: 'consent',
 });
+app.use(VeeValidate);
 
 app.component('Select2', Select2);
 

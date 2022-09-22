@@ -24,9 +24,9 @@
           type="search"
           placeholder="Tìm kiếm"
           aria-label="Search"
-          v-model="key_word"
+          v-model.trim="key_word"
         />
-        <a @click.prevent="searchVideo" class="btn btn-outline-success">
+        <a @click.prevent="searchProduct" class="btn btn-outline-success">
           <i class="fa-solid fa-magnifying-glass"></i>
         </a>
       </form>
@@ -89,13 +89,13 @@ const unSaveUser = () => {
   // localStorage.removeItem("user");
   localStorage.clear();
 };
-const searchVideo = () => {
+const searchProduct = () => {
+  console.log('search');
   if (key_word.value.trim()) {
-    // Send key_word to ListVideo component
-    emitter.emit("search-video", key_word.value);
+    emitter.emit("searchProduct", key_word.value.trim());
 
     router.push({
-      path: `/videos/search/${key_word.value}`,
+      path: `/products/search/q=${key_word.value.trim()}`,
     });
   }
 };

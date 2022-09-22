@@ -15,4 +15,7 @@ export default {
     getAllDetailProduct() {
         return Repository.get(`${baseUrl}/details/list`);
     },
+    searchProductByKeyWord(key_word) {
+        return Repository.get(`${baseUrl}/search/${key_word}`);
+    }
 }

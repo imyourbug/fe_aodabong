@@ -50,8 +50,7 @@
                       type="radio"
                       name="size"
                       :value="size"
-                      v-model="choice.new_size"
-                      @click="getUnitInStock"
+                      @click="setSize(size)"
                     />
                     <span>{{ size }}</span
                     >&ensp;
@@ -71,8 +70,7 @@
                       type="radio"
                       name="color"
                       :value="color"
-                      v-model="choice.new_color"
-                      @click="getUnitInStock"
+                      @click="setColor(color)"
                     />
                     <span>{{ getNameByHexColor(color.toString()) }}</span
                     >&ensp;
@@ -241,6 +239,18 @@ const reload = () => {
 
 reload();
 
+// set size
+const setSize = (size) => {
+  choice.new_size = size;
+  getUnitInStock();
+}
+
+// set color
+const setColor = (color) => {
+  choice.new_color = color;
+  getUnitInStock();
+}
+
 // get unit in stock
 const getUnitInStock = () => {
   choice.quantity = 1;
@@ -259,6 +269,7 @@ const getUnitInStock = () => {
     unit_in_stock.value = correctItem.unit_in_stock;
   } else unit_in_stock.value = 0;
 };
+
 // decrease quantity
 const decreaseQuantity = () => {
   if (unit_in_stock.value > 0 && choice.quantity > 1) {

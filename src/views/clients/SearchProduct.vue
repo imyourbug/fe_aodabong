@@ -1,17 +1,12 @@
 <template>
-  <main v-if="groups && groups.length > 0">
-    <div class="group-product" v-for="(group, key) in groups" v-bind:key="key">
-      <div
-        class="album bg-light"
-        v-if="group.products && group.products.length > 0"
+  <main>
+      <div class="album bg-light"
       >
         <div class="container">
           <div class="block-text-1">
             <div class="block-text-left">
-              <a class="btn-left" @click="groupProduct(group.category_id)"
-                >&ensp;<i class="far fa-futbol"></i>&ensp;{{
-                  group.category_name
-                }}&emsp;</a
+              <a class="btn-left" 
+                >&ensp;<i class="far fa-futbol"></i>&ensp;Sản phẩm tìm kiếm&emsp;</a
               >
             </div>
             <div class="block-text-right">
@@ -21,22 +16,21 @@
               ></a>
             </div>
           </div>
-          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3">
+          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3" v-if="products && products.length > 0">
             <div
               class="col"
-              v-for="(product, key) in group.products"
-              v-bind:key="key"
+              v-for="(info, key) in products" v-bind:key="key"
             >
-              <router-link :to="`/products/detail/${product.product.id}`">
+              <router-link :to="`/products/detail/${info.product.id}`">
                 <div class="block-product">
                   <a> <img src="@/assets/khai.png" /></a>
                   <a>
-                    <p>{{ product.name }}</p>
+                    <p>{{ info.product.name }}</p>
                   </a>
-                  {{ formatCash(product.min_price) }}đ
+                  {{ formatCash(info.min_price) }}đ
                   {{
-                    product.max_price > product.min_price
-                      ? ` - ${product.max_price}đ`
+                    info.max_price > info.min_price
+                      ? ` - ${info.max_price}đ`
                       : ""
                   }}
                   <br />
@@ -50,32 +44,41 @@
         </div>
       </div>
       <br />
-    </div>
   </main>
 </template>
 
 <script setup>
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
-import { ref } from "vue";
+import { ref, inject } from "vue";
 import { useRouter } from "vue-router";
 
 const clientRepository = RepositoryFactory.get("client");
+const emitter = inject('emitter');
 const router = useRouter();
 
-const groups = ref([]);
-const reload = () => {
+const products = ref([]);
+const other_products = ref([]);
+const key_word = ref(router.currentRoute.value.params.key_word ?? '');
+
+emitter.on('searchProduct', (key) => {
+  reload(key);
+});
+
+const reload = (key) => {
   clientRepository
-    .getAllProductGroup()
+    .searchProductByKeyWord(key)
     .then((response) => {
-      groups.value = response.data.data;
-      console.log(groups.value);
+      products.value = response.data.data.like;
+      other_products.value = response.data.data.not_like;
+      console.log(products.value);
+      console.log(other_products.value);
     })
     .catch((e) => {
       console.log(e);
     });
 };
 
-reload();
+reload(key_word.value);
 
 const formatCash = (str) => {
   return str
@@ -88,18 +91,14 @@ const formatCash = (str) => {
 };
 
 const detailProduct = (id) => {
-  router.push({
+  this.$router.push({
     path: "/products/detail/" + id,
     params: {
       id: id,
     },
   });
 };
-const groupProduct = (id) => {
-  router.push({
-    path: "/categories/" + id,
-  });
-};
+
 </script>
 
 <style scoped>

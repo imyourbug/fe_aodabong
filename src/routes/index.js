@@ -4,6 +4,7 @@ import Login from "@/views/clients/Login.vue";
 import About from "@/views/clients/About.vue";
 import Home from "@/views/clients/Home.vue";
 import ProductDetail from "@/views/clients/ProductDetail.vue";
+import SearchProduct from "@/views/clients/SearchProduct.vue";
 import Cart from "@/views/clients/Cart.vue";
 import Register from "@/views/clients/Register.vue";
 
@@ -12,6 +13,14 @@ const routes = [
         path: '/home',
         name: 'Home',
         component: Home,
+        meta: {
+            requiresAuth: true
+        },
+    },
+    {
+        path: '/products/search/q=:key_word',
+        name: 'SearchProduct',
+        component: SearchProduct,
         meta: {
             requiresAuth: true
         },

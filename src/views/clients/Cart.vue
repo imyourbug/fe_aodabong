@@ -113,97 +113,98 @@
       </div>
       <div class="row">
         <div class="information col-7">
-          <div class="text-hint">
-            * Vui lòng nhập đầy đủ thông tin để chúng tôi giao hàng được chính
-            xác, cảm ơn!
-          </div>
-          <div class="input-text">
-            <input
-              id="ten"
-              type="text"
-              v-model="customer.name"
-              placeholder="Tên đầy đủ của bạn"
-              required
-            />
-            <p>*</p>
-            &emsp;
-            <div v-if="error && error.length > 0">
-              <span
-                v-for="(e, key) in error"
-                v-bind:key="key"
-                class="invalid"
-                >{{ e.type === "name" ? e.message : "" }}</span
-              >
+          <form @submit.prevent="submitForm">
+            <div class="text-hint">
+              * Vui lòng nhập đầy đủ thông tin để chúng tôi giao hàng được chính
+              xác, cảm ơn!
             </div>
-          </div>
-          <div class="input-text">
-            <input
-              id="email"
-              type="email"
-              v-model="customer.email"
-              placeholder="Email của bạn"
-              required
-            />
-            <p>*</p>
-            &emsp;
-            <div v-if="error && error.length > 0">
-              <span
-                v-for="(e, key) in error"
-                v-bind:key="key"
-                class="invalid"
-                >{{ e.type === "email" ? e.message : "" }}</span
-              >
+            <div class="input-text">
+              <input
+                id="ten"
+                type="text"
+                v-model="customer.name"
+                placeholder="Tên đầy đủ của bạn"
+              />
+              <p>*</p>
+              &emsp;
+              <div :class="{ error: v$.name.$errors.length }">
+                <div
+                  class="input-errors"
+                  v-for="error of v$.name.$errors"
+                  :key="error.$uid"
+                >
+                  <div class="error-msg">{{ error.$message }}</div>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="text-hint">* Địa chỉ nhận hàng</div>
-          <div class="input-text">
-            <input
-              id="sonha"
-              type="text"
-              v-model="customer.address"
-              placeholder="Số nhà, đường, (tòa nhà), phường/xã..."
-              required
-            />
-            <p>*</p>
-            &emsp;
-            <div v-if="error && error.length > 0">
-              <span
-                v-for="(e, key) in error"
-                v-bind:key="key"
-                class="invalid"
-                >{{ e.type === "address" ? e.message : "" }}</span
-              >
+            <div class="input-text">
+              <input
+                id="email"
+                type="email"
+                v-model="customer.email"
+                placeholder="Email của bạn"
+              />
+              <p>*</p>
+              &emsp;
+              <div :class="{ error: v$.email.$errors.length }">
+                <div
+                  class="input-errors"
+                  v-for="error of v$.email.$errors"
+                  :key="error.$uid"
+                >
+                  <div class="error-msg">{{ error.$message }}</div>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="input-text">
-            <input
-              id="sdt"
-              type="number"
-              placeholder="Số điện thoại"
-              v-model="customer.phone"
-              required
-            />
-            <p>*</p>
-            &emsp;
-            <div v-if="error && error.length > 0">
-              <span
-                v-for="(e, key) in error"
-                v-bind:key="key"
-                class="invalid"
-                >{{ e.type === "phone" ? e.message : "" }}</span
-              >
+            <div class="text-hint">* Địa chỉ nhận hàng</div>
+            <div class="input-text">
+              <input
+                id="sonha"
+                type="text"
+                v-model="customer.address"
+                placeholder="Số nhà, đường, (tòa nhà), phường/xã..."
+              />
+              <p>*</p>
+              &emsp;
+              <div :class="{ error: v$.address.$errors.length }">
+                <div
+                  class="input-errors"
+                  v-for="error of v$.address.$errors"
+                  :key="error.$uid"
+                >
+                  <div class="error-msg">{{ error.$message }}</div>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="text-hint">* Ghi chú</div>
-          <textarea
-            id="mota"
-            rows="2"
-            cols="60"
-            placeholder="Giao cho tôi vào giờ hành chính"
-            v-model="customer.note"
-          ></textarea>
-          <!-- <span>{{ errorMessage }}</span> -->
-          <br />
+            <div class="input-text">
+              <input
+                id="sdt"
+                type="text"
+                placeholder="Số điện thoại"
+                v-model="customer.phone"
+              />
+              <p>*</p>
+              &emsp;
+              <div :class="{ error: v$.phone.$errors.length }">
+                <div
+                  class="input-errors"
+                  v-for="error of v$.phone.$errors"
+                  :key="error.$uid"
+                >
+                  <div class="error-msg">{{ error.$message }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="text-hint">* Ghi chú</div>
+            <textarea
+              id="mota"
+              rows="2"
+              cols="60"
+              placeholder="Giao cho tôi vào giờ hành chính"
+              v-model="customer.note"
+            ></textarea>
+            <br />
+          </form>
         </div>
         <div class="information col-5">
           <br />
@@ -251,7 +252,7 @@
             </tr>
           </table>
           <br />
-          <button @click="checkOut" class="btn-buy">
+          <button type="submit" class="btn-buy" @click="submitForm">
             <i class="fas fa-dollar-sign"></i> Thanh toán
           </button>
         </div>
@@ -360,9 +361,16 @@
 <script setup>
 import ntc from "ntc-hi-js";
 import Select2 from "vue3-select2-component";
-import { useField } from "vee-validate";
 import { ref, inject, reactive } from "vue";
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
+import { useVuelidate } from "@vuelidate/core";
+import {
+  required,
+  email,
+  minLength,
+  helpers,
+  maxLength,
+} from "@vuelidate/validators";
 
 // const toasted = inject("Toasted");
 
@@ -382,45 +390,33 @@ const customer = reactive({
   note: "",
 });
 
-const error = ref([]);
-
 // validate
-const validate = () => {
-  let check = true;
-  if (!customer.name.trim()) {
-    error.value.push({
-      type: "name",
-      message: "Chưa nhập tên",
-    });
-    check = false;
-  }
-  if (!customer.email.trim()) {
-    error.value.push({
-      type: "email",
-      message: "Chưa nhập email",
-    });
-    check = false;
-  }
-  if (!customer.address.trim()) {
-    error.value.push({
-      type: "address",
-      message: "Chưa nhập địa chỉ",
-    });
-    check = false;
-  }
-  if (!customer.phone) {
-    error.value.push({
-      type: "phone",
-      message: "Chưa nhập số điện thoại",
-    });
-    check = false;
-  }
-  return check;
+const alpha = helpers.regex(/^0\d{9}$/);
+
+const rules = {
+  name: { required: helpers.withMessage("Không được để trống!", required) },
+  email: {
+    required: helpers.withMessage("Không được để trống!", required),
+    email: helpers.withMessage("Email không hợp lệ!", email),
+  },
+  address: { required: helpers.withMessage("Không được để trống!", required) },
+  phone: {
+    required: helpers.withMessage("Không được để trống!", required),
+    alpha: helpers.withMessage("Số điện thoại không hợp lệ!", alpha),
+  },
 };
 
-// const changeVoucher = (voucher) => {
-//   console.log(voucher);
-// };
+const v$ = useVuelidate(rules, customer);
+
+const submitForm = () => {
+  console.log(v$);
+  v$.value.$validate();
+  if (v$.value.$invalid) {
+    alert("Vui lòng điền đầy đủ thông tin");
+  } else alert("Chuyển sang form thanh toán");
+};
+
+//
 const selectVoucher = (voucher) => {
   voucherSelected.value = voucher;
   console.log(voucherSelected.value);
@@ -480,7 +476,6 @@ const increaseQuantity = (id_detail, quantity) => {
     });
   } else {
     alert("Bạn đã đạt mức tối đa số lượng sản phẩm này");
-    // toasted.error("Bạn đã đạt mức tối đa số lượng sản phẩm này");
   }
   localStorage.setItem("carts", JSON.stringify(carts.value));
   reload();
@@ -530,14 +525,6 @@ const removeProduct = (id) => {
   localStorage.setItem("carts", JSON.stringify(products));
 
   reload();
-};
-
-// checkout
-const checkOut = () => {
-  if (validate()) {
-    error.value = [];
-  }
-  console.log(customer);
 };
 </script>
 
@@ -704,7 +691,7 @@ a.info-product {
 .information p {
   color: red;
 }
-.invalid {
+.error-msg {
   color: #ed1a29;
   font-size: 14px;
   align-items: center;

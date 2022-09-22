@@ -106,7 +106,9 @@ const logInByGoogle = async () => {
     console.log(e);
   }
 };
-const logOut = () => {};
+
+const handleLogin = () => { };
+
 const saveUser = (user) => {
   let account = [];
   account.push({
