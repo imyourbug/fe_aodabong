@@ -20,11 +20,11 @@
     <div class="col-4 block-search">
       <form class="d-flex">
         <input
+          type="text"
           class="form-control me-2"
-          type="search"
           placeholder="Tìm kiếm"
-          aria-label="Search"
           v-model.trim="key_word"
+          @keyup.enter="searchProduct"
         />
         <a @click.prevent="searchProduct" class="btn btn-outline-success">
           <i class="fa-solid fa-magnifying-glass"></i>
@@ -36,16 +36,20 @@
         <router-link class="btn-login" to="/login" v-if="!isLogged"
           >Đăng nhập</router-link
         >
-        <router-link to="/carts" v-if="isLogged"
+        <router-link class="cart" to="/carts" v-if="isLogged"
           ><i class="fa-solid fa-cart-shopping"></i
-          ><sup class="cart-quantity">{{ carts.length }}</sup></router-link
+          ><sup class="cart-quantity">{{ carts.length }}</sup>
+          <CartHeader
+            class="cart-header"
+            :carts="carts"
+            :user="user" /></router-link
         >&emsp; <i class="fa-solid fa-bell nav-icon" v-if="isLogged"></i>&emsp;
         <a
           href="#"
           @click.prevent="handleSignOut"
           class="btn-logout"
           v-if="isLogged"
-          ><img class="nav-avatar" :src="avatar_user" /> &ensp;Đăng xuất</a
+          ><img class="nav-avatar" :src="user.url" /> &ensp;Đăng xuất</a
         >
       </div>
     </div>
@@ -55,12 +59,13 @@
 <script setup>
 import { ref, inject } from "vue";
 import { useRouter } from "vue-router";
+import CartHeader from "@/components/CartHeader.vue";
 
 const router = useRouter();
 const Vue3GoogleOauth = inject("Vue3GoogleOauth");
 const emitter = inject("emitter");
 
-const avatar_user = ref("");
+const user = ref([]);
 const isLogged = ref(false);
 const key_word = ref("");
 const carts = ref([]);
@@ -70,7 +75,6 @@ emitter.on("changeName", () => {
 });
 
 emitter.on("changeQuantity", () => {
-  console.log("run change quantity");
   reload();
 });
 
@@ -90,7 +94,6 @@ const unSaveUser = () => {
   localStorage.clear();
 };
 const searchProduct = () => {
-  console.log('search');
   if (key_word.value.trim()) {
     emitter.emit("searchProduct", key_word.value.trim());
 
@@ -103,7 +106,7 @@ const reload = () => {
   isLogged.value = JSON.parse(localStorage.getItem("user")) ? true : false;
   carts.value = JSON.parse(localStorage.getItem("carts")) ?? [];
   if (isLogged.value) {
-    avatar_user.value = JSON.parse(localStorage.getItem("user"))[0].url ?? "";
+    user.value = JSON.parse(localStorage.getItem("user")) ?? "";
   }
 };
 
@@ -117,6 +120,25 @@ a {
 }
 a:hover {
   color: black;
+}
+/* cart header */
+.cart:hover .cart-header {
+  display: block;
+}
+.cart-header {
+  display: none;
+  width: 25%;
+  height: max-content;
+  top: 80px;
+  right: 300px;
+  position: absolute;
+  z-index: 9;
+}
+sup.cart-quantity {
+  color: #ed1a29;
+  border-radius: 50%;
+  padding: 1px 4px;
+  font-size: 14px;
 }
 .block-head {
   align-items: center;
@@ -166,11 +188,5 @@ a:hover {
 }
 .nav-icon {
   font-size: 22px;
-}
-sup.cart-quantity {
-  color: #ed1a29;
-  border-radius: 50%;
-  padding: 1px 4px;
-  font-size: 14px;
 }
 </style>

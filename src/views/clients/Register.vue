@@ -16,6 +16,15 @@
               class="form-control"
               placeholder="Tên hiển thị"
             />
+            <div :class="{ error: v$.name.$error.length }">
+              <div
+                class="input-errors"
+                v-for="error of v$.name.$errors"
+                :key="error.$uid"
+              >
+                <div class="error-msg">{{ error.$message }}</div>
+              </div>
+            </div>
           </div>
           <div class="form-group form-primary">
             <input
@@ -25,35 +34,55 @@
               class="form-control"
               placeholder="Email"
             />
+            <div :class="{ error: v$.email.$error.length }">
+              <div
+                class="input-errors"
+                v-for="error of v$.email.$errors"
+                :key="error.$uid"
+              >
+                <div class="error-msg">{{ error.$message }}</div>
+              </div>
+            </div>
           </div>
 
           <div class="form-group form-primary">
             <input
-              required
               type="password"
               v-model="account.password"
               class="form-control"
               placeholder="Mật khẩu"
             />
+            <div :class="{ error: v$.password.$error.length }">
+              <div
+                class="input-errors"
+                v-for="error of v$.password.$errors"
+                :key="error.$uid"
+              >
+                <div class="error-msg">{{ error.$message }}</div>
+              </div>
+            </div>
           </div>
           <div class="form-group form-primary">
             <input
-              required
               type="password"
               class="form-control"
               v-model="account.repassword"
               placeholder="Nhập lại mật khẩu"
             />
+            <div :class="{ error: v$.repassword.$error.length }">
+              <div
+                class="input-errors"
+                v-for="error of v$.repassword.$errors"
+                :key="error.$uid"
+              >
+                <div class="error-msg">{{ error.$message }}</div>
+              </div>
+            </div>
           </div>
           <div class="row">
             <div class="col-md-12 block-btn">
               <input
-                class="
-                  btn btn-primary btn-md btn-block
-                  waves-effect
-                  text-center
-                  m-b-20
-                "
+                class="btn btn-primary btn-md btn-block waves-effect text-center m-b-20"
                 readonly
                 value="Đăng ký"
                 @click="handleRegister"
@@ -67,24 +96,7 @@
             <div class="or-label">or</div>
             <div class="line-separator"></div>
           </div>
-
-          <div class="row">
-            <div class="col-md-12 block-btn">
-              <a
-                class="
-                  btn btn-lg btn-google btn-block
-                  text-uppercase
-                  btn-outline
-                "
-                @click="logInByGoogle"
-                href="#"
-                ><img
-                  src="https://img.icons8.com/color/16/000000/google-logo.png"
-                />
-                Đăng nhập bằng Google</a
-              >
-            </div>
-          </div>
+          <GoogleLogin class="GoogleLogin" />
           <br />
           <p class="text-inverse text-center">
             Đã có tài khoản?
@@ -100,6 +112,15 @@
 import { reactive, ref } from "vue";
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
 import { useRouter } from "vue-router";
+import { useVuelidate } from "@vuelidate/core";
+import GoogleLogin from "@/components/GoogleLogin.vue";
+import {
+  email,
+  helpers,
+  required,
+  minLength,
+  sameAs,
+} from "@vuelidate/validators";
 
 const router = useRouter();
 const accountRepository = RepositoryFactory.get("account");
@@ -111,22 +132,62 @@ const account = reactive({
   repassword: "",
 });
 
-const error = ref([]);
+// validate
+// confirm
+const space = helpers.regex(/[^\s]/);
+
+const rules = {
+  name: {
+    required: helpers.withMessage("Không được để trống!", required),
+  },
+  email: {
+    email: helpers.withMessage("Email không hợp lệ!", email),
+    required: helpers.withMessage("Không được để trống!", required),
+  },
+  password: {
+    required: helpers.withMessage("Không được để trống!", required),
+    space: helpers.withMessage("Mật khẩu không được chứa dấu cách!", space),
+    minLength: helpers.withMessage(
+      "Mật khẩu tối thiểu gồm 8 ký tự!",
+      minLength(8)
+    ),
+  },
+  repassword: {
+    required: helpers.withMessage("Không được để trống!", required),
+    space: helpers.withMessage("Mật khẩu không được chứa dấu cách!", space),
+    minLength: helpers.withMessage(
+      "Mật khẩu tối thiểu gồm 8 ký tự!",
+      minLength(8)
+    ),
+    sameAs: helpers.withMessage(
+      "Mật khẩu nhập lại phải trùng khớp!",
+      sameAs(account.password)
+    ),
+  },
+};
+
+const v$ = useVuelidate(rules, account);
 
 const handleRegister = () => {
-  console.log(account);
-  accountRepository.register(account).then((response) => {
-    if (response.data.status === 1) {
-      alert(response.data.error.message);
-    } else {
-      alert("Đăng ký thành công");
-      router.push({
-        path: "/login",
-      });
-    }
-
-    console.log(response.data);
-  });
+  v$.value.$validate();
+  if (v$.value.$invalid) {
+    alert("Vui lòng điền đầy đủ thông tin");
+  } else {
+    accountRepository.register(account).then((response) => {
+      if (response.data.status === 0) {
+        console.log("Đăng ký thành công");
+        router.push({
+          path: "/login",
+        });
+      }
+      if (response.data.status === 1) {
+        alert(response.data.error.message);
+      }
+      if (response.data.status !== 1 && response.data.status !== 0) {
+        alert("Throw exception");
+      }
+    });
+  }
 };
 </script>
 
@@ -255,6 +316,15 @@ body {
 }
 
 .block-btn {
+  text-align: center;
+}
+
+.error-msg {
+  color: #ed1a29;
+  font-size: 14px;
+  align-items: center;
+}
+.GoogleLogin {
   text-align: center;
 }
 </style>

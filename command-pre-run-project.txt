@@ -12,3 +12,4 @@ npm i vue3-select2-component --save
 npm i vue-toasted --save
 npm i mitt --save
 npm i @vuelidate/core @vuelidate/validators --save
+npm i vue-js-modal --save --force

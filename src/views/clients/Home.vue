@@ -31,7 +31,7 @@
                 <div class="block-product">
                   <a> <img src="@/assets/khai.png" /></a>
                   <a>
-                    <p>{{ product.name }}</p>
+                    <p>{{ product.product.name }}</p>
                   </a>
                   {{ formatCash(product.min_price) }}đ
                   {{

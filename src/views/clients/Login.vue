@@ -10,35 +10,46 @@
           </div>
           <div class="form-group form-primary">
             <input
-              required
+              @keyup.enter="handleLogin"
               type="text"
               class="form-control"
-              name="email"
               placeholder="Email"
-              id="email"
+              v-model="account.email"
             />
+            <div :class="{ error: v$.email.$errors.length }">
+              <div
+                class="input-errors"
+                v-for="error of v$.email.$errors"
+                :key="error.$uid"
+              >
+                <div class="error-msg">{{ error.$message }}</div>
+              </div>
+            </div>
           </div>
 
           <div class="form-group form-primary">
             <input
-              required
+              @keyup.enter="handleLogin"
               type="password"
               class="form-control"
-              name="password"
               placeholder="Mật khẩu"
-              id="password"
+              v-model="account.password"
             />
+            <div :class="{ error: v$.password.$errors.length }">
+              <div
+                class="input-errors"
+                v-for="error of v$.password.$errors"
+                :key="error.$uid"
+              >
+                <div class="error-msg">{{ error.$message }}</div>
+              </div>
+            </div>
           </div>
           <div class="row">
             <div class="col-md-12 block-btn">
               <input
                 type="submit"
-                class="
-                  btn btn-primary btn-md btn-block
-                  waves-effect
-                  text-center
-                  m-b-20
-                "
+                class="btn btn-primary btn-md btn-block waves-effect text-center m-b-20"
                 name="submit"
                 value="Đăng nhập"
                 @click="handleLogin"
@@ -52,24 +63,7 @@
             <div class="or-label">or</div>
             <div class="line-separator"></div>
           </div>
-
-          <div class="row">
-            <div class="col-md-12 block-btn">
-              <a
-                class="
-                  btn btn-lg btn-google btn-block
-                  text-uppercase
-                  btn-outline
-                "
-                @click="logInByGoogle"
-                href="#"
-                ><img
-                  src="https://img.icons8.com/color/16/000000/google-logo.png"
-                />
-                Đăng nhập bằng Google</a
-              >
-            </div>
-          </div>
+          <GoogleLogin class="GoogleLogin" />
           <br />
           <p class="text-inverse text-center">
             Chưa có tài khoản?
@@ -81,48 +75,81 @@
   </section>
 </template>
 <script setup>
-import { inject } from "vue";
+import { inject, reactive } from "vue";
 import { useRouter } from "vue-router";
+import { useVuelidate } from "@vuelidate/core";
+import { required, email, helpers } from "@vuelidate/validators";
+import { RepositoryFactory } from "@/api/repositories/RepositoryFactory";
+import GoogleLogin from "@/components/GoogleLogin.vue";
 
 const router = useRouter();
 const emitter = inject("emitter");
+const authRepository = RepositoryFactory.get("auth");
 
-const Vue3GoogleOauth = inject("Vue3GoogleOauth");
+const account = reactive({
+  email: "",
+  password: "",
+});
+
+// validate
+const rules = {
+  email: {
+    required: helpers.withMessage("Không được để trống!", required),
+    email: helpers.withMessage("Email không hợp lệ!", email),
+  },
+  password: {
+    required: helpers.withMessage("Không được để trống!", required),
+  },
+};
+
+const v$ = useVuelidate(rules, account);
+console.log(v$);
 
 const unSave = () => {
   localStorage.removeItem("user");
 };
 
-const logInByGoogle = async () => {
-  try {
-    const googleUser = await Vue3GoogleOauth.instance.signIn();
-    // save user login
-    saveUser(googleUser);
-    // Change name
-    emitter.emit("changeName");
-    //
-    router.push({ path: "/home" });
-  } catch (e) {
-    console.log(e);
+const handleLogin = () => {
+  v$.value.$validate();
+  if (v$.value.$invalid) {
+    alert("Vui lòng điền đầy đủ thông tin");
+  } else {
+    try {
+      authRepository.login(account).then((response) => {
+        if (response.data.status === 0) {
+          saveUser(response.data.data.user);
+          // Change name
+          emitter.emit("changeName");
+          //
+          router.push({ path: "/home" });
+        }
+        if (response.data.status === 1) {
+          alert(response.data.error.message);
+        }
+        if (response.data.status !== 1 && response.data.status !== 0) {
+          alert("Throw exception");
+        }
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }
 };
 
-const handleLogin = () => { };
-
 const saveUser = (user) => {
-  let account = [];
-  account.push({
-    id: user.getBasicProfile().getId(),
-    name: user.getBasicProfile().getName(),
-    email: user.getBasicProfile().getEmail(),
-    access_token: user.Cc.access_token,
-    url: user.getBasicProfile().getImageUrl(),
-  });
+  let account = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    // authtoken: user.authtoken,
+    url:
+      user.avatar ??
+      "https://lh3.googleusercontent.com/a/ALm5wu3puRoYHFiWkiDzVURYU01We0ZJXXGNvv6TiVDa=s96-c",
+  };
   localStorage.setItem("user", JSON.stringify(account));
 };
 </script>
 
-<!-- Add 'scoped' attribute to limit CSS to this component only -->
 <style scoped>
 body {
   background-color: #f2f7fb;
@@ -222,12 +249,6 @@ body {
   color: red !important;
 }
 
-.btn-google {
-  color: #545454;
-  background-color: #ffffff;
-  box-shadow: 0 1px 2px 1px #ddd;
-}
-
 .or-container {
   align-items: center;
   color: #ccc;
@@ -248,6 +269,16 @@ body {
 }
 
 .block-btn {
+  text-align: center;
+}
+
+.error-msg {
+  color: #ed1a29;
+  font-size: 14px;
+  align-items: center;
+}
+
+.GoogleLogin {
   text-align: center;
 }
 </style>

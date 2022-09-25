@@ -113,98 +113,96 @@
       </div>
       <div class="row">
         <div class="information col-7">
-          <form @submit.prevent="submitForm">
-            <div class="text-hint">
-              * Vui lòng nhập đầy đủ thông tin để chúng tôi giao hàng được chính
-              xác, cảm ơn!
-            </div>
-            <div class="input-text">
-              <input
-                id="ten"
-                type="text"
-                v-model="customer.name"
-                placeholder="Tên đầy đủ của bạn"
-              />
-              <p>*</p>
-              &emsp;
-              <div :class="{ error: v$.name.$errors.length }">
-                <div
-                  class="input-errors"
-                  v-for="error of v$.name.$errors"
-                  :key="error.$uid"
-                >
-                  <div class="error-msg">{{ error.$message }}</div>
-                </div>
+          <div class="text-hint">
+            * Vui lòng nhập đầy đủ thông tin để chúng tôi giao hàng được chính
+            xác, cảm ơn!
+          </div>
+          <div class="input-text">
+            <input
+              id="ten"
+              type="text"
+              v-model="customer.name"
+              placeholder="Tên đầy đủ của bạn"
+            />
+            <p>*</p>
+            &emsp;
+            <div :class="{ error: v$.name.$errors.length }">
+              <div
+                class="input-errors"
+                v-for="error of v$.name.$errors"
+                :key="error.$uid"
+              >
+                <div class="error-msg">{{ error.$message }}</div>
               </div>
             </div>
-            <div class="input-text">
-              <input
-                id="email"
-                type="email"
-                v-model="customer.email"
-                placeholder="Email của bạn"
-              />
-              <p>*</p>
-              &emsp;
-              <div :class="{ error: v$.email.$errors.length }">
-                <div
-                  class="input-errors"
-                  v-for="error of v$.email.$errors"
-                  :key="error.$uid"
-                >
-                  <div class="error-msg">{{ error.$message }}</div>
-                </div>
+          </div>
+          <div class="input-text">
+            <input
+              id="email"
+              type="email"
+              v-model="customer.email"
+              placeholder="Email của bạn"
+            />
+            <p>*</p>
+            &emsp;
+            <div :class="{ error: v$.email.$errors.length }">
+              <div
+                class="input-errors"
+                v-for="error of v$.email.$errors"
+                :key="error.$uid"
+              >
+                <div class="error-msg">{{ error.$message }}</div>
               </div>
             </div>
-            <div class="text-hint">* Địa chỉ nhận hàng</div>
-            <div class="input-text">
-              <input
-                id="sonha"
-                type="text"
-                v-model="customer.address"
-                placeholder="Số nhà, đường, (tòa nhà), phường/xã..."
-              />
-              <p>*</p>
-              &emsp;
-              <div :class="{ error: v$.address.$errors.length }">
-                <div
-                  class="input-errors"
-                  v-for="error of v$.address.$errors"
-                  :key="error.$uid"
-                >
-                  <div class="error-msg">{{ error.$message }}</div>
-                </div>
+          </div>
+          <div class="text-hint">* Địa chỉ nhận hàng</div>
+          <div class="input-text">
+            <input
+              id="sonha"
+              type="text"
+              v-model="customer.address"
+              placeholder="Số nhà, đường, (tòa nhà), phường/xã..."
+            />
+            <p>*</p>
+            &emsp;
+            <div :class="{ error: v$.address.$errors.length }">
+              <div
+                class="input-errors"
+                v-for="error of v$.address.$errors"
+                :key="error.$uid"
+              >
+                <div class="error-msg">{{ error.$message }}</div>
               </div>
             </div>
-            <div class="input-text">
-              <input
-                id="sdt"
-                type="text"
-                placeholder="Số điện thoại"
-                v-model="customer.phone"
-              />
-              <p>*</p>
-              &emsp;
-              <div :class="{ error: v$.phone.$errors.length }">
-                <div
-                  class="input-errors"
-                  v-for="error of v$.phone.$errors"
-                  :key="error.$uid"
-                >
-                  <div class="error-msg">{{ error.$message }}</div>
-                </div>
+          </div>
+          <div class="input-text">
+            <input
+              id="sdt"
+              type="text"
+              placeholder="Số điện thoại"
+              v-model="customer.phone"
+            />
+            <p>*</p>
+            &emsp;
+            <div :class="{ error: v$.phone.$errors.length }">
+              <div
+                class="input-errors"
+                v-for="error of v$.phone.$errors"
+                :key="error.$uid"
+              >
+                <div class="error-msg">{{ error.$message }}</div>
               </div>
             </div>
-            <div class="text-hint">* Ghi chú</div>
-            <textarea
-              id="mota"
-              rows="2"
-              cols="60"
-              placeholder="Giao cho tôi vào giờ hành chính"
-              v-model="customer.note"
-            ></textarea>
-            <br />
-          </form>
+          </div>
+          <div class="text-hint">* Ghi chú</div>
+          <textarea
+            id="mota"
+            rows="2"
+            cols="60"
+            placeholder="Giao cho tôi vào giờ hành chính"
+            v-model="customer.note"
+          ></textarea>
+          <br />
         </div>
         <div class="information col-5">
           <br />
@@ -231,7 +229,9 @@
                 {{
                   voucherSelected.discount
                     ? formatCash(
-                        (voucherSelected.discount / 100) * totalMoney()
+                        parseInt(
+                          (voucherSelected.discount / 100) * totalMoney()
+                        )
                       )
                     : 0
                 }}<sup>đ</sup>
@@ -239,123 +239,84 @@
             </tr>
             <tr class="tongtien">
               <td><label>Tổng thanh toán</label></td>
-              <td class="col-infor2">
+              <td class="col-infor2 total-money">
                 {{
-                  voucherSelected.discount
-                    ? formatCash(
-                        (1 - voucherSelected.discount / 100) * totalMoney() +
-                          30000
-                      )
-                    : 0
+                  formatCash(
+                    voucherSelected.discount
+                      ? parseInt(
+                          (1 - voucherSelected.discount / 100) * totalMoney() +
+                            30000
+                        )
+                      : parseInt(totalMoney() + 30000)
+                  )
                 }}<sup>đ</sup>
               </td>
             </tr>
           </table>
           <br />
-          <button type="submit" class="btn-buy" @click="submitForm">
-            <i class="fas fa-dollar-sign"></i> Thanh toán
+          <button type="submit" class="btn-buy" @click="order">
+            <i class="fas fa-dollar-sign"></i> Đặt hàng
           </button>
         </div>
       </div>
     </div>
     <br />
   </div>
-  <div class="form-popup" id="myForm">
-    <h3>Xác nhận</h3>
-    <table class="table-confirm">
-      <tr>
-        <td>
-          <label><b>Họ tên</b></label>
-        </td>
-        <td>
-          <input
-            type="text"
-            class="form-control"
-            id="ten2"
-            name="cus_name"
-            readonly
-          />
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label><b>Email</b></label>
-        </td>
-        <td>
-          <input
-            type="email"
-            class="form-control"
-            id="email2"
-            name="email"
-            readonly
-          />
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label><b>Địa chỉ</b></label>
-        </td>
-        <td>
-          <input
-            type="text"
-            class="form-control"
-            id="sonha2"
-            name="address"
-            readonly
-          />
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label><b>Số điện thoại</b></label>
-        </td>
-        <td>
-          <input
-            type="text"
-            class="form-control"
-            id="sdt2"
-            name="phone_number"
-            readonly
-          />
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label><b>Tổng tiền</b></label>
-        </td>
-        <td>
-          <input
-            type="text"
-            class="form-control"
-            id="total2"
-            name="total"
-            readonly
-          />
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label><b>Ghi chú</b></label>
-        </td>
-        <td>
-          <input
-            type="text"
-            class="form-control"
-            id="mota2"
-            name="note"
-            readonly
-          />
-        </td>
-      </tr>
-    </table>
-    <button type="submit" class="btn">
-      <i class="fas fa-save"></i>&ensp;Xác nhận
-    </button>
-    <a class="btn" onclick="closeForm()"
-      ><i class="fas fa-window-close"></i>&ensp;Đóng</a
-    >
-    <input type="hidden" id="voucher_id" name="voucher_id" />
+  <div
+    class="container form-popup"
+    :style="isShow ? 'display:block' : 'display:none'"
+  >
+    <div class="title">Xác nhận</div>
+    <div class="row">
+      <div class="col-4">Họ tên</div>
+      <div class="col-8">
+        {{ customer.name }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-4">Email</div>
+      <div class="col-8">{{ customer.email }}</div>
+    </div>
+    <div class="row">
+      <div class="col-4">Địa chỉ</div>
+      <div class="col-8">{{ customer.address }}</div>
+    </div>
+    <div class="row">
+      <div class="col-4">Số điện thoại</div>
+      <div class="col-8">{{ customer.phone }}</div>
+    </div>
+    <div class="row">
+      <div class="col-4">Ghi chú</div>
+      <div class="col-8">{{ customer.note }}</div>
+    </div>
+    <div class="row">
+      <div class="col-4">Tổng tiền</div>
+      <div class="col-8">
+        {{
+          formatCash(
+            voucherSelected.discount
+              ? parseInt(
+                  (1 - voucherSelected.discount / 100) * totalMoney() + 30000
+                )
+              : parseInt(totalMoney() + 30000)
+          )
+        }}<sup>đ</sup>
+      </div>
+    </div>
+    <br />
+    <div class="row">
+      <div class="col-12" style="text-align: right">
+        <button class="btn-checkout" @click="checkOut">
+          <i class="fa-regular fa-credit-card"></i>&ensp;Thanh toán
+        </button>
+        &emsp;
+        <button class="btn-exit" @click="close">
+          <i class="fa-sharp fa-solid fa-circle-xmark"></i>&ensp;Thoát
+        </button>
+      </div>
+    </div>
   </div>
+  <modal name="example">This is an example</modal>
 </template>
 
 <script setup>
@@ -364,20 +325,13 @@ import Select2 from "vue3-select2-component";
 import { ref, inject, reactive } from "vue";
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
 import { useVuelidate } from "@vuelidate/core";
-import {
-  required,
-  email,
-  minLength,
-  helpers,
-  maxLength,
-} from "@vuelidate/validators";
-
-// const toasted = inject("Toasted");
+import { required, email, helpers, integer } from "@vuelidate/validators";
 
 const clientRepository = RepositoryFactory.get("client");
 const voucherRepository = RepositoryFactory.get("voucher");
 const emitter = inject("emitter");
 
+const isShow = ref(false);
 const carts = ref([]);
 const data = ref([]);
 const vouchers = ref([]);
@@ -407,19 +361,24 @@ const rules = {
 };
 
 const v$ = useVuelidate(rules, customer);
-
-const submitForm = () => {
-  console.log(v$);
+// order
+const order = () => {
   v$.value.$validate();
   if (v$.value.$invalid) {
     alert("Vui lòng điền đầy đủ thông tin");
-  } else alert("Chuyển sang form thanh toán");
+  } else {
+    localStorage.setItem("customer", JSON.stringify(customer));
+    isShow.value = true;
+    // alert("Chuyển sang form thanh toán");
+  }
 };
 
 //
+const close = () => {
+  isShow.value = false;
+};
 const selectVoucher = (voucher) => {
   voucherSelected.value = voucher;
-  console.log(voucherSelected.value);
 };
 
 const reload = async () => {
@@ -504,6 +463,7 @@ const totalMoney = () => {
   carts.value.forEach((item) => {
     total += item.quantity * item.unit_price;
   });
+
   return total;
 };
 
@@ -529,6 +489,57 @@ const removeProduct = (id) => {
 </script>
 
 <style scoped>
+/* Popup form */
+.form-popup {
+  padding: 20px;
+  display: block;
+  position: fixed;
+  bottom: 250px;
+  right: 550px;
+  z-index: 9;
+  border-radius: 10px;
+  background-color: white;
+  border: 3px solid #2e3094;
+  width: 400px;
+  -moz-box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
+  -webkit-box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
+}
+
+.row button {
+  border: none;
+  border-radius: 5px;
+}
+.btn-exit {
+  text-align: right;
+  background-color: #ed1a29;
+  color: white;
+  padding: 10px 15px;
+}
+.btn-checkout {
+  background-color: #2e3094;
+  color: white;
+  border: none;
+  text-align: left;
+  padding: 10px 15px;
+}
+.title {
+  text-align: center;
+  font-size: 24px;
+  padding-bottom: 10px;
+  font-weight: bold;
+  border-bottom: 1px solid rgb(241, 215, 231);
+}
+.table-payment {
+  width: 100%;
+}
+.col-infor2 {
+  text-align: right;
+}
+.total-money {
+  font-weight: bold;
+  color: #ed1a29;
+}
 * {
   margin: 0;
   padding: 0;
@@ -569,10 +580,6 @@ a {
 .table-product {
   width: 100%;
 }
-input.money {
-  border: none;
-  width: 50%;
-}
 td img {
   width: 80px;
   height: 80px;
@@ -605,7 +612,7 @@ td img {
   padding-left: 40px;
 }
 .col-voucher {
-  width: 80%;
+  width: 70%;
 }
 td .button,
 td button {
@@ -616,11 +623,6 @@ td button {
   border-radius: 5px;
   font-size: 20px;
 }
-.soluong {
-  width: 20px;
-  border: none;
-}
-
 .row-end-money {
   font-weight: bold;
   color: #ed1a29;
@@ -651,16 +653,13 @@ a.info-product {
   font-weight: bold;
 }
 /*  */
-.button-home .btn-home,
-.btn-update {
-  border: none;
-  border-radius: 10px;
-  padding: 10px 15px 10px 15px;
-  color: white;
+.button-home .btn-home {
   background-color: #2e3094;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
 }
-.button-home .btn-home:hover,
-.btn-update:hover {
+.button-home .btn-home:hover {
   background-color: #ed1a29;
 }
 .out-texthead {
@@ -720,79 +719,5 @@ textarea {
 }
 .btn-buy:hover {
   background-color: red;
-}
-/* Popup form */
-.form-popup {
-  display: none;
-  position: fixed;
-  bottom: 5%;
-  right: 30%;
-  z-index: 9;
-  border-radius: 10px;
-  background-color: white;
-  border: 3px solid #2e3094;
-}
-
-/* Add styles to the form container */
-.form-container {
-  height: 580px;
-  width: 500px;
-  padding: 10px;
-}
-
-.form-container h3 {
-  text-align: center;
-}
-
-/* Full-width input fields */
-.form-container input[type="text"],
-.form-container input[type="number"],
-.form-container input[type="email"] {
-  width: 100%;
-  padding: 10px;
-  margin: 5px 0 22px 0;
-  border: none;
-  background: #f1f1f1;
-}
-
-/* Khi nhấn vào input */
-.form-container input[type="text"]:focus,
-.form-container
-  input[type="number"]:focus
-  .form-container
-  input[type="email"]:focus {
-  background-color: #ddd;
-  outline: none;
-}
-
-.form-container .btn[type="submit"] {
-  background-color: #2e3094;
-}
-
-/* Nút lưu, đóng */
-.form-container .btn {
-  background-color: #ed1a29;
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-  margin-bottom: 5px;
-  opacity: 0.8;
-}
-.table-confirm,
-.table-payment {
-  width: 100%;
-}
-.col-infor2 {
-  text-align: right;
-  font-weight: bold;
-}
-.col-infor2 #discount,
-.col-infor2 #total {
-  border: none;
-  width: 50%;
-  text-align: right;
-  font-weight: bold;
 }
 </style>

@@ -267,7 +267,10 @@ const getUnitInStock = () => {
     choice.id_detail = correctItem.id;
     choice.price = correctItem.price_sale ?? correctItem.price;
     unit_in_stock.value = correctItem.unit_in_stock;
-  } else unit_in_stock.value = 0;
+  } else {
+    unit_in_stock.value = 0;
+    choice.price = 0;
+  };
 };
 
 // decrease quantity
