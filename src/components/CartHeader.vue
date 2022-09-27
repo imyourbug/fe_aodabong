@@ -4,9 +4,7 @@
     <div class="cart" v-if="carts && carts.length > 0">
       <div
         class="row product py-1"
-        v-for="(product, key) in carts
-          .slice(carts.length - 6, carts.length - 1)
-          .reverse()"
+        v-for="(product, key) in carts.slice(0, 4).reverse()"
         v-bind:key="key"
       >
         <div class="col-3">
@@ -30,9 +28,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits } from "vue";
-
-// const emit = defineEmits([])
+import { defineProps } from "vue";
 
 const props = defineProps({
   carts: Object,
@@ -60,6 +56,10 @@ a {
 .card {
   background-color: rgb(248, 233, 233);
   text-align: left;
+  border: 2px solid #2e3094;
+  -moz-box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
+  -webkit-box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
 }
 .btn-cart {
   color: white;

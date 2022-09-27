@@ -84,7 +84,7 @@
             <tr style="border: none">
               <td colspan="6">
                 <div class="total">
-                  Tổng tiền: {{ formatCash(totalMoney()) }}<sup>đ</sup>
+                  Tổng tiền: {{ formatCash(total_money) }}<sup>đ</sup>
                 </div>
               </td>
             </tr>
@@ -229,9 +229,7 @@
                 {{
                   voucherSelected.discount
                     ? formatCash(
-                        parseInt(
-                          (voucherSelected.discount / 100) * totalMoney()
-                        )
+                        parseInt((voucherSelected.discount / 100) * total_money)
                       )
                     : 0
                 }}<sup>đ</sup>
@@ -244,10 +242,10 @@
                   formatCash(
                     voucherSelected.discount
                       ? parseInt(
-                          (1 - voucherSelected.discount / 100) * totalMoney() +
+                          (1 - voucherSelected.discount / 100) * total_money +
                             30000
                         )
-                      : parseInt(totalMoney() + 30000)
+                      : parseInt(total_money + 30000)
                   )
                 }}<sup>đ</sup>
               </td>
@@ -260,12 +258,8 @@
         </div>
       </div>
     </div>
-    <br />
   </div>
-  <div
-    class="container form-popup"
-    :style="isShow ? 'display:block' : 'display:none'"
-  >
+  <div name="popup" class="form-popup" v-if="showCheckOut">
     <div class="title">Xác nhận</div>
     <div class="row">
       <div class="col-4">Họ tên</div>
@@ -287,7 +281,7 @@
     </div>
     <div class="row">
       <div class="col-4">Ghi chú</div>
-      <div class="col-8">{{ customer.note }}</div>
+      <div class="col-8">{{ customer.note ?? "Trống" }}</div>
     </div>
     <div class="row">
       <div class="col-4">Tổng tiền</div>
@@ -296,42 +290,44 @@
           formatCash(
             voucherSelected.discount
               ? parseInt(
-                  (1 - voucherSelected.discount / 100) * totalMoney() + 30000
+                  (1 - voucherSelected.discount / 100) * total_money + 30000
                 )
-              : parseInt(totalMoney() + 30000)
+              : parseInt(total_money + 30000)
           )
         }}<sup>đ</sup>
       </div>
     </div>
     <br />
     <div class="row">
-      <div class="col-12" style="text-align: right">
-        <button class="btn-checkout" @click="checkOut">
-          <i class="fa-regular fa-credit-card"></i>&ensp;Thanh toán
-        </button>
-        &emsp;
+      <div class="col-9">
+        <PaypalCheckout
+          class="btn-paypal"
+          :total_money="total_money"
+        ></PaypalCheckout>
+      </div>
+      <div class="col-3">
         <button class="btn-exit" @click="close">
           <i class="fa-sharp fa-solid fa-circle-xmark"></i>&ensp;Thoát
         </button>
       </div>
     </div>
   </div>
-  <modal name="example">This is an example</modal>
 </template>
 
 <script setup>
 import ntc from "ntc-hi-js";
-import Select2 from "vue3-select2-component";
 import { ref, inject, reactive } from "vue";
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
 import { useVuelidate } from "@vuelidate/core";
 import { required, email, helpers, integer } from "@vuelidate/validators";
+import PaypalCheckout from "@/components/checkouts/PaypalCheckout.vue";
 
 const clientRepository = RepositoryFactory.get("client");
 const voucherRepository = RepositoryFactory.get("voucher");
 const emitter = inject("emitter");
 
-const isShow = ref(false);
+const total_money = ref(30000);
+const showCheckOut = ref(false);
 const carts = ref([]);
 const data = ref([]);
 const vouchers = ref([]);
@@ -342,6 +338,13 @@ const customer = reactive({
   address: "",
   phone: "",
   note: "",
+});
+
+emitter.on("CheckoutSuccess", () => {
+  console.log("run checkout success");
+  localStorage.removeItem("carts");
+  showCheckOut.value = false;
+  reload();
 });
 
 // validate
@@ -368,17 +371,17 @@ const order = () => {
     alert("Vui lòng điền đầy đủ thông tin");
   } else {
     localStorage.setItem("customer", JSON.stringify(customer));
-    isShow.value = true;
+    showCheckOut.value = true;
     // alert("Chuyển sang form thanh toán");
   }
 };
 
-//
 const close = () => {
-  isShow.value = false;
+  showCheckOut.value = false;
 };
 const selectVoucher = (voucher) => {
   voucherSelected.value = voucher;
+  total_money.value = (1 - voucher.discount / 100) * total_money.value;
 };
 
 const reload = async () => {
@@ -401,6 +404,12 @@ const reload = async () => {
   });
   //
   carts.value = JSON.parse(localStorage.getItem("carts"));
+  // total money
+  if (carts.value) {
+    carts.value.forEach((item) => {
+      total_money.value += item.quantity * item.unit_price;
+    });
+  }
 };
 
 reload();
@@ -457,16 +466,6 @@ const getQuantity = (id_detail) => {
   return unit_in_stock;
 };
 
-// total money
-const totalMoney = () => {
-  let total = 0;
-  carts.value.forEach((item) => {
-    total += item.quantity * item.unit_price;
-  });
-
-  return total;
-};
-
 // format cash
 const formatCash = (str) => {
   return str
@@ -486,21 +485,31 @@ const removeProduct = (id) => {
 
   reload();
 };
+
+// check out
+const checkOut = () => {
+  clientRepository.getUrlCheckOut().then((response) => {
+    console.log(response.data);
+  });
+};
 </script>
 
 <style scoped>
+.btn-paypal {
+  float: right;
+}
 /* Popup form */
 .form-popup {
   padding: 20px;
-  display: block;
+  /* display: block; */
   position: fixed;
   bottom: 250px;
   right: 550px;
   z-index: 9;
   border-radius: 10px;
   background-color: white;
+  width: 500px;
   border: 3px solid #2e3094;
-  width: 400px;
   -moz-box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
   -webkit-box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);

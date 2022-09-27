@@ -7,6 +7,7 @@ import ProductDetail from "@/views/clients/ProductDetail.vue";
 import SearchProduct from "@/views/clients/SearchProduct.vue";
 import Cart from "@/views/clients/Cart.vue";
 import Register from "@/views/clients/Register.vue";
+import Checkout from "@/components/checkouts/PaypalCheckout.vue";
 
 const routes = [
     {
@@ -55,6 +56,11 @@ const routes = [
         path: '/register',
         name: 'Register',
         component: Register,
+    },
+    {
+        path: '/checkout',
+        name: 'Checkout',
+        component: Checkout,
     },
 ]
 

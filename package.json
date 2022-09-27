@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.6",
+    "@vue-stripe/vue-stripe": "^4.4.4",
     "@vuelidate/core": "^2.0.0-alpha.44",
     "@vuelidate/validators": "^2.0.0-alpha.31",
     "axios": "^0.27.2",
@@ -18,10 +19,7 @@
     "ntc-hi-js": "^3.2.0",
     "url-loader": "^4.1.1",
     "vue": "^3.2.13",
-    "vue-js-modal": "^2.0.1",
     "vue-router": "^4.0.13",
-    "vue-toasted": "^1.1.28",
-    "vue3-cookies": "^1.0.6",
     "vue3-google-oauth2": "^1.0.6",
     "vue3-select2-component": "^0.1.7",
     "vue3-storage": "^0.1.11"

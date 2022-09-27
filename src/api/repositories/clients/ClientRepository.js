@@ -17,5 +17,8 @@ export default {
     },
     searchProductByKeyWord(key_word) {
         return Repository.get(`${baseUrl}/search/${key_word}`);
+    },
+    getUrlCheckOut() {
+        return Repository.post(`${baseUrl}/check_out`);
     }
 }

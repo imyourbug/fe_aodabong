@@ -6,7 +6,6 @@ import 'bootstrap/dist/js/bootstrap.js';
 import gAuthPlugin from 'vue3-google-oauth2';
 import Select2 from 'vue3-select2-component';
 import mitt from 'mitt';
-import VModal from 'vue-js-modal';
 
 const emitter = mitt();
 const app = createApp(App);
@@ -20,7 +19,6 @@ app.use(gAuthPlugin, {
   scope: 'email',
   prompt: 'consent',
 });
-app.use(VModal);
 
 app.component('Select2', Select2);
 
