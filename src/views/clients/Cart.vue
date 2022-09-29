@@ -46,14 +46,14 @@
               </td>
               <td class="col-soluong">
                 <input
-                  @click="decreaseQuantity(product.id_detail, product.quantity)"
+                  @click="decreaseQuantity(product.detail_id, product.quantity)"
                   type="button"
                   value="-"
                   class="button"
                 />
                 {{ product.quantity }}
                 <input
-                  @click="increaseQuantity(product.id_detail, product.quantity)"
+                  @click="increaseQuantity(product.detail_id, product.quantity)"
                   type="button"
                   value="+"
                   class="button"
@@ -67,13 +67,13 @@
                 <div class="in-thaotac">
                   <button class="delete-product">
                     <i
-                      @click="removeProduct(product.id_detail)"
+                      @click="removeProduct(product.detail_id)"
                       class="fas fa-trash-alt"
                     ></i>
                   </button>
                   &emsp;
                   <router-link
-                    :to="`/products/detail/${product.id_product}`"
+                    :to="`/products/detail/${product.product_id}`"
                     class="info-product"
                   >
                     <i class="fas fa-info-circle"></i>
@@ -84,7 +84,7 @@
             <tr style="border: none">
               <td colspan="6">
                 <div class="total">
-                  Tổng tiền: {{ formatCash(total_money) }}<sup>đ</sup>
+                  Tổng tiền: {{ formatCash(totalMoney()) }}<sup>đ</sup>
                 </div>
               </td>
             </tr>
@@ -229,7 +229,9 @@
                 {{
                   voucherSelected.discount
                     ? formatCash(
-                        parseInt((voucherSelected.discount / 100) * total_money)
+                        parseInt(
+                          (voucherSelected.discount / 100) * totalMoney()
+                        )
                       )
                     : 0
                 }}<sup>đ</sup>
@@ -242,10 +244,10 @@
                   formatCash(
                     voucherSelected.discount
                       ? parseInt(
-                          (1 - voucherSelected.discount / 100) * total_money +
+                          (1 - voucherSelected.discount / 100) * totalMoney() +
                             30000
                         )
-                      : parseInt(total_money + 30000)
+                      : parseInt(totalMoney() + 30000)
                   )
                 }}<sup>đ</sup>
               </td>
@@ -259,7 +261,7 @@
       </div>
     </div>
   </div>
-  <div name="popup" class="form-popup" v-if="showCheckOut">
+  <div name="popup" class="form-popup" v-if="showCheckOut" ref="target">
     <div class="title">Xác nhận</div>
     <div class="row">
       <div class="col-4">Họ tên</div>
@@ -290,9 +292,9 @@
           formatCash(
             voucherSelected.discount
               ? parseInt(
-                  (1 - voucherSelected.discount / 100) * total_money + 30000
+                  (1 - voucherSelected.discount / 100) * totalMoney() + 30000
                 )
-              : parseInt(total_money + 30000)
+              : parseInt(totalMoney() + 30000)
           )
         }}<sup>đ</sup>
       </div>
@@ -302,7 +304,15 @@
       <div class="col-9">
         <PaypalCheckout
           class="btn-paypal"
-          :total_money="total_money"
+          :total_money="
+            VNDtoUSD(
+              voucherSelected.discount
+                ? parseInt(
+                    (1 - voucherSelected.discount / 100) * totalMoney() + 30000
+                  )
+                : parseInt(totalMoney() + 30000)
+            )
+          "
         ></PaypalCheckout>
       </div>
       <div class="col-3">
@@ -320,13 +330,14 @@ import { ref, inject, reactive } from "vue";
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
 import { useVuelidate } from "@vuelidate/core";
 import { required, email, helpers, integer } from "@vuelidate/validators";
+import { onClickOutside } from "@vueuse/core";
 import PaypalCheckout from "@/components/checkouts/PaypalCheckout.vue";
 
 const clientRepository = RepositoryFactory.get("client");
 const voucherRepository = RepositoryFactory.get("voucher");
 const emitter = inject("emitter");
 
-const total_money = ref(30000);
+const target = ref(null);
 const showCheckOut = ref(false);
 const carts = ref([]);
 const data = ref([]);
@@ -340,11 +351,26 @@ const customer = reactive({
   note: "",
 });
 
-emitter.on("CheckoutSuccess", () => {
-  console.log("run checkout success");
-  localStorage.removeItem("carts");
-  showCheckOut.value = false;
-  reload();
+onClickOutside(target, (event) => (showCheckOut.value = false));
+
+emitter.on("checkoutSuccess", () => {
+  // insert data to database
+  let data = {
+    customer: customer,
+    carts: carts.value,
+    discount: voucherSelected.value.discount ?? 0,
+  };
+  clientRepository.createOrder(data).then((response) => {
+    console.log(response);
+    if (response.data.status === 0) {
+      // reset carts
+      localStorage.removeItem("carts");
+      showCheckOut.value = false;
+      emitter.emit("changeQuantity");
+      reload();
+      alert("Thanh toán thành công");
+    }
+  });
 });
 
 // validate
@@ -372,7 +398,6 @@ const order = () => {
   } else {
     localStorage.setItem("customer", JSON.stringify(customer));
     showCheckOut.value = true;
-    // alert("Chuyển sang form thanh toán");
   }
 };
 
@@ -381,7 +406,6 @@ const close = () => {
 };
 const selectVoucher = (voucher) => {
   voucherSelected.value = voucher;
-  total_money.value = (1 - voucher.discount / 100) * total_money.value;
 };
 
 const reload = async () => {
@@ -404,29 +428,23 @@ const reload = async () => {
   });
   //
   carts.value = JSON.parse(localStorage.getItem("carts"));
-  // total money
-  if (carts.value) {
-    carts.value.forEach((item) => {
-      total_money.value += item.quantity * item.unit_price;
-    });
-  }
 };
 
 reload();
 
 // decrease quantity
-const decreaseQuantity = (id_detail, quantity) => {
+const decreaseQuantity = (detail_id, quantity) => {
   if (quantity > 1) {
     carts.value.forEach((item) => {
-      if (item.id_detail === id_detail) {
+      if (item.detail_id === detail_id) {
         item.quantity -= 1;
       }
     });
   } else {
     if (confirm("Bạn muốn xóa sản phẩm này khỏi giỏ hàng?")) {
-      removeProduct(id_detail);
+      removeProduct(detail_id);
       // change count quantity cart
-      emitter.emit("changeQuantity");
+      emitter.emit("reloadHeader");
       return;
     }
   }
@@ -435,10 +453,10 @@ const decreaseQuantity = (id_detail, quantity) => {
 };
 
 // increase quantity
-const increaseQuantity = (id_detail, quantity) => {
-  if (quantity < getQuantity(id_detail)) {
+const increaseQuantity = (detail_id, quantity) => {
+  if (quantity < getQuantity(detail_id)) {
     carts.value.forEach((item) => {
-      if (item.id_detail === id_detail) {
+      if (item.detail_id === detail_id) {
         item.quantity += 1;
       }
     });
@@ -454,11 +472,11 @@ const getNameByHexColor = (hexCode) => {
   return ntc.name(hexCode, "en").color.name;
 };
 
-// get quantity by id_detail
-const getQuantity = (id_detail) => {
+// get quantity by detail_id
+const getQuantity = (detail_id) => {
   let unit_in_stock = 0;
   data.value.forEach((item) => {
-    if (item.id === id_detail) {
+    if (item.id === detail_id) {
       unit_in_stock = item.unit_in_stock;
     }
   });
@@ -480,7 +498,7 @@ const formatCash = (str) => {
 // remove product from carts
 const removeProduct = (id) => {
   let storageProducts = JSON.parse(localStorage.getItem("carts"));
-  let products = storageProducts.filter((product) => product.id_detail !== id);
+  let products = storageProducts.filter((product) => product.detail_id !== id);
   localStorage.setItem("carts", JSON.stringify(products));
 
   reload();
@@ -491,6 +509,22 @@ const checkOut = () => {
   clientRepository.getUrlCheckOut().then((response) => {
     console.log(response.data);
   });
+};
+
+// total money
+const totalMoney = () => {
+  let total = 0;
+  if (carts.value) {
+    carts.value.forEach((item) => {
+      total += item.quantity * item.unit_price;
+    });
+  }
+  return total;
+};
+
+// change vnd to usd
+const VNDtoUSD = (money) => {
+  return Math.round((money / 24000) * 100) / 100;
 };
 </script>
 

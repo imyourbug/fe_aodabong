@@ -18,7 +18,13 @@ export default {
     searchProductByKeyWord(key_word) {
         return Repository.get(`${baseUrl}/search/${key_word}`);
     },
-    getUrlCheckOut() {
-        return Repository.post(`${baseUrl}/check_out`);
+    createOrder(data) {
+        console.log(data);
+        return Repository.post(`${baseUrl}/orders/create`, {
+            carts: data.carts,
+            customer: data.customer,
+            status: 0, // default - in progress
+            discount: data.discount
+        });
     }
 }

@@ -13,3 +13,6 @@ npm i mitt --save
 npm i @vuelidate/core @vuelidate/validators --save
 npm i vue-dk-toast --save
 npm i @vue-stripe/vue-stripe --save
+npm i @vueuse/core --save
+npm i vuetify --legacy-peer-deps
+npm install sass@~1.32 sass-loader deepmerge -D --legacy-peer-deps

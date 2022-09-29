@@ -1,7 +1,8 @@
 <template>
-  <div class="container card">
-    <div class="row user py-3 px-3">Sản phẩm mới thêm</div>
+  <div class="container card py-2">
+    <!-- <div class="row user py-3 px-3">Sản phẩm mới thêm</div> -->
     <div class="cart" v-if="carts && carts.length > 0">
+      Sản phẩm mới thêm
       <div
         class="row product py-1"
         v-for="(product, key) in carts.slice(0, 4).reverse()"
@@ -22,6 +23,12 @@
         <div class="col-6 right">
           <router-link class="btn-cart" to="/carts">Xem giỏ hàng</router-link>
         </div>
+      </div>
+    </div>
+    <div class="row py-3" v-else>
+      <div class="col-6">Giỏ hàng trống</div>
+      <div class="col-6 right">
+        <router-link class="btn-cart" to="/carts">Xem giỏ hàng</router-link>
       </div>
     </div>
   </div>
@@ -68,6 +75,7 @@ a {
   border-radius: 5px;
 }
 .btn-cart:hover {
+  transition: 0.5s ease;
   background-color: #ed1a29;
 }
 .user,

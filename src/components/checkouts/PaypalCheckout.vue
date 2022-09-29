@@ -37,10 +37,10 @@ const reload = () => {
       },
       onApprove: async (data, actions) => {
         const order = await actions.order.capture();
+        console.log(order);
         if (order.status === "COMPLETED") {
-          emitter.emit("CheckoutSuccess");
-          alert("Thanh toán thành công");
-        }
+          emitter.emit("checkoutSuccess");
+        } else alert("Thanh toán thất bại");
       },
       onError: (err) => {
         console.log(err);

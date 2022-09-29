@@ -5,37 +5,27 @@
         <div class="card-block">
           <div class="row">
             <div class="col-md-12">
-              <h3 class="text-center heading">ĐĂNG NHẬP</h3>
+              <h3 class="text-center heading">ĐỔI MẬT KHẨU</h3>
             </div>
           </div>
           <div class="form-group form-primary">
             <input
-              @keyup.enter="handleLogin"
+              readonly
               type="text"
+              v-model="account.email"
               class="form-control"
               placeholder="Email"
-              v-model="account.email"
             />
-            <div :class="{ error: v$.email.$errors.length }">
-              <div
-                class="input-errors"
-                v-for="error of v$.email.$errors"
-                :key="error.$uid"
-              >
-                <div class="error-msg">{{ error.$message }}</div>
-              </div>
-            </div>
           </div>
 
           <div class="form-group form-primary">
             <input
-              @keyup.enter="handleLogin"
               type="password"
-              class="form-control"
-              placeholder="Mật khẩu"
               v-model="account.password"
+              class="form-control"
+              placeholder="Mật khẩu cũ"
             />
-            <div :class="{ error: v$.password.$errors.length }">
+            <div :class="{ error: v$.password.$error.length }">
               <div
                 class="input-errors"
                 v-for="error of v$.password.$errors"
@@ -45,14 +35,47 @@
               </div>
             </div>
           </div>
+          <div class="form-group form-primary">
+            <input
+              type="password"
+              v-model="account.new_password"
+              class="form-control"
+              placeholder="Mật khẩu mới"
+            />
+            <div :class="{ error: v$.new_password.$error.length }">
+              <div
+                class="input-errors"
+                v-for="error of v$.new_password.$errors"
+                :key="error.$uid"
+              >
+                <div class="error-msg">{{ error.$message }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group form-primary">
+            <input
+              type="password"
+              class="form-control"
+              v-model="account.re_new_password"
+              placeholder="Nhập lại mật khẩu mới"
+            />
+            <div :class="{ error: v$.re_new_password.$error.length }">
+              <div
+                class="input-errors"
+                v-for="error of v$.re_new_password.$errors"
+                :key="error.$uid"
+              >
+                <div class="error-msg">{{ error.$message }}</div>
+              </div>
+            </div>
+          </div>
           <div class="row">
             <div class="col-md-12 block-btn">
               <input
-                type="submit"
                 class="btn btn-primary btn-md btn-block waves-effect text-center m-b-20"
-                name="submit"
-                value="Đăng nhập"
-                @click="handleLogin"
+                readonly
+                value="Xác nhận"
+                @click="changePassword"
               />
               <!--  <button type="button" class="btn btn-primary btn-md btn-block waves-effect text-center m-b-20"><i class="fa fa-lock"></i> Signup Now </button> -->
             </div>
@@ -66,91 +89,95 @@
           <GoogleLogin class="GoogleLogin" />
           <br />
           <p class="text-inverse text-center">
-            Chưa có tài khoản?
-            <router-link to="/register">Đăng ký</router-link>
+            Trang chủ
+            <router-link :to="{ name: 'home' }">Quay lại</router-link>
           </p>
         </div>
       </div>
     </div>
   </section>
 </template>
+
 <script setup>
-import { inject, reactive } from "vue";
+import { reactive, ref } from "vue";
+import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
 import { useRouter } from "vue-router";
 import { useVuelidate } from "@vuelidate/core";
-import { required, email, helpers } from "@vuelidate/validators";
-import { RepositoryFactory } from "@/api/repositories/RepositoryFactory";
-import GoogleLogin from "@/components/GoogleLogin.vue";
+import {
+  email,
+  helpers,
+  required,
+  minLength,
+  sameAs,
+  not,
+} from "@vuelidate/validators";
 
 const router = useRouter();
-const emitter = inject("emitter");
 const authRepository = RepositoryFactory.get("auth");
 
 const account = reactive({
-  email: "",
+  email: JSON.parse(localStorage.getItem("user")).email ?? "",
   password: "",
+  new_password: "",
+  re_new_password: "",
 });
 
 // validate
+// confirm
+const space = helpers.regex(/[^\s]/);
+
 const rules = {
-  email: {
-    required: helpers.withMessage("Không được để trống!", required),
-    email: helpers.withMessage("Email không hợp lệ!", email),
-  },
   password: {
     required: helpers.withMessage("Không được để trống!", required),
+  },
+  new_password: {
+    required: helpers.withMessage("Không được để trống!", required),
+    space: helpers.withMessage("Mật khẩu không được chứa dấu cách!", space),
+    minLength: helpers.withMessage(
+      "Mật khẩu tối thiểu gồm 8 ký tự!",
+      minLength(8)
+    ),
+    // sameAs: helpers.withMessage(
+    //   "Mật khẩu mới không được trùng với mật khẩu cũ!",
+    //   not(sameAs(account.password))
+    // ),
+  },
+  re_new_password: {
+    required: helpers.withMessage("Không được để trống!", required),
+    space: helpers.withMessage("Mật khẩu không được chứa dấu cách!", space),
+    minLength: helpers.withMessage(
+      "Mật khẩu tối thiểu gồm 8 ký tự!",
+      minLength(8)
+    ),
+    // sameAs: helpers.withMessage(
+    //   "Mật khẩu nhập lại phải trùng khớp!",
+    //   sameAs(account.new_password)
+    // ),
   },
 };
 
 const v$ = useVuelidate(rules, account);
-console.log(v$);
 
-const unSave = () => {
-  localStorage.removeItem("user");
-};
-
-const handleLogin = () => {
+const changePassword = () => {
   v$.value.$validate();
   if (v$.value.$invalid) {
     alert("Vui lòng điền đầy đủ thông tin");
   } else {
-    try {
-      authRepository.login(account).then((response) => {
-        if (response.data.status === 0) {
-          saveUser(response.data.data.user);
-          // Change name
-          emitter.emit("reloadHeader");
-          //
-          router.push({ path: "/home" });
-        }
-        if (response.data.status === 1) {
-          alert(response.data.error.message);
-        }
-        if (response.data.status !== 1 && response.data.status !== 0) {
-          alert("Throw exception");
-        }
-      });
-    } catch (e) {
-      console.log(e);
-    }
+    authRepository.changePassword(account).then((response) => {
+      if (response.data.status === 0) {
+        console.log("Đổi mật khẩu thành công");
+        router.push({
+          name: "home",
+        });
+      }
+      if (response.data.status === 1) {
+        alert(response.data.error.message);
+      }
+      if (response.data.status !== 1 && response.data.status !== 0) {
+        alert("Throw exception");
+      }
+    });
   }
-};
-
-const saveUser = (user) => {
-  let account = {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    address: user.address,
-    district: user.district,
-    province: user.province,
-    zip_code: user.zip_code,
-    // authtoken: user.authtoken,
-    url:
-      user.avatar ??
-      "https://lh3.googleusercontent.com/a/ALm5wu3puRoYHFiWkiDzVURYU01We0ZJXXGNvv6TiVDa=s96-c",
-  };
-  localStorage.setItem("user", JSON.stringify(account));
 };
 </script>
 
@@ -253,6 +280,12 @@ body {
   color: red !important;
 }
 
+.btn-google {
+  color: #545454;
+  background-color: #ffffff;
+  box-shadow: 0 1px 2px 1px #ddd;
+}
+
 .or-container {
   align-items: center;
   color: #ccc;
@@ -281,7 +314,6 @@ body {
   font-size: 14px;
   align-items: center;
 }
-
 .GoogleLogin {
   text-align: center;
 }

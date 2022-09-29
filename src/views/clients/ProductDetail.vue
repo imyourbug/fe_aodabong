@@ -16,7 +16,7 @@
       <div class="row">
         <div class="col-6">
           <div class="detail-pro">
-            <img class="img-detail" src="../../assets/08-30-20ao1.jpg" />
+            <img class="img-detail" :src="`${domain}${data.thumb}`" />
             <div class="block-khuyenmai">
               <div class="khuyenmai">
                 <i class="far fa-star"></i> Tặng ngay quả bóng đá, giày bóng đá,
@@ -200,13 +200,14 @@ const clientRepository = RepositoryFactory.get("client");
 const router = useRouter();
 const emitter = inject("emitter");
 
-const id_product = parseInt(router.currentRoute.value.params.id);
+const domain = process.env.VUE_APP_DOMAIN_URL;
+const product_id = parseInt(router.currentRoute.value.params.id);
 const data = ref([]);
 const sizes = ref([]);
 const colors = ref([]);
 const unit_in_stock = ref(0);
 const choice = reactive({
-  id_detail: -1,
+  detail_id: -1,
   new_size: "",
   new_color: "",
   price: 0,
@@ -220,7 +221,7 @@ const getNameByHexColor = (hexCode) => {
 
 const reload = () => {
   // get detail product
-  clientRepository.getDetailProduct(id_product).then((response) => {
+  clientRepository.getDetailProduct(product_id).then((response) => {
     data.value = response.data.data.product;
     // console.log(data.value);
     // get sizes and colors
@@ -243,13 +244,13 @@ reload();
 const setSize = (size) => {
   choice.new_size = size;
   getUnitInStock();
-}
+};
 
 // set color
 const setColor = (color) => {
   choice.new_color = color;
   getUnitInStock();
-}
+};
 
 // get unit in stock
 const getUnitInStock = () => {
@@ -264,13 +265,13 @@ const getUnitInStock = () => {
     }
   });
   if (correctItem) {
-    choice.id_detail = correctItem.id;
+    choice.detail_id = correctItem.id;
     choice.price = correctItem.price_sale ?? correctItem.price;
     unit_in_stock.value = correctItem.unit_in_stock;
   } else {
     unit_in_stock.value = 0;
     choice.price = 0;
-  };
+  }
 };
 
 // decrease quantity
@@ -305,7 +306,7 @@ const addProductToCart = () => {
   if (carts.length > 0) {
     carts.forEach((item) => {
       if (
-        item.id_product == id_product &&
+        item.product_id == product_id &&
         item.code_color === choice.new_color &&
         item.code_size === choice.new_size
       ) {
@@ -323,8 +324,8 @@ const addProductToCart = () => {
   //
   if (count === 0) {
     carts.push({
-      id_detail: choice.id_detail,
-      id_product: id_product,
+      detail_id: choice.detail_id,
+      product_id: product_id,
       code_color: choice.new_color,
       code_size: choice.new_size,
       quantity: choice.quantity,
@@ -336,7 +337,7 @@ const addProductToCart = () => {
   }
   localStorage.setItem("carts", JSON.stringify(carts));
   // change count quantity cart
-  emitter.emit("changeQuantity");
+  emitter.emit("reloadHeader");
 
   return true;
 };

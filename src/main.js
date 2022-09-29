@@ -19,6 +19,7 @@ app.use(gAuthPlugin, {
   scope: 'email',
   prompt: 'consent',
 });
+// app.use(vuetify);
 
 app.component('Select2', Select2);
 

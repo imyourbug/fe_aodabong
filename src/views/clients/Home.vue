@@ -29,7 +29,7 @@
             >
               <router-link :to="`/products/detail/${product.product.id}`">
                 <div class="block-product">
-                  <a> <img src="@/assets/khai.png" /></a>
+                  <a> <img :src="`${domain}${product.product.thumb}`" /></a>
                   <a>
                     <p>{{ product.product.name }}</p>
                   </a>
@@ -63,6 +63,8 @@ const clientRepository = RepositoryFactory.get("client");
 const router = useRouter();
 
 const groups = ref([]);
+const domain = process.env.VUE_APP_DOMAIN_URL;
+
 const reload = () => {
   clientRepository
     .getAllProductGroup()

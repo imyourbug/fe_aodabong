@@ -26,9 +26,9 @@ const logInByGoogle = async () => {
     // save user login
     saveGoogleUser(googleUser);
     // Change name
-    emitter.emit("changeName");
+    emitter.emit("reloadHeader");
     //
-    router.push({ path: "/home" });
+    router.push({ name: "home" });
   } catch (e) {
     console.log(e);
   }

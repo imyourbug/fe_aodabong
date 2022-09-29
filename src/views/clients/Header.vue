@@ -32,25 +32,22 @@
       </form>
     </div>
     <div class="col-4 block-user">
-      <div id="nav d-flex">
-        <router-link class="btn-login" to="/login" v-if="!isLogged"
-          >Đăng nhập</router-link
-        >
-        <router-link class="cart" to="/carts" v-if="isLogged"
+      <div class="block-left-header">
+        <router-link class="cart" to="/carts"
           ><i class="fa-solid fa-cart-shopping"></i
           ><sup class="cart-quantity">{{ carts.length }}</sup>
           <CartHeader
             class="cart-header"
             :carts="carts"
             :user="user" /></router-link
-        >&emsp; <i class="fa-solid fa-bell nav-icon" v-if="isLogged"></i>&emsp;
-        <a
-          href="#"
-          @click.prevent="handleSignOut"
-          class="btn-logout"
-          v-if="isLogged"
-          ><img class="nav-avatar" :src="user.url" /> &ensp;Đăng xuất</a
-        >
+        >&emsp;
+        <router-link class="btn-login" to="/login" v-if="!isLogged"
+          ><img class="nav-avatar" src="@/assets/default.jpg"
+        /></router-link>
+        <div class="btn-logout btn-user" v-if="isLogged">
+          <img class="nav-avatar" :src="user.url" /> &ensp;
+          <div class="user-header"><UserHeader /></div>
+        </div>
       </div>
     </div>
   </div>
@@ -60,6 +57,7 @@
 import { ref, inject } from "vue";
 import { useRouter } from "vue-router";
 import CartHeader from "@/components/CartHeader.vue";
+import UserHeader from "@/components/UserHeader.vue";
 
 const router = useRouter();
 const Vue3GoogleOauth = inject("Vue3GoogleOauth");
@@ -70,11 +68,7 @@ const isLogged = ref(false);
 const key_word = ref("");
 const carts = ref([]);
 
-emitter.on("changeName", () => {
-  reload();
-});
-
-emitter.on("changeQuantity", () => {
+emitter.on("reloadHeader", () => {
   reload();
 });
 
@@ -84,7 +78,7 @@ const handleSignOut = async () => {
     unSaveUser();
     isLogged.value = false;
 
-    router.push({ path: "/login" });
+    router.push({ name: "login" });
   } catch (error) {
     console.log(error);
   }
@@ -120,6 +114,26 @@ a {
 }
 a:hover {
   color: black;
+}
+.block-left-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+/* user-header */
+.user-header {
+  display: none;
+  top: 90px;
+  right: 200px;
+  border: 1px solid black;
+  position: absolute;
+  z-index: 9;
+  background-color: white;
+  padding: 5px 10px;
+  text-align: left;
+}
+.btn-user:hover .user-header {
+  display: block;
 }
 /* cart header */
 .cart:hover .cart-header {

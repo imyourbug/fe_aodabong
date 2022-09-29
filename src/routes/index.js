@@ -8,59 +8,67 @@ import SearchProduct from "@/views/clients/SearchProduct.vue";
 import Cart from "@/views/clients/Cart.vue";
 import Register from "@/views/clients/Register.vue";
 import Checkout from "@/components/checkouts/PaypalCheckout.vue";
+import InfoUser from "@/views/clients/InfoUser.vue";
+import ChangePassword from '@/views/clients/ChangePassword.vue';
+import Modal from '@/components/Modal.vue';
 
 const routes = [
     {
         path: '/home',
-        name: 'Home',
+        name: 'home',
         component: Home,
-        meta: {
-            requiresAuth: true
-        },
+        // meta: {
+        //     requiresAuth: true
+        // },
     },
     {
         path: '/products/search/q=:key_word',
-        name: 'SearchProduct',
+        name: 'search_product',
         component: SearchProduct,
-        meta: {
-            requiresAuth: true
-        },
     },
     {
         path: '/products/detail/:id',
-        name: 'ProductDetail',
+        name: 'product_detail',
         component: ProductDetail,
-        meta: {
-            requiresAuth: true
-        },
     },
     {
         path: '/carts',
-        name: 'Cart',
+        name: 'cart',
         component: Cart,
-        meta: {
-            requiresAuth: true
-        },
     },
     {
         path: '/about',
-        name: 'About',
+        name: 'about',
         component: About,
     },
     {
         path: '/login',
-        name: 'Login',
+        name: 'login',
         component: Login,
     },
     {
         path: '/register',
-        name: 'Register',
+        name: 'register',
         component: Register,
     },
     {
+        path: '/change_password',
+        name: 'change_password',
+        component: ChangePassword,
+    },
+    {
         path: '/checkout',
-        name: 'Checkout',
+        name: 'checkout',
         component: Checkout,
+    },
+    {
+        path: '/user/info',
+        name: 'info_user',
+        component: InfoUser,
+    },
+    {
+        path: '/modal',
+        component: Modal,
     },
 ]
 
