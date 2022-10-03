@@ -65,6 +65,8 @@ const router = useRouter();
 const groups = ref([]);
 const domain = process.env.VUE_APP_DOMAIN_URL;
 
+console.log(domain);
+
 const reload = () => {
   clientRepository
     .getAllProductGroup()

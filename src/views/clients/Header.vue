@@ -42,10 +42,10 @@
             :user="user" /></router-link
         >&emsp;
         <router-link class="btn-login" to="/login" v-if="!isLogged"
-          ><img class="nav-avatar" src="@/assets/default.jpg"
+          ><img class="nav-avatar" src="../../assets/default.jpg"
         /></router-link>
         <div class="btn-logout btn-user" v-if="isLogged">
-          <img class="nav-avatar" :src="user.url" /> &ensp;
+          <img class="nav-avatar" :src="user.avatar" /> &ensp;
           <div class="user-header"><UserHeader /></div>
         </div>
       </div>
@@ -125,11 +125,12 @@ a:hover {
   display: none;
   top: 90px;
   right: 200px;
-  border: 1px solid black;
+  border: 1px solid #2e3094;
+  border-radius: 5px;
   position: absolute;
   z-index: 9;
   background-color: white;
-  padding: 5px 10px;
+  padding: 10px 15px;
   text-align: left;
 }
 .btn-user:hover .user-header {
@@ -198,6 +199,7 @@ sup.cart-quantity {
 }
 .nav-avatar {
   width: 35px;
+  height: 35px;
   border-radius: 50%;
 }
 .nav-icon {

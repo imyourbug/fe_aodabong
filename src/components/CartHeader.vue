@@ -9,7 +9,7 @@
         v-bind:key="key"
       >
         <div class="col-3">
-          <img class="thumb" src="@/assets/08-30-20ao1.jpg" />
+          <img class="thumb" :src="`${domain}${product.thumb}`" />
         </div>
         <div class="col-5">
           {{ product.name }}
@@ -41,6 +41,8 @@ const props = defineProps({
   carts: Object,
   user: Object,
 });
+
+const domain = process.env.VUE_APP_DOMAIN_URL ?? "";
 
 const reload = () => {};
 

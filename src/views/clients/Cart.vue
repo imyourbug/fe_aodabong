@@ -33,7 +33,8 @@
           <tbody>
             <tr v-for="(product, key) in carts" v-bind:key="key">
               <td class="col-img">
-                <img :src="product.thumb" />&emsp; {{ product.name }}
+                <img :src="`${domain}${product.thumb}`" />&emsp;
+                {{ product.name }}
               </td>
               <td class="col-dongia">
                 {{ formatCash(product.unit_price) }}<sup>đ</sup>
@@ -337,6 +338,7 @@ const clientRepository = RepositoryFactory.get("client");
 const voucherRepository = RepositoryFactory.get("voucher");
 const emitter = inject("emitter");
 
+const domain = process.env.VUE_APP_DOMAIN_URL ?? "";
 const target = ref(null);
 const showCheckOut = ref(false);
 const carts = ref([]);
@@ -366,7 +368,7 @@ emitter.on("checkoutSuccess", () => {
       // reset carts
       localStorage.removeItem("carts");
       showCheckOut.value = false;
-      emitter.emit("changeQuantity");
+      emitter.emit("reloadHeader");
       reload();
       alert("Thanh toán thành công");
     }

@@ -137,18 +137,21 @@ const handleLogin = () => {
 };
 
 const saveUser = (user) => {
+  console.log(user);
   let account = {
     id: user.id,
     name: user.name,
     email: user.email,
-    address: user.address,
-    district: user.district,
+    phone: user.phone,
     province: user.province,
+    district: user.district,
+    ward: user.ward,
+    street: user.street,
     zip_code: user.zip_code,
     // authtoken: user.authtoken,
-    url:
+    avatar:
       user.avatar ??
-      "https://lh3.googleusercontent.com/a/ALm5wu3puRoYHFiWkiDzVURYU01We0ZJXXGNvv6TiVDa=s96-c",
+      `${process.env.VUE_APP_DOMAIN_URL}/storage/uploads/default.jpg`,
   };
   localStorage.setItem("user", JSON.stringify(account));
 };

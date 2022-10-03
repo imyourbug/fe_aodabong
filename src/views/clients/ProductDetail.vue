@@ -1,5 +1,5 @@
 <template>
-  <div class="block-content">
+  <div class="block-content pb-2">
     <div class="container">
       <div class="row">
         <div class="block-head-2">
@@ -185,6 +185,43 @@
           <img class="img-size" src="../../assets/bang_size_giay.png" />
         </div>
         <br />
+      </div>
+      <br />
+      <div class="out-texthead">
+        <div class="text-head">
+          <i class="far fa-comment-dots"></i>&ensp;ĐÁNH GIÁ SẢN PHẨM
+        </div>
+      </div>
+      <div class="block-comment mt-2">
+        <div class="head-comment">
+          <div class="txt-cmt">
+            Viết bình luận ..... <i class="fas fa-pencil-alt"></i>
+          </div>
+        </div>
+        <div class="content-comment">
+          <textarea
+            name="content"
+            class="content-comment"
+            rows="4"
+            cols="60"
+            placeholder="Nhập đánh giá của bạn vào đây..."
+          >
+          </textarea
+          ><br />
+          <button type="submit" class="btn-send">Gửi</button>
+        </div>
+      </div>
+      <div class="comment mt-2">
+        <div class="user-img">
+          <img src="@/assets/khai.png" />
+        </div>
+        &ensp;
+        <div class="infor-comment">
+          <br />
+          <div class="name-user"><a href="#"></a>Lúc</div>
+          <div class="line-comment"></div>
+          <a href="#" class="delete-comment">Xóa </a>
+        </div>
       </div>
     </div>
   </div>
@@ -520,9 +557,6 @@ td.txt-end {
 }
 
 /* block-commnet */
-.enter-comment {
-  padding: 15px;
-}
 
 .out-texthead {
   border-bottom: 1px solid #2e3094;
@@ -718,5 +752,55 @@ label.radio input:checked + span {
   border-color: #8f37aa;
   background-color: #8f37aa;
   color: #fff;
+}
+/* block-comment */
+
+.enter-comment {
+  padding: 15px;
+}
+.out-texthead {
+  border-bottom: 1px solid #2e3094;
+}
+.out-texthead .text-head {
+  font-size: 20px;
+  padding: 5px 0px 5px 10px;
+  background-color: #2e3094;
+  width: 30%;
+  color: white;
+}
+.content-comment textarea {
+  padding: 10px;
+}
+.btn-send {
+  border: none;
+  border-radius: 10px;
+  padding: 5px 10px 5px 10px;
+  color: white;
+  background-color: #2e3094;
+}
+.btn-send:hover {
+  background-color: #ed1a29;
+  outline: 1px solid #ed1a29;
+}
+/* .show-commnet */
+.show-commnet {
+}
+.comment {
+  display: flex;
+}
+.user-img img {
+  width: 80px;
+  height: 80px;
+}
+.line-comment {
+  font-weight: bold;
+}
+.delete-comment {
+  margin-top: 10px;
+  color: rgb(39, 133, 209);
+  background-color: transparent;
+}
+.delete-comment:hover {
+  color: #ed1a29;
 }
 </style>

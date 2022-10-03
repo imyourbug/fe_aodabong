@@ -1,5 +1,5 @@
 {
-  "name": "practice8",
+  "name": "aodabong",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -23,8 +23,7 @@
     "vue-router": "^4.0.13",
     "vue3-google-oauth2": "^1.0.6",
     "vue3-select2-component": "^0.1.7",
-    "vue3-storage": "^0.1.11",
-    "vuetify": "^2.6.10"
+    "vue3-storage": "^0.1.11"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
