@@ -49,7 +49,12 @@
             <div class="col-md-12 block-btn">
               <input
                 type="submit"
-                class="btn btn-primary btn-md btn-block waves-effect text-center m-b-20"
+                class="
+                  btn btn-primary btn-md btn-block
+                  waves-effect
+                  text-center
+                  m-b-20
+                "
                 name="submit"
                 value="Đăng nhập"
                 @click="handleLogin"
@@ -149,9 +154,7 @@ const saveUser = (user) => {
     street: user.street,
     zip_code: user.zip_code,
     // authtoken: user.authtoken,
-    avatar:
-      user.avatar ??
-      `${process.env.VUE_APP_DOMAIN_URL}/storage/uploads/default.jpg`,
+    avatar: user.avatar ?? "/storage/uploads/default.jpg",
   };
   localStorage.setItem("user", JSON.stringify(account));
 };

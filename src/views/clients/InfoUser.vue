@@ -11,7 +11,7 @@
           <img
             @click="changeImage"
             class="rounded-circle mt-5 avatar"
-            :src="user.avatar"
+            :src="`${domain}${user.avatar}`"
             width="90"
           />
           <input
@@ -21,8 +21,7 @@
             @change="changeImage"
           />
           <span class="font-weight-bold">{{ user.name }}</span
-          ><span class="text-black-50">{{ user.email }}</span
-          ><span>United States</span>
+          ><span class="text-black-50">{{ user.email }}</span>
         </div>
       </div>
       <div class="col-md-7 border-right">
@@ -319,7 +318,7 @@ const changeImage = async (event) => {
   formData.append("image_file", event.target.files[0]);
   let respone_upload = await uploadRepository.uploadImage(formData);
   if (respone_upload.data.status === 0) {
-    user.value.avatar = `${domain}${respone_upload.data.url}`;
+    user.value.avatar = respone_upload.data.url;
   }
   if (respone_upload.data.status === 1) {
     alert(respone_upload.data.error.message);

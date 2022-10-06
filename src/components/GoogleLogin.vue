@@ -40,7 +40,7 @@ const saveGoogleUser = (user) => {
     name: user.getBasicProfile().getName(),
     email: user.getBasicProfile().getEmail(),
     access_token: user.Cc.access_token,
-    url: user.getBasicProfile().getImageUrl(),
+    avatar: user.getBasicProfile().getImageUrl(),
   };
   localStorage.setItem("user", JSON.stringify(account));
 };

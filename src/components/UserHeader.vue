@@ -1,6 +1,12 @@
 <template>
-  <router-link :to="{ name: 'info_user' }"
+  <router-link :to="{ name: 'info_user' }" v-if="!user.access_token"
     ><i class="fa-solid fa-user"></i> Tài khoản</router-link
+  >
+  <a
+    href="https://myaccount.google.com/personal-info?hl=vi&pli=1"
+    target="_blank"
+    v-else
+    ><i class="fa-solid fa-user"></i> Tài khoản</a
   >
   <br />
   <router-link :to="{ name: 'change_password' }"
@@ -18,6 +24,7 @@ import { useRouter } from "vue-router";
 
 const props = defineProps({
   isLogged: Boolean,
+  user: Object,
 });
 
 const Vue3GoogleOauth = inject("Vue3GoogleOauth");

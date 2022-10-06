@@ -17,6 +17,12 @@
         <div class="col-6">
           <div class="detail-pro">
             <img class="img-detail" :src="`${domain}${data.thumb}`" />
+            <div class="row">
+              <div class="col-12" style="font-size: 24px; font-weight: bold">
+                Đánh giá sản phẩm
+              </div>
+              <div class="col-12"><Rating /></div>
+            </div>
             <div class="block-khuyenmai">
               <div class="khuyenmai">
                 <i class="far fa-star"></i> Tặng ngay quả bóng đá, giày bóng đá,
@@ -163,7 +169,7 @@
               <td class="txt-head">Cân nặng</td>
               <td>40 - 54 kg</td>
               <td>55 - 65 kg</td>
-              <td>65 -76 kg</td>
+              <td>65 - 76 kg</td>
               <td>77 - 99 kg</td>
             </tr>
             <tr>
@@ -192,56 +198,62 @@
           <i class="far fa-comment-dots"></i>&ensp;ĐÁNH GIÁ SẢN PHẨM
         </div>
       </div>
-      <div class="block-comment mt-2">
+      <div class="block-comment mt-2 col-6">
         <div class="head-comment">
           <div class="txt-cmt">
             Viết bình luận ..... <i class="fas fa-pencil-alt"></i>
           </div>
         </div>
-        <div class="content-comment">
-          <textarea
-            name="content"
-            class="content-comment"
-            rows="4"
-            cols="60"
-            placeholder="Nhập đánh giá của bạn vào đây..."
-          >
-          </textarea
-          ><br />
-          <button type="submit" class="btn-send">Gửi</button>
+        <div class="content-comment mt-2">
+          <img class="avatar" :src="`${domain}${user.avatar}`" />&emsp;
+          <input
+            class="form-control"
+            placeholder="Nhập bình luận của bạn tại đây"
+            v-model="comment.content"
+            @keyup.enter="addComment"
+          />
+          <br />
+        </div>
+        <div style="text-align: right">
+          <button @click="addComment" class="btn-send my-2">Gửi</button>
         </div>
       </div>
-      <div class="comment mt-2">
-        <div class="user-img">
-          <img src="@/assets/khai.png" />
-        </div>
-        &ensp;
-        <div class="infor-comment">
-          <br />
-          <div class="name-user"><a href="#"></a>Lúc</div>
-          <div class="line-comment"></div>
-          <a href="#" class="delete-comment">Xóa </a>
-        </div>
+      <div v-if="comments && comments.length > 0">
+        <Comment
+          v-for="comment in comments"
+          :key="comment.id"
+          :comment="comment"
+          :showRepComment="showRepComment"
+          :showEditComment="showEditComment"
+          :domain="domain"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
+// import dateFormat, { masks } from "dateformat";
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
 import { reactive, ref, inject } from "vue";
 import { useRouter } from "vue-router";
 import ntc from "ntc-hi-js";
+import Rating from "@/components/rates/Rating.vue";
+import Comment from "@/components/comments/Comment.vue";
 
 const clientRepository = RepositoryFactory.get("client");
+const commentRepository = RepositoryFactory.get("comment");
 const router = useRouter();
 const emitter = inject("emitter");
 
 const domain = process.env.VUE_APP_DOMAIN_URL;
 const product_id = parseInt(router.currentRoute.value.params.id);
+const showRepComment = ref(-1);
+const showEditComment = ref([]);
 const data = ref([]);
 const sizes = ref([]);
 const colors = ref([]);
+const comments = ref([]);
 const unit_in_stock = ref(0);
 const choice = reactive({
   detail_id: -1,
@@ -250,6 +262,120 @@ const choice = reactive({
   price: 0,
   quantity: unit_in_stock.value === 0 ? 0 : 1,
 });
+const user = localStorage.getItem("user")
+  ? JSON.parse(localStorage.getItem("user"))
+  : {
+      avatar: `${domain}/storage/uploads/default.jpg`,
+    };
+const comment = reactive({
+  user_id: user.id ?? "",
+  product_id: product_id,
+  content: "",
+  reply_id: 0,
+});
+
+// show edit comment
+emitter.on("showEdit", (comment_id) => {
+  if (!showEditComment.value.includes(comment_id)) {
+    showEditComment.value.push(comment_id);
+  }
+});
+
+// show reply comment
+emitter.on("showReply", (comment_id) => {
+  showRepComment.value = comment_id;
+});
+
+// edit comment
+emitter.on("editComment", (comment) => {
+  commentRepository
+    .updateContentComment(comment.id, comment.content)
+    .then((response) => {
+      if (response.data.status === 0) {
+        reload();
+      }
+      if (response.data.status === 1) {
+        alert(response.data.error.message);
+      }
+      if (response.data.status !== 0 && response.data.status !== 1) {
+        alert(response.data);
+      }
+    });
+});
+
+// rep comment
+emitter.on("repComment", (comment) => {
+  commentRepository.createComment(comment).then((response) => {
+    if (response.data.status === 0) {
+      reload();
+    }
+    if (response.data.status === 1) {
+      alert(response.data.error.message);
+    }
+    if (response.data.status !== 0 && response.data.status !== 1) {
+      alert(response.data);
+    }
+  });
+});
+
+// delete comment
+emitter.on("deleteComment", (comment_id) => {
+  if (confirm("Bạn có muốn xóa bình luận này không?")) {
+    commentRepository.deleteComment(comment_id).then((response) => {
+      if (response.data.status === 0) {
+        reload();
+      }
+      if (response.data.status === 1) {
+        alert(response.data.error.message);
+      }
+      if (response.data.status !== 0 && response.data.status !== 1) {
+        alert(response.data);
+      }
+    });
+  }
+});
+
+// parse flat structure to tree structure
+const traverse = (arr, parentId) =>
+  arr
+    .filter((comment) => comment.reply_id === parentId)
+    .reduce(
+      (result, current) => [
+        ...result,
+        {
+          ...current,
+          children: traverse(arr, current.id),
+        },
+      ],
+      []
+    );
+
+const parseTree = (arr) =>
+  arr
+    .sort(({ order }) => order)
+    .filter(({ reply_id }) => !reply_id)
+    .map((comment) => ({
+      ...comment,
+      children: traverse(arr, comment.id),
+    }));
+
+// addComment
+const addComment = () => {
+  if (comment.content.trim()) {
+    commentRepository.createComment(comment).then((response) => {
+      console.log(response.data);
+      if (response.data.status === 0) {
+        reload();
+      }
+      if (response.data.status === 1) {
+        alert(response.data.error.message);
+      }
+      if (response.data.status !== 0 && response.data.status !== 1) {
+        alert(response.data);
+      }
+    });
+  }
+};
 
 // get name color
 const getNameByHexColor = (hexCode) => {
@@ -260,7 +386,6 @@ const reload = () => {
   // get detail product
   clientRepository.getDetailProduct(product_id).then((response) => {
     data.value = response.data.data.product;
-    // console.log(data.value);
     // get sizes and colors
     let size = [];
     let color = [];
@@ -272,6 +397,12 @@ const reload = () => {
     colors.value = color.filter((v, i, a) => a.indexOf(v) === i);
     // get unit in stock
     getUnitInStock();
+    // get comments
+    comments.value = parseTree(data.value.comments ?? []);
+    comment.content = "";
+    //
+    showEditComment.value = [];
+    showRepComment.value = -1;
   });
 };
 
@@ -423,20 +554,6 @@ a {
   box-shadow: 0px 4px 8px 0px rgb(207, 200, 200);
 }
 
-.block-content-1 {
-  display: flex;
-  justify-content: center;
-}
-
-.block-content-1-left {
-  width: 400px;
-}
-
-.block-img .in-img img {
-  width: max-content;
-  height: max-content;
-}
-
 .block-khuyenmai {
   margin-top: 10px;
 }
@@ -445,10 +562,6 @@ a {
   background-color: rgb(248, 28, 138);
   color: white;
   padding: 5px;
-}
-
-.block-content-1-right {
-  padding: 10px 0px 0px 40px;
 }
 
 .block-soluong {
@@ -470,24 +583,9 @@ a {
   background-color: #ed1a29;
 }
 
-p.thongbao {
-  margin-left: 15%;
-  font-size: 20px;
-  font-weight: bold;
-}
 .text-1 {
   font-weight: bold;
   font-size: 25px;
-}
-
-.text-2 {
-  color: #ed1a29;
-  font-weight: bold;
-  font-size: 25px;
-}
-
-.text-2:hover {
-  color: #ed1a29;
 }
 
 .text-3 {
@@ -570,8 +668,9 @@ td.txt-end {
   color: white;
 }
 
-.content-comment textarea {
-  padding: 10px;
+.content-comment {
+  display: flex;
+  justify-content: center;
 }
 
 .btn-send {
@@ -586,113 +685,6 @@ td.txt-end {
   background-color: #ed1a29;
   outline: 1px solid #ed1a29;
 }
-
-/* .show-commnet */
-.comment {
-  display: flex;
-}
-
-.user-img img {
-  width: 80px;
-  height: 80px;
-}
-
-.line-comment {
-  font-weight: bold;
-}
-
-.delete-comment {
-  margin-top: 10px;
-  color: rgb(39, 133, 209);
-  background-color: transparent;
-}
-
-.delete-comment:hover {
-  color: #ed1a29;
-}
-
-/*  */
-.block-text-1 {
-  border-bottom: 1px solid #ed1a29;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0px 8px 0px;
-}
-
-.block-text-1 a {
-  color: white;
-  padding: 8px;
-}
-
-.btn-left {
-  background-color: #ed1a29;
-  font-size: 17px;
-  font-weight: bold;
-}
-
-.btn-left:hover {
-  color: white;
-}
-
-/* .block-4 */
-.img {
-  overflow: hidden;
-  position: relative;
-  width: auto;
-}
-
-.img img {
-  width: 100%;
-}
-
-.img img:hover {
-  -webkit-transform: scale(1);
-  transform: scale(1.1);
-  transition: 1s;
-}
-
-.block-img {
-  margin: 15px 15px;
-}
-
-.block-img:hover {
-  transition: 0.5s;
-  box-shadow: 0px 8px 16px 0px rgb(99, 95, 95);
-}
-
-.img p,
-.btn-out {
-  text-align: center;
-}
-
-.img .id-pro {
-  position: absolute;
-  top: -9999px;
-  left: -9999px;
-}
-
-.img a {
-  color: black;
-}
-
-.img a:hover {
-  color: #ed1a29;
-}
-
-.btn-group a.detail {
-  color: #ed1a29;
-  font-weight: bold;
-  background-color: white;
-  padding: 5px 10px 5px 10px;
-  border-radius: 60px;
-  outline: 1px solid #ed1a29;
-}
-
-.btn-group a.detail:hover {
-  color: #ed1a29;
-  outline: 2px solid #ed1a29;
-}
 .img-size {
   width: 100%;
   height: 100%;
@@ -702,33 +694,6 @@ td.txt-end {
   height: 400px;
 }
 /*  */
-.card {
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
-  float: left;
-  font-family: "Lato", Arial, sans-serif;
-  font-size: 16px;
-  margin: 10px 1%;
-  max-width: 310px;
-  min-width: 250px;
-  overflow: hidden;
-  position: relative;
-  text-align: left;
-  width: 100%;
-}
-
-.ratings i {
-  font-size: 14px;
-  margin-right: 2px;
-}
-
-.p-description {
-  font-size: 12px;
-  margin-top: 11px;
-}
-
-label.radio {
-  cursor: pointer;
-}
 
 label.radio input {
   position: absolute;
@@ -755,8 +720,10 @@ label.radio input:checked + span {
 }
 /* block-comment */
 
-.enter-comment {
-  padding: 15px;
+.avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
 }
 .out-texthead {
   border-bottom: 1px solid #2e3094;
@@ -781,26 +748,5 @@ label.radio input:checked + span {
 .btn-send:hover {
   background-color: #ed1a29;
   outline: 1px solid #ed1a29;
-}
-/* .show-commnet */
-.show-commnet {
-}
-.comment {
-  display: flex;
-}
-.user-img img {
-  width: 80px;
-  height: 80px;
-}
-.line-comment {
-  font-weight: bold;
-}
-.delete-comment {
-  margin-top: 10px;
-  color: rgb(39, 133, 209);
-  background-color: transparent;
-}
-.delete-comment:hover {
-  color: #ed1a29;
 }
 </style>
