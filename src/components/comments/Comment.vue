@@ -2,9 +2,14 @@
   <div class="mt-2" :style="commentMargin">
     <div class="row comment">
       <div class="col-1 user-img mt-2">
-        <img :src="`${domain}/storage/uploads/default.jpg`" />
+        <img
+          :src="
+            comment.user.avatar ??
+            'http://localhost:8000/storage/uploads/default.jpg'
+          "
+        />
       </div>
-      <div class="col-11 infor-comment mt-3">
+      <div class="col-6 infor-comment mt-1">
         <div class="name-user">
           <a href="#">{{ comment.user.name }}</a>
         </div>
@@ -23,12 +28,18 @@
           ><small> &bull; Phản hồi</small>
         </a>
         &ensp;
-        <a class="change-comment" @click="showEdit(comment.id)"
+        <a
+          class="change-comment"
+          @click="showEdit(comment.id)"
+          v-if="comment.user.id === user.id"
           ><small> &bull; Sửa</small>
         </a>
         &ensp;
 
-        <a class="delete-comment" @click="deleteComment(comment.id)"
+        <a
+          class="delete-comment"
+          @click="deleteComment(comment.id)"
+          v-if="comment.user.id === user.id"
           ><small> &bull; Xóa</small>
         </a>
       </div>
@@ -57,12 +68,22 @@
 </template>
 
 <script setup>
-import { computed, defineProps, inject, ref } from "vue";
+import {
+  computed,
+  defineProps,
+  inject,
+  onUnmounted,
+  ref,
+  onBeforeUnmount,
+} from "vue";
 import Comment from "@/components/comments/Comment.vue";
 
 const emitter = inject("emitter");
 
 const reply_content = ref("");
+const user = localStorage.getItem("user")
+  ? JSON.parse(localStorage.getItem("user"))
+  : "";
 
 const props = defineProps({
   comment: Object,
@@ -103,21 +124,30 @@ const editComment = (comment_id, new_content) => {
   }
 };
 
-const repComment = (comment, rep_content) => {
-  if (rep_content.trim()) {
-    let rep_comment = {
-      user_id: comment.user_id,
-      product_id: comment.product_id,
-      reply_id: comment.id,
-      content: rep_content,
-    };
-    emitter.emit("repComment", rep_comment);
+const repComment = (comment) => {
+  if (!user.id) {
+    alert("Bạn cần đăng nhập để bình luận");
+  } else {
+    if (reply_content.value.trim()) {
+      let rep_comment = {
+        user_id: user.id,
+        product_id: comment.product_id,
+        reply_id: comment.id,
+        content: reply_content.value,
+      };
+      emitter.emit("repComment", rep_comment);
+    }
   }
 };
 
 const deleteComment = (comment_id) => {
   emitter.emit("deleteComment", comment_id);
 };
+
+onUnmounted(() => {
+  emitter.off("repComment");
+  emitter.off("deleteComment");
+});
 </script>
 
 <style scoped>
@@ -139,11 +169,17 @@ label.radio {
 
 /* .show-commnet */
 .comment {
+  border-top: 1px solid rgb(199, 191, 191);
+}
+.user-img img {
+  border-radius: 50%;
+}
+.comment {
   display: flex;
 }
 .user-img img {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
 }
 .line-comment {
   font-weight: bold;

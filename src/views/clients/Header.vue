@@ -42,13 +42,12 @@
             :user="user" /></router-link
         >&emsp;
         <router-link class="btn-login" to="/login" v-if="!isLogged"
-          ><img class="nav-avatar" src="../../assets/default.jpg"
+          ><img
+            class="nav-avatar"
+            src="http://localhost:8000/storage/uploads/default.jpg"
         /></router-link>
         <div class="btn-logout btn-user" v-if="isLogged">
-          <img
-            class="nav-avatar"
-            :src="user.access_token ? user.avatar : `${domain}${user.avatar}`"
-          />
+          <img class="nav-avatar" :src="user.avatar" />
           &ensp;
           <div class="user-header"><UserHeader :user="user" /></div>
         </div>
@@ -67,7 +66,6 @@ const router = useRouter();
 const Vue3GoogleOauth = inject("Vue3GoogleOauth");
 const emitter = inject("emitter");
 
-const domain = process.env.VUE_APP_DOMAIN_URL;
 const user = ref([]);
 const isLogged = ref(false);
 const key_word = ref("");

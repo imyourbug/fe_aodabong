@@ -11,6 +11,7 @@ import Checkout from "@/components/checkouts/PaypalCheckout.vue";
 import InfoUser from "@/views/clients/InfoUser.vue";
 import ChangePassword from "@/views/clients/ChangePassword.vue";
 import GroupProduct from "@/views/clients/GroupProduct.vue";
+import RecoverPassword from "@/views/clients/RecoverPassword.vue";
 
 const routes = [
   {
@@ -65,6 +66,11 @@ const routes = [
     path: "/user/info",
     name: "info_user",
     component: InfoUser,
+  },
+  {
+    path: "/password/recover",
+    name: "recover-password",
+    component: RecoverPassword,
   },
 ];
 

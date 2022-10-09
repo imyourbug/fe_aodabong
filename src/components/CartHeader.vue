@@ -9,7 +9,7 @@
         v-bind:key="key"
       >
         <div class="col-3">
-          <img class="thumb" :src="`${domain}${product.thumb}`" />
+          <img class="thumb" :src="product.thumb" />
         </div>
         <div class="col-5">
           {{ product.name }}

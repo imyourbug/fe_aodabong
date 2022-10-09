@@ -25,6 +25,7 @@ export default {
       customer: data.customer,
       status: 0, // default - in progress
       discount: data.discount,
+      total_money: data.total_money,
     });
   },
   updateInfo(user) {

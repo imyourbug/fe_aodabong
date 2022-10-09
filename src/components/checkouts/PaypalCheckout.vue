@@ -29,7 +29,7 @@ const reload = () => {
             {
               amount: {
                 currency_code: "USD",
-                value: props.total_money,
+                value: VNDtoUSD(props.total_money),
               },
             },
           ],
@@ -39,7 +39,7 @@ const reload = () => {
         const order = await actions.order.capture();
         console.log(order);
         if (order.status === "COMPLETED") {
-          emitter.emit("checkoutSuccess");
+          emitter.emit("checkoutSuccess", props.total_money);
         } else alert("Thanh toán thất bại");
       },
       onError: (err) => {
@@ -52,5 +52,10 @@ const reload = () => {
 onMounted(() => {
   reload();
 });
+
+// change vnd to usd
+const VNDtoUSD = (money) => {
+  return Math.round((money / 24000) * 100) / 100;
+};
 </script>
 <style scoped></style>

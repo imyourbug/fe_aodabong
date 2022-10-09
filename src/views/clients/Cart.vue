@@ -33,7 +33,7 @@
           <tbody>
             <tr v-for="(product, key) in carts" v-bind:key="key">
               <td class="col-img">
-                <img :src="`${domain}${product.thumb}`" />&emsp;
+                <img :src="product.thumb" />&emsp;
                 {{ product.name }}
               </td>
               <td class="col-dongia">
@@ -306,13 +306,11 @@
         <PaypalCheckout
           class="btn-paypal"
           :total_money="
-            VNDtoUSD(
-              voucherSelected.discount
-                ? parseInt(
-                    (1 - voucherSelected.discount / 100) * totalMoney() + 30000
-                  )
-                : parseInt(totalMoney() + 30000)
-            )
+            voucherSelected.discount
+              ? parseInt(
+                  (1 - voucherSelected.discount / 100) * totalMoney() + 30000
+                )
+              : parseInt(totalMoney() + 30000)
           "
         ></PaypalCheckout>
       </div>
@@ -345,32 +343,43 @@ const carts = ref([]);
 const data = ref([]);
 const vouchers = ref([]);
 const voucherSelected = ref([]);
+const user = JSON.parse(localStorage.getItem("user"));
 const customer = reactive({
-  name: "",
-  email: "",
-  address: "",
-  phone: "",
+  name: user.name ?? "",
+  email: user.email ?? "",
+  address:
+    `${user.street ?? ""} - ${user.ward ?? ""} - ${user.district ?? ""} - ${
+      user.province ?? ""
+    }` ?? "",
+  phone: user.phone ?? "",
   note: "",
 });
 
 onClickOutside(target, (event) => (showCheckOut.value = false));
 
-emitter.on("checkoutSuccess", () => {
+emitter.on("checkoutSuccess", (total_money) => {
   // insert data to database
   let data = {
     customer: customer,
     carts: carts.value,
     discount: voucherSelected.value.discount ?? 0,
+    total_money: total_money,
   };
   clientRepository.createOrder(data).then((response) => {
-    console.log(response);
     if (response.data.status === 0) {
       // reset carts
       localStorage.removeItem("carts");
+      localStorage.removeItem("customer");
       showCheckOut.value = false;
       emitter.emit("reloadHeader");
       reload();
       alert("Thanh toán thành công");
+    }
+    if (response.data.status === 1) {
+      console.log(response.data.error.message);
+    }
+    if (response.data.status !== 1 && response.data.status !== 0) {
+      console.log(response);
     }
   });
 });
@@ -522,11 +531,6 @@ const totalMoney = () => {
     });
   }
   return total;
-};
-
-// change vnd to usd
-const VNDtoUSD = (money) => {
-  return Math.round((money / 24000) * 100) / 100;
 };
 </script>
 
@@ -747,6 +751,7 @@ a.info-product {
 textarea {
   border-radius: 5px;
   border: 1px solid rgb(208, 212, 216);
+  width: 80%;
 }
 textarea {
   padding-left: 10px;

@@ -11,13 +11,13 @@
           <img
             @click="changeImage"
             class="rounded-circle mt-5 avatar"
-            :src="`${domain}${user.avatar}`"
+            :src="user.avatar"
             width="90"
           />
           <input
             class="upload"
             type="file"
-            v-if="!!isEdit"
+            v-if="!!isEdit && user.type === 'normal'"
             @change="changeImage"
           />
           <span class="font-weight-bold">{{ user.name }}</span

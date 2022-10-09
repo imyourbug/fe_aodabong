@@ -16,7 +16,7 @@
       <div class="row">
         <div class="col-6">
           <div class="detail-pro">
-            <img class="img-detail" :src="`${domain}${data.thumb}`" />
+            <img class="img-detail" :src="data.thumb" />
             <div class="row">
               <div class="col-12" style="font-size: 24px; font-weight: bold">
                 Đánh giá sản phẩm
@@ -205,7 +205,7 @@
           </div>
         </div>
         <div class="content-comment mt-2">
-          <img class="avatar" :src="`${domain}${user.avatar}`" />&emsp;
+          <img class="avatar" :src="user.avatar" />&emsp;
           <input
             class="form-control"
             placeholder="Nhập bình luận của bạn tại đây"
@@ -363,7 +363,6 @@ const parseTree = (arr) =>
 const addComment = () => {
   if (comment.content.trim()) {
     commentRepository.createComment(comment).then((response) => {
-      console.log(response.data);
       if (response.data.status === 0) {
         reload();
       }
@@ -401,8 +400,10 @@ const reload = () => {
     comments.value = parseTree(data.value.comments ?? []);
     comment.content = "";
     //
+    // reply_content.value = "";
     showEditComment.value = [];
     showRepComment.value = -1;
+    //
   });
 };
 

@@ -15,33 +15,49 @@
 <script setup>
 import { inject } from "vue";
 import { useRouter } from "vue-router";
+import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
 
 const Vue3GoogleOauth = inject("Vue3GoogleOauth");
 const emitter = inject("emitter");
 const router = useRouter();
 
+const authRepository = RepositoryFactory.get("auth");
+
 const logInByGoogle = async () => {
   try {
     const googleUser = await Vue3GoogleOauth.instance.signIn();
     // save user login
-    saveGoogleUser(googleUser);
-    // Change name
-    emitter.emit("reloadHeader");
-    //
-    router.push({ name: "home" });
+    if (googleUser) {
+      let account = {
+        id: googleUser.getBasicProfile().getId(),
+        name: googleUser.getBasicProfile().getName(),
+        email: googleUser.getBasicProfile().getEmail(),
+        access_token: googleUser.Cc.access_token,
+        avatar: googleUser.getBasicProfile().getImageUrl(),
+        type: "social",
+      };
+      authRepository.googleLogin(account).then((response) => {
+        if (response.data.status === 0) {
+          saveGoogleUser(response.data.data[1].user);
+          // Change name
+          emitter.emit("reloadHeader");
+          //
+          router.push({ name: "home" });
+        }
+        if (response.data.status === 1) {
+          alert(response.data.error.message);
+        }
+        if (response.data.status !== 0 && response.data.status !== 1) {
+          alert(response.data);
+        }
+      });
+    }
   } catch (e) {
     console.log(e);
   }
 };
 
-const saveGoogleUser = (user) => {
-  let account = {
-    id: user.getBasicProfile().getId(),
-    name: user.getBasicProfile().getName(),
-    email: user.getBasicProfile().getEmail(),
-    access_token: user.Cc.access_token,
-    avatar: user.getBasicProfile().getImageUrl(),
-  };
+const saveGoogleUser = (account) => {
   localStorage.setItem("user", JSON.stringify(account));
 };
 </script>

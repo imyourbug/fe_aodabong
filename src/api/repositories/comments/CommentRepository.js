@@ -8,7 +8,6 @@ export default {
     return Repository.get(`${baseUrl}/list`);
   },
   createComment(comment) {
-    console.log(comment);
     return Repository.post(`${baseUrl}/create`, {
       user_id: comment.user_id,
       product_id: comment.product_id,
@@ -23,7 +22,6 @@ export default {
     });
   },
   deleteComment(comment_id) {
-    console.log(comment_id);
     return Repository.delete(`${baseUrl}/delete`, {
       data: {
         id: comment_id,

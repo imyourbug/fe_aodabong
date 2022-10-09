@@ -49,12 +49,7 @@
             <div class="col-md-12 block-btn">
               <input
                 type="submit"
-                class="
-                  btn btn-primary btn-md btn-block
-                  waves-effect
-                  text-center
-                  m-b-20
-                "
+                class="btn btn-primary btn-md btn-block waves-effect text-center m-b-20"
                 name="submit"
                 value="Đăng nhập"
                 @click="handleLogin"
@@ -73,6 +68,12 @@
           <p class="text-inverse text-center">
             Chưa có tài khoản?
             <router-link to="/register">Đăng ký</router-link>
+          </p>
+          <p class="text-inverse text-center">
+            Quên mật khẩu?
+            <router-link :to="{ name: 'recover-password' }"
+              >Nhấn vào đây</router-link
+            >
           </p>
         </div>
       </div>
@@ -108,7 +109,6 @@ const rules = {
 };
 
 const v$ = useVuelidate(rules, account);
-console.log(v$);
 
 const unSave = () => {
   localStorage.removeItem("user");
@@ -154,7 +154,10 @@ const saveUser = (user) => {
     street: user.street,
     zip_code: user.zip_code,
     // authtoken: user.authtoken,
-    avatar: user.avatar ?? "/storage/uploads/default.jpg",
+    avatar:
+      user.avatar ??
+      `${process.env.VUE_APP_DOMAIN_URL}/storage/uploads/default.jpg`,
+    type: "normal",
   };
   localStorage.setItem("user", JSON.stringify(account));
 };
@@ -177,26 +180,6 @@ body {
 }
 .form-login {
   width: 25%;
-}
-.card {
-  border-radius: 5px;
-  -webkit-box-shadow: 0 0 5px 0 rgba(43, 43, 43, 0.1),
-    0 11px 6px -7px rgba(43, 43, 43, 0.1);
-  box-shadow: 0 0 5px 0 rgba(43, 43, 43, 0.1),
-    0 11px 6px -7px rgba(43, 43, 43, 0.1);
-  border: none;
-  margin-bottom: 30px;
-  -webkit-transition: all 0.3s ease-in-out;
-  transition: all 0.3s ease-in-out;
-  background-color: #fff;
-}
-
-.card .card-block {
-  padding: 1.25rem;
-}
-
-.f-80 {
-  font-size: 80px;
 }
 
 .form-group {
