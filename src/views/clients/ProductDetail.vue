@@ -225,6 +225,7 @@
           :comment="comment"
           :showRepComment="showRepComment"
           :showEditComment="showEditComment"
+          :showChildComment="showChildComment"
           :domain="domain"
         />
       </div>
@@ -250,6 +251,7 @@ const domain = process.env.VUE_APP_DOMAIN_URL;
 const product_id = parseInt(router.currentRoute.value.params.id);
 const showRepComment = ref(-1);
 const showEditComment = ref([]);
+const showChildComment = ref([]);
 const data = ref([]);
 const sizes = ref([]);
 const colors = ref([]);
@@ -278,6 +280,13 @@ const comment = reactive({
 emitter.on("showEdit", (comment_id) => {
   if (!showEditComment.value.includes(comment_id)) {
     showEditComment.value.push(comment_id);
+  }
+});
+
+// show child comment
+emitter.on("showChild", (comment_id) => {
+  if (!showChildComment.value.includes(comment_id)) {
+    showChildComment.value.push(comment_id);
   }
 });
 
@@ -361,6 +370,10 @@ const parseTree = (arr) =>
 
 // addComment
 const addComment = () => {
+  if (!user.id) {
+    alert("Bạn cần đăng nhập để bình luận");
+    return;
+  }
   if (comment.content.trim()) {
     commentRepository.createComment(comment).then((response) => {
       if (response.data.status === 0) {
@@ -398,6 +411,7 @@ const reload = () => {
     getUnitInStock();
     // get comments
     comments.value = parseTree(data.value.comments ?? []);
+    console.log(comments.value);
     comment.content = "";
     //
     // reply_content.value = "";

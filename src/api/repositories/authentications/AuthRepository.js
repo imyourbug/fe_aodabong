@@ -27,4 +27,9 @@ export default {
       re_new_password: account.re_new_password,
     });
   },
+  resetPassword(email) {
+    return Repository.post(`${baseUrl}/reset_password`, {
+      email: email,
+    });
+  },
 };

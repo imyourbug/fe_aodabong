@@ -8,6 +8,7 @@ import AuthRepository from "@/api/repositories/authentications/AuthRepository";
 import UploadRepository from "@/api/repositories/uploads/UploadRepository";
 import ProvinceRepository from "@/api/repositories/provinces/ProvinceRepository";
 import CommentRepository from "@/api/repositories/comments/CommentRepository";
+import SlideRepository from "@/api/repositories/sliders/SlideRepository";
 
 const repositories = {
   color: ColorRepository,
@@ -20,6 +21,7 @@ const repositories = {
   upload: UploadRepository,
   province: ProvinceRepository,
   comment: CommentRepository,
+  slide: SlideRepository,
 };
 
 export const RepositoryFactory = {

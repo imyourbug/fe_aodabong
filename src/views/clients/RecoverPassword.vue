@@ -6,6 +6,7 @@
         class="form-control"
         placeholder="Email đăng nhập"
         v-model="account.email"
+        @keyup.enter="confirm"
       />
       <div :class="{ error: v$.email.$errors.length }">
         <div
@@ -35,9 +36,12 @@
 </template>
 
 <script setup>
+import { RepositoryFactory } from "@/api/repositories/RepositoryFactory";
 import { useVuelidate } from "@vuelidate/core";
 import { required, email, helpers } from "@vuelidate/validators";
 import { ref, reactive } from "vue";
+
+const authRepository = RepositoryFactory.get("auth");
 
 const account = reactive({
   email: "",
@@ -57,7 +61,18 @@ const v$ = useVuelidate(rules, account);
 const confirm = () => {
   v$.value.$validate();
   if (!v$.value.$invalid) {
-    isRecovered.value = true;
+    authRepository.resetPassword(account.email.trim()).then((response) => {
+      console.log(response);
+      if (response.data.status === 0) {
+        isRecovered.value = true;
+      }
+      if (response.data.status === 1) {
+        alert(response.data.error.message);
+      }
+      if (response.data.status !== 1 && response.data.status !== 0) {
+        alert("Throw exception");
+      }
+    });
   }
 };
 </script>

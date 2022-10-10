@@ -92,15 +92,16 @@
           </tbody>
         </table>
         <div class="row-end-money" v-else>
-          <span>Giỏ hàng hiện chưa có sản phẩm nào :(</span>
+          <CartEmpty />
+        </div>
+        <div class="button-home" v-if="carts && carts.length > 0">
+          <router-link class="btn-home" to="/home">
+            <i class="fas fa-arrow-left"></i> Tiếp tục mua hàng
+          </router-link>
         </div>
       </div>
       <br />
-      <div class="button-home">
-        <router-link class="btn-home" to="/home">
-          <i class="fas fa-arrow-left"></i> Tiếp tục mua hàng
-        </router-link>
-      </div>
+
       <br />
     </div>
     <div class="content-bot" v-if="carts && carts.length > 0">
@@ -331,6 +332,7 @@ import { useVuelidate } from "@vuelidate/core";
 import { required, email, helpers, integer } from "@vuelidate/validators";
 import { onClickOutside } from "@vueuse/core";
 import PaypalCheckout from "@/components/checkouts/PaypalCheckout.vue";
+import CartEmpty from "@/components/carts/CartEmpty.vue";
 
 const clientRepository = RepositoryFactory.get("client");
 const voucherRepository = RepositoryFactory.get("voucher");
@@ -345,13 +347,13 @@ const vouchers = ref([]);
 const voucherSelected = ref([]);
 const user = JSON.parse(localStorage.getItem("user"));
 const customer = reactive({
-  name: user.name ?? "",
-  email: user.email ?? "",
+  name: user?.name ?? "",
+  email: user?.email ?? "",
   address:
-    `${user.street ?? ""} - ${user.ward ?? ""} - ${user.district ?? ""} - ${
-      user.province ?? ""
+    `${user?.street ?? ""} - ${user?.ward ?? ""} - ${user?.district ?? ""} - ${
+      user?.province ?? ""
     }` ?? "",
-  phone: user.phone ?? "",
+  phone: user?.phone ?? "",
   note: "",
 });
 

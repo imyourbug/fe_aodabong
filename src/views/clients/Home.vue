@@ -48,8 +48,36 @@
             </div>
           </div>
         </div>
+        <br />
       </div>
-      <br />
+    </div>
+    <div class="block-feature">
+      <div class="features">
+        <div class="feature">
+          <div class="in-feature"><i class="fas fa-tshirt"></i></div>
+          &ensp;
+          <div class="in-feature">
+            <div class="text-top">SẢN PHẨM ĐA DẠNG</div>
+            <div class="text-bot">Cung cấp nhiều mẫu mã đẹp</div>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="in-feature"><i class="fas fa-dolly-flatbed"></i></div>
+          &ensp;
+          <div class="in-feature">
+            <div class="text-top">GIAO HÀNG SIÊU TỐC</div>
+            <div class="text-bot">Giao hàng ngay sau khi đặt mua</div>
+          </div>
+        </div>
+        <div class="feature">
+          <div class="in-feature"><i class="fas fa-handshake"></i></div>
+          &ensp;
+          <div class="in-feature">
+            <div class="text-top">CHÍNH SÁCH ƯU ÁI</div>
+            <div class="text-bot">Chính sách bảo hành dài hạn</div>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 </template>
@@ -69,7 +97,6 @@ const reload = () => {
     .getAllProductGroup()
     .then((response) => {
       groups.value = response.data.data;
-      console.log(groups.value);
     })
     .catch((e) => {
       console.log(e);
@@ -183,5 +210,27 @@ a.detail {
 a.detail:hover {
   color: #ed1a29;
   outline: 2px solid #ed1a29;
+}
+
+/* block-feature */
+.block-feature {
+  background-color: rgb(220, 220, 228);
+  padding: 50px 160px;
+}
+.block-feature .features,
+.features .feature {
+  justify-content: space-between;
+  display: flex;
+}
+.in-feature i {
+  color: white;
+  font-size: 30px;
+  border-radius: 50%;
+  padding: 10px 7px 10px 7px;
+  background-color: red;
+}
+.in-feature .text-top {
+  font-weight: bold;
+  font-size: 18px;
 }
 </style>

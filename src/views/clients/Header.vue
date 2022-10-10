@@ -17,19 +17,17 @@
         ><img class="logo" src="@/assets/logo.png" /></router-link
       >&emsp;
     </div>
-    <div class="col-4 block-search">
-      <form class="d-flex">
-        <input
-          type="text"
-          class="form-control me-2"
-          placeholder="Tìm kiếm"
-          v-model.trim="key_word"
-          @keyup.enter="searchProduct"
-        />
-        <a @click.prevent="searchProduct" class="btn btn-outline-success">
-          <i class="fa-solid fa-magnifying-glass"></i>
-        </a>
-      </form>
+    <div class="col-4 d-flex block-search">
+      <input
+        type="text"
+        class="form-control me-2"
+        placeholder="Tìm kiếm"
+        v-model.trim="key_word"
+        @keyup.enter="searchProduct"
+      />
+      <a @click.prevent="searchProduct" class="btn btn-outline-success">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </a>
     </div>
     <div class="col-4 block-user">
       <div class="block-left-header">
@@ -54,6 +52,8 @@
       </div>
     </div>
   </div>
+  <MegaMenu />
+  <SlideHome />
 </template>
 
 <script setup>
@@ -61,6 +61,8 @@ import { ref, inject } from "vue";
 import { useRouter } from "vue-router";
 import CartHeader from "@/components/CartHeader.vue";
 import UserHeader from "@/components/UserHeader.vue";
+import MegaMenu from "@/components/menus/MegaMenu.vue";
+import SlideHome from "@/components/sliders/SlideHome.vue";
 
 const router = useRouter();
 const Vue3GoogleOauth = inject("Vue3GoogleOauth");
@@ -191,6 +193,7 @@ sup.cart-quantity {
 }
 .block-search {
   padding-top: 10px;
+  align-items: center;
 }
 .block-user {
   padding-top: 10px;

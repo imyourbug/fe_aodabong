@@ -53,7 +53,20 @@
       />
     </div>
   </div>
-  <div v-if="hasChildren">
+  <p
+    class="show-child-comment mt-1"
+    v-if="hasChildren"
+    @click="showChild(comment.id)"
+    :style="
+      showChildComment.includes(comment.id)
+        ? 'display:none'
+        : `margin-left:${spacing + 100}px;`
+    "
+  >
+    <i class="fa-solid fa-arrow-right"></i>&ensp;Hiển thị
+    {{ comment.children.length }} phản hồi
+  </p>
+  <div v-if="hasChildren && showChildComment.includes(comment.id)">
     <Comment
       v-for="cmt in comment.children"
       :key="cmt.id"
@@ -61,6 +74,7 @@
       :spacing="spacing + 70"
       :showRepComment="showRepComment"
       :showEditComment="showEditComment"
+      :showChildComment="showChildComment"
       :reply_content="reply_content"
       :domain="domain"
     />
@@ -68,14 +82,7 @@
 </template>
 
 <script setup>
-import {
-  computed,
-  defineProps,
-  inject,
-  onUnmounted,
-  ref,
-  onBeforeUnmount,
-} from "vue";
+import { computed, defineProps, inject, onUnmounted, ref } from "vue";
 import Comment from "@/components/comments/Comment.vue";
 
 const emitter = inject("emitter");
@@ -92,7 +99,8 @@ const props = defineProps({
     default: 0,
   },
   showEditComment: Array,
-  showRepComment: Array,
+  showChildComment: Array,
+  showRepComment: Number,
   domain: String,
 });
 
@@ -107,6 +115,10 @@ const hasChildren = computed(() => {
 
 const showEdit = (comment_id) => {
   emitter.emit("showEdit", comment_id);
+};
+
+const showChild = (comment_id) => {
+  emitter.emit("showChild", comment_id);
 };
 
 const showReply = (comment_id) => {
@@ -191,5 +203,13 @@ label.radio {
 }
 .delete-comment:hover {
   color: #ed1a29;
+}
+.show-child-comment {
+  cursor: pointer;
+  color: #0084fe;
+  font-size: 14px;
+}
+.show-child-comment i {
+  color: rgb(39, 36, 36);
 }
 </style>
