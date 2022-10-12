@@ -27,33 +27,30 @@
   </footer>
 </template>
 
-<script>
+<script setup>
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const CategoryRepository = RepositoryFactory.get("category");
-
-export default {
-  name: "ListCategories",
-  data() {
-    return {
-      categories: [],
-    };
-  },
-  mounted() {
-    CategoryRepository.getAllCategories()
-      .then((response) => {
-        this.categories = response.data.categories;
-        console.log(this.categories);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  },
-  methods: {},
+const id_category = router.currentRoute.value.params.id ?? "";
+const categories = ref([]);
+const reload = () => {
+  CategoryRepository.getAllCategories()
+    .then((response) => {
+      categories.value = response.data.categories;
+      console.log(categories.value);
+    })
+    .catch((e) => {
+      console.log(e);
+    });
 };
+
+reload();
 </script>
 
-<style>
+<style scoped>
 .card-body,
 .text-card {
   text-align: left;

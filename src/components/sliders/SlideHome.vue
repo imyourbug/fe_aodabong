@@ -1,5 +1,5 @@
 <template>
-  <div class="container slider my-2">
+  <div class="sliders">
     <div class="row">
       <div class="col">
         <div
@@ -86,9 +86,9 @@ reload();
 </script>
 
 <style scoped>
-.slider {
+.sliders {
   /* height: 300px; */
-  width: 1230px;
+  width: 100%;
 }
 .carousel-item img {
   width: 100%;

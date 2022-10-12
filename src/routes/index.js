@@ -27,6 +27,12 @@ const routes = [
     name: "search_product",
     component: SearchProduct,
   },
+  ,
+  {
+    path: "/categories/id=:category_id",
+    name: "group_product",
+    component: GroupProduct,
+  },
   {
     path: "/products/detail/:id",
     name: "product_detail",

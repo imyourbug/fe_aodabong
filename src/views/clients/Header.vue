@@ -53,7 +53,6 @@
     </div>
   </div>
   <MegaMenu />
-  <SlideHome />
 </template>
 
 <script setup>

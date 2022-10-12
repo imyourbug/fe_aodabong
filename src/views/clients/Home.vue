@@ -1,6 +1,27 @@
 <template>
+  <div class="row slider">
+    <div class="list-danhmuc col-3">
+      <div class="danhmuc">
+        <div class="text-top">
+          <i class="fas fa-bars"></i>&ensp;DANH MỤC SẢN PHẨM
+        </div>
+        <br />
+        <div class="option" v-if="groups && groups.length > 0">
+          <div class="" v-for="(menu, key) in groups" :key="key">
+            <a href="#" v-if="menu.parent_id === 0"
+              ><i class="fas fa-arrow-circle-right"></i>&ensp;{{
+                menu.category_name
+              }}</a
+            >
+            <hr v-if="menu.parent_id === 0" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-8"><SlideHome /></div>
+  </div>
   <main v-if="groups && groups.length > 0">
-    <div class="group-product" v-for="(group, key) in groups" v-bind:key="key">
+    <div class="group-product" v-for="(group, key) in groups" :key="key">
       <div
         class="album bg-light"
         v-if="group.products && group.products.length > 0"
@@ -83,11 +104,13 @@
 </template>
 
 <script setup>
+import SlideHome from "@/components/sliders/SlideHome.vue";
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
-import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { ref, inject } from "vue";
 
 const clientRepository = RepositoryFactory.get("client");
+
 const router = useRouter();
 
 const groups = ref([]);
@@ -133,6 +156,32 @@ const groupProduct = (id) => {
 <style scoped>
 a {
   text-decoration: none;
+}
+
+.slider {
+  margin: 10px 145px 10px 145px;
+}
+
+.list-danhmuc {
+  border: 1px solid rgb(218, 209, 209);
+  padding: 0px;
+  margin: 0px 96px 0px 11px;
+}
+.danhmuc .text-top {
+  color: white;
+  background-color: #ed1a29;
+  padding: 10px;
+  font-size: 17px;
+  font-weight: bold;
+}
+.option a {
+  font-size: 16px;
+  color: #2e3094;
+  width: 100%;
+  padding: 10px;
+}
+.option a:hover {
+  color: #ed1a29;
 }
 
 .album {

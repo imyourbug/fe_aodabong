@@ -23,7 +23,7 @@
           <div class="col" v-for="(info, key) in products" v-bind:key="key">
             <router-link :to="`/products/detail/${info.product.id}`">
               <div class="block-product">
-                <a> <img src="@/assets/khai.png" /></a>
+                <a> <img :src="info.product.thumb" /></a>
                 <a>
                   <p>{{ info.product.name }}</p>
                 </a>

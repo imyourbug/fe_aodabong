@@ -1,6 +1,8 @@
 <template>
   <nav class="navbar navbar-expand-sm navbar-dark bg-info">
-    <a class="navbar-brand" href="#">Trang chủ</a>
+    <router-link class="navbar-brand" :to="{ name: 'home' }"
+      >Trang chủ</router-link
+    >
 
     <button
       class="navbar-toggler"
@@ -21,9 +23,12 @@
           v-for="category in categories"
           :key="category.id"
         >
-          <a
+          <router-link
             class="nav-link catogary"
-            href="#"
+            :to="{
+              name: 'group_product',
+              params: { category_id: category.id },
+            }"
             id="navbarDropdown"
             role="button"
             data-toggle="dropdown"
@@ -35,7 +40,7 @@
               v-if="category.children && category.children.length > 0"
               class="fa-solid fa-caret-down icon-catgory"
             ></i>
-          </a>
+          </router-link>
           <div
             class="dropdown-menu"
             aria-labelledby="navbarDropdown"
@@ -50,10 +55,24 @@
                 >
                   <ul class="nav flex-column">
                     <li class="nav-item">
-                      <a class="nav-link active" href="#">{{ cate.name }}</a>
+                      <router-link
+                        class="nav-link active"
+                        :to="{
+                          name: 'group_product',
+                          params: { category_id: cate.id },
+                        }"
+                        >{{ cate.name }}</router-link
+                      >
                     </li>
                     <li class="nav-item" v-for="c in cate.children" :key="c.id">
-                      <a class="nav-link i" href="#">{{ c.name }}</a>
+                      <router-link
+                        class="nav-link i"
+                        :to="{
+                          name: 'group_product',
+                          params: { category_id: c.id },
+                        }"
+                        >{{ c.name }}</router-link
+                      >
                     </li>
                   </ul>
                 </div>
@@ -64,18 +83,24 @@
       </ul>
     </div>
   </nav>
+  <!-- <router-view /> -->
 </template>
 
 <script setup>
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory";
-import { ref, inject } from "vue";
+import { ref, inject, watch } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
 const emitter = inject("emitter");
 const cateRepository = RepositoryFactory.get("category");
 
+const category_id = ref(router.currentRoute.value.params.category_id ?? "");
 const categories = ref([]);
+
+// const reloadGroupProduct = () => {
+//   emitter.emit("reloadGroupProduct");
+// };
 
 const reload = () => {
   cateRepository.getAllCategories().then((response) => {
@@ -157,6 +182,7 @@ const parseTree = (arr) =>
 
 .navbar .dropdown:hover .icon-catgory {
   transform: rotate(180deg);
+  transition: all 0.25s ease;
 }
 .navbar .dropdown:hover .dropdown-menu,
 .navbar .dropdown .dropdown-menu:hover {
@@ -195,7 +221,7 @@ button.srch {
 }
 a.nav-link.active {
   font-weight: 700;
-  background-color: #3b82f6;
+  background-color: #2e3094;
   color: white;
 }
 
@@ -208,6 +234,7 @@ a.nav-link.i {
 }
 a.nav-link.i:hover {
   color: rgb(134, 125, 125);
+  cursor: pointer;
 }
 a.navbar-brand {
   padding: 7px 25px;

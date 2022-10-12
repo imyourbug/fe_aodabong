@@ -4,7 +4,7 @@
       <div class="row">
         <div class="block-head-2">
           <div class="head-text">
-            <router-link to="/home" style="color: #ed1a29"
+            <router-link :to="{ name: 'home' }" style="color: #ed1a29"
               >Trang chủ</router-link
             >
             >><a style="color: #ed1a29" href=""> Sản phẩm </a>
