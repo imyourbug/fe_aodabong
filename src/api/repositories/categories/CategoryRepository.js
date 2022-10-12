@@ -10,6 +10,7 @@ export default {
     return Repository.get(`${baseUrl}/list`);
   },
   getDetailCategory(category_id) {
+    console.log(category_id);
     return Repository.get(`${baseUrl}/detail/${category_id}`);
   },
 };

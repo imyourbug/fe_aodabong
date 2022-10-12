@@ -24,7 +24,8 @@
     "vue-router": "^4.0.13",
     "vue3-google-oauth2": "^1.0.6",
     "vue3-select2-component": "^0.1.7",
-    "vue3-storage": "^0.1.11"
+    "vue3-storage": "^0.1.11",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

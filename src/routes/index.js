@@ -29,9 +29,10 @@ const routes = [
   },
   ,
   {
-    path: "/categories/id=:category_id",
+    path: "/categories/:chapters+/id=:id_category",
     name: "group_product",
     component: GroupProduct,
+    // children: [{ path: "", name: "group_child_product", component: GroupProduct }],
   },
   {
     path: "/products/detail/:id",

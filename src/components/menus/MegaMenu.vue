@@ -1,8 +1,6 @@
 <template>
   <nav class="navbar navbar-expand-sm navbar-dark bg-info">
-    <router-link class="navbar-brand" :to="{ name: 'home' }"
-      >Trang chủ</router-link
-    >
+    <router-link class="navbar-brand" to="/home">Trang chủ</router-link>
 
     <button
       class="navbar-toggler"
@@ -23,12 +21,9 @@
           v-for="category in categories"
           :key="category.id"
         >
-          <router-link
+          <a
             class="nav-link catogary"
-            :to="{
-              name: 'group_product',
-              params: { category_id: category.id },
-            }"
+            @click="reloadGroupProduct(category.id)"
             id="navbarDropdown"
             role="button"
             data-toggle="dropdown"
@@ -40,7 +35,7 @@
               v-if="category.children && category.children.length > 0"
               class="fa-solid fa-caret-down icon-catgory"
             ></i>
-          </router-link>
+          </a>
           <div
             class="dropdown-menu"
             aria-labelledby="navbarDropdown"
@@ -55,24 +50,16 @@
                 >
                   <ul class="nav flex-column">
                     <li class="nav-item">
-                      <router-link
+                      <a
                         class="nav-link active"
-                        :to="{
-                          name: 'group_product',
-                          params: { category_id: cate.id },
-                        }"
-                        >{{ cate.name }}</router-link
+                        @click="reloadGroupProduct(cate.id)"
+                        >{{ cate.name }}</a
                       >
                     </li>
                     <li class="nav-item" v-for="c in cate.children" :key="c.id">
-                      <router-link
-                        class="nav-link i"
-                        :to="{
-                          name: 'group_product',
-                          params: { category_id: c.id },
-                        }"
-                        >{{ c.name }}</router-link
-                      >
+                      <a class="nav-link i" @click="reloadGroupProduct(c.id)">{{
+                        c.name
+                      }}</a>
                     </li>
                   </ul>
                 </div>
@@ -88,24 +75,31 @@
 
 <script setup>
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory";
-import { ref, inject, watch } from "vue";
+import { ref, inject, computed } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
 const emitter = inject("emitter");
 const cateRepository = RepositoryFactory.get("category");
+const child_categories = ref([]);
 
-const category_id = ref(router.currentRoute.value.params.category_id ?? "");
+const category_id = ref(router.currentRoute.value.params.id_category ?? "");
 const categories = ref([]);
 
-// const reloadGroupProduct = () => {
-//   emitter.emit("reloadGroupProduct");
-// };
+const reloadGroupProduct = (cate_id) => {
+  console.log(getUrlByIdCategory(cate_id, categories.value, ""));
+  // router.push({
+  //   path: `${getUrlByIdCategory(cate_id)}id=${cate_id}`,
+  // });
+
+  // emitter.emit("reloadGroupProduct", cate_id);
+};
 
 const reload = () => {
   cateRepository.getAllCategories().then((response) => {
     if (response.data.status === 0) {
       categories.value = parseTree(response.data.categories);
+      console.log(categories.value);
     }
     if (response.data.status === 1) {
       alert(response.data.error.message);
@@ -141,6 +135,29 @@ const parseTree = (arr) =>
       ...category,
       children: traverse(arr, category.id),
     }));
+
+const getUrlByIdCategory = () => {};
+
+// const getAllUrl = (urls = [], categories, url = "") => {
+//   categories.forEach((item) => {
+//     if (item.children && item.children.length > 0) {
+//       url += `${item.slug}/`;
+//       getAllUrl(urls, item.children, url);
+//       urls.push({
+//         id: item.id,
+//         url: url,
+//       });
+//     } else {
+//       url = `${item.slug}/`;
+//       urls.push({
+//         id: item.id,
+//         url: url,
+//       });
+//       url = "";
+//     }
+//   });
+//   return urls;
+// };
 </script>
 
 <style scoped>

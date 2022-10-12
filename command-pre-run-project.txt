@@ -15,3 +15,4 @@ npm i vue-dk-toast --save
 npm i @vue-stripe/vue-stripe --save
 npm i @vueuse/core --save
 npm i dateformat --save
+npm install vuex@next --save
