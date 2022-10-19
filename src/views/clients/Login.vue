@@ -87,11 +87,14 @@ import { useVuelidate } from "@vuelidate/core";
 import { required, email, helpers } from "@vuelidate/validators";
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory";
 import GoogleLogin from "@/components/GoogleLogin.vue";
+import { useToasted } from "@hoppscotch/vue-toasted";
 
+const toast = useToasted();
 const router = useRouter();
 const emitter = inject("emitter");
 const authRepository = RepositoryFactory.get("auth");
 
+const duration_time = process.env.VUE_APP_DURATION_TOAST ?? 3000;
 const account = reactive({
   email: "",
   password: "",
@@ -122,17 +125,28 @@ const handleLogin = () => {
     try {
       authRepository.login(account).then((response) => {
         if (response.data.status === 0) {
-          saveUser(response.data.data.user);
+          let user = response.data.data.user;
+          saveUser(user);
           // Change name
           emitter.emit("reloadHeader");
           //
-          router.push({ path: "/home" });
+          router.push({ name: user.role === 0 ? "home" : "admin-home" });
         }
         if (response.data.status === 1) {
-          alert(response.data.error.message);
+          toast.error(response.data.error.message, {
+            duration: duration_time,
+            action: [
+              {
+                text: `OK`,
+                onClick: (_, toastObject) => {
+                  toastObject.goAway(0);
+                },
+              },
+            ],
+          });
         }
         if (response.data.status !== 1 && response.data.status !== 0) {
-          alert("Throw exception");
+          console.log(response.date);
         }
       });
     } catch (e) {
@@ -148,6 +162,7 @@ const saveUser = (user) => {
     name: user.name,
     email: user.email,
     phone: user.phone,
+    role: user.role,
     province: user.province,
     district: user.district,
     ward: user.ward,

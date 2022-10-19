@@ -333,11 +333,14 @@ import { required, email, helpers, integer } from "@vuelidate/validators";
 import { onClickOutside } from "@vueuse/core";
 import PaypalCheckout from "@/components/checkouts/PaypalCheckout.vue";
 import CartEmpty from "@/components/carts/CartEmpty.vue";
+import { useToasted } from "@hoppscotch/vue-toasted";
 
+const toast = useToasted();
 const clientRepository = RepositoryFactory.get("client");
 const voucherRepository = RepositoryFactory.get("voucher");
 const emitter = inject("emitter");
 
+const duration_time = process.env.VUE_APP_DURATION_TOAST ?? 3000;
 const domain = process.env.VUE_APP_DOMAIN_URL ?? "";
 const target = ref(null);
 const showCheckOut = ref(false);
@@ -375,10 +378,30 @@ emitter.on("checkoutSuccess", (total_money) => {
       showCheckOut.value = false;
       emitter.emit("reloadHeader");
       reload();
-      alert("Thanh toán thành công");
+      toast.success("Thanh toán thành công", {
+        duration: duration_time,
+        action: [
+          {
+            text: `OK`,
+            onClick: (_, toastObject) => {
+              toastObject.goAway(0);
+            },
+          },
+        ],
+      });
     }
     if (response.data.status === 1) {
-      console.log(response.data.error.message);
+      toast.error(response.data.error.message, {
+        duration: duration_time,
+        action: [
+          {
+            text: `OK`,
+            onClick: (_, toastObject) => {
+              toastObject.goAway(0);
+            },
+          },
+        ],
+      });
     }
     if (response.data.status !== 1 && response.data.status !== 0) {
       console.log(response);
@@ -407,7 +430,17 @@ const v$ = useVuelidate(rules, customer);
 const order = () => {
   v$.value.$validate();
   if (v$.value.$invalid) {
-    alert("Vui lòng điền đầy đủ thông tin");
+    toast.error("Vui lòng điền đầy đủ thông tin", {
+      duration: duration_time,
+      action: [
+        {
+          text: `OK`,
+          onClick: (_, toastObject) => {
+            toastObject.goAway(0);
+          },
+        },
+      ],
+    });
   } else {
     localStorage.setItem("customer", JSON.stringify(customer));
     showCheckOut.value = true;
@@ -474,7 +507,17 @@ const increaseQuantity = (detail_id, quantity) => {
       }
     });
   } else {
-    alert("Bạn đã đạt mức tối đa số lượng sản phẩm này");
+    toast.error("Bạn đã đạt mức tối đa số lượng sản phẩm này", {
+      duration: duration_time,
+      action: [
+        {
+          text: `OK`,
+          onClick: (_, toastObject) => {
+            toastObject.goAway(0);
+          },
+        },
+      ],
+    });
   }
   localStorage.setItem("carts", JSON.stringify(carts.value));
   reload();
@@ -513,7 +556,17 @@ const removeProduct = (id) => {
   let storageProducts = JSON.parse(localStorage.getItem("carts"));
   let products = storageProducts.filter((product) => product.detail_id !== id);
   localStorage.setItem("carts", JSON.stringify(products));
-
+  toast.success("Xóa sản phẩm khỏi giỏ hàng thành công", {
+    duration: duration_time,
+    action: [
+      {
+        text: `OK`,
+        onClick: (_, toastObject) => {
+          toastObject.goAway(0);
+        },
+      },
+    ],
+  });
   reload();
 };
 

@@ -12,6 +12,9 @@ import InfoUser from "@/views/clients/InfoUser.vue";
 import ChangePassword from "@/views/clients/ChangePassword.vue";
 import GroupProduct from "@/views/clients/GroupProduct.vue";
 import RecoverPassword from "@/views/clients/RecoverPassword.vue";
+import AdminHome from "@/views/admins/Home.vue";
+import ListProduct from "@/views/admins/products/ListProduct.vue";
+import ListCategory from "@/views/admins/categories/ListCategory.vue";
 
 const routes = [
   {
@@ -32,7 +35,6 @@ const routes = [
     path: "/categories/:chapters+/id=:id_category",
     name: "group_product",
     component: GroupProduct,
-    // children: [{ path: "", name: "group_child_product", component: GroupProduct }],
   },
   {
     path: "/products/detail/:id",
@@ -78,6 +80,20 @@ const routes = [
     path: "/password/recover",
     name: "recover-password",
     component: RecoverPassword,
+  },
+  {
+    path: "/admin",
+    name: "admin-home",
+    component: AdminHome,
+    meta: {
+      requiresAuth: true,
+    },
+    child: [
+      {
+        path: "categories/list",
+        component: ListCategory,
+      },
+    ],
   },
 ];
 

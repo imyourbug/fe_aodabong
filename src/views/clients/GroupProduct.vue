@@ -8,62 +8,36 @@
         </div>
       </div>
     </div>
-    <!-- <div
+    <div
       class="group-product"
       v-if="category.children && category.children.length > 0"
     >
       <div class="album bg-light">
         <div class="container">
-          <div class="block-text-1">
-            <div class="block-text-left">
-              <a class="btn-left"
-                >&ensp;<i class="far fa-futbol"></i>&ensp;{{
-                  category.detail.name
-                }}&emsp;</a
-              >
-            </div>
-            <div class="block-text-right">
-              <a class="btn-right"
-                >Xem thêm <i class="fas fa-chevron-right"></i
-                ><i class="fas fa-chevron-right"></i
-              ></a>
-            </div>
-          </div>
           <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3">
             <div
               class="col"
               v-for="(child, key) in category.children"
               :key="key"
             >
-              <router-link
-                :to="{
-                  name: 'group_product',
-                  params: { id: product.product.id },
-                }"
-              >
+              <a @click="reloadGroupProduct(child)">
                 <div class="block-product">
-                  <a> <img :src="product.product.thumb" /></a>
                   <a>
-                    <p>{{ product.product.name }}</p>
+                    <img
+                      src="http://localhost:8000/storage/uploads/img-not-available.jpg"
+                  /></a>
+                  <a>
+                    <p>{{ child.name }}</p>
                   </a>
-                  {{ formatCash(product.min_price) }}đ
-                  {{
-                    product.max_price > product.min_price
-                      ? ` - ${product.max_price}đ`
-                      : ""
-                  }}
-                  <br />
-                  <br />
-                  <a class="detail"> Chi tiết</a>
                   <br />&ensp;
                 </div>
-              </router-link>
+              </a>
             </div>
           </div>
         </div>
         <br />
       </div>
-    </div> -->
+    </div>
     <div class="group-product">
       <div class="album bg-light">
         <div class="container">
@@ -116,6 +90,9 @@
               </router-link>
             </div>
           </div>
+          <div v-else>
+            <ProductEmpty />
+          </div>
         </div>
         <br />
       </div>
@@ -153,18 +130,16 @@
 
 <script setup>
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
-import { inject, onUnmounted, ref, onBeforeUnmount } from "vue";
-import { useRouter } from "vue-router";
+import { ref, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import ProductEmpty from "../../components/products/ProductEmpty.vue";
 
 const router = useRouter();
-const emitter = inject("emitter");
+const route = useRoute();
 const categoryRepository = RepositoryFactory.get("category");
 
 const category = ref([]);
-
-emitter.on("reloadGroupProduct", (category_id) => {
-  reload(category_id);
-});
+const categories = ref([]);
 
 const reload = (category_id) => {
   let id = category_id ?? "";
@@ -173,7 +148,26 @@ const reload = (category_id) => {
     .then((response) => {
       if (response.data.status === 0) {
         category.value = response.data.category;
-        // console.log(category.value);
+        getAllCategories();
+      }
+      if (response.data.status === 1) {
+        alert(response.data.error.message);
+      }
+      if (response.data.status !== 0 && response.data.status !== 1) {
+        alert(response.data);
+      }
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+};
+
+const getAllCategories = () => {
+  categoryRepository
+    .getAllCategories()
+    .then((response) => {
+      if (response.data.status === 0) {
+        categories.value = response.data.categories;
       }
       if (response.data.status === 1) {
         alert(response.data.error.message);
@@ -199,12 +193,37 @@ const formatCash = (str) => {
 
 reload(router.currentRoute.value.params.id_category);
 
-// onBeforeUnmount(() => {
-//   emitter.off("reloadGroupProduct");
-// });
-onUnmounted(() => {
-  emitter.off("reloadGroupProduct");
-});
+const reloadGroupProduct = (cate) => {
+  router.push({
+    path: `/categories/${getNameParent(cate, categories.value, [])
+      .reverse()
+      .join("/")}/id=${cate.id}`,
+  });
+  reload(cate.id);
+};
+
+const getNameParent = (category, categories, urls = []) => {
+  urls.push(category.slug);
+  categories.forEach((item) => {
+    if (item.id === category.parent_id) {
+      getNameParent(
+        item,
+        categories.filter((cate) => {
+          return cate.id !== item.id;
+        }),
+        urls
+      );
+    }
+  });
+  return urls;
+};
+
+watch(
+  () => route.params.id_category,
+  (new_id_category) => {
+    reload(new_id_category);
+  }
+);
 </script>
 
 <style scoped>

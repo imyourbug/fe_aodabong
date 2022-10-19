@@ -59,25 +59,34 @@
 <script setup>
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory";
 import { ref, inject } from "vue";
-import { useRouter } from "vue-router";
+import { useToasted } from "@hoppscotch/vue-toasted";
 
-const router = useRouter();
-const emitter = inject("emitter");
+const toast = useToasted();
 const slideRepository = RepositoryFactory.get("slide");
 
 const slides = ref([]);
+const duration_time = process.env.VUE_APP_DURATION_TOAST ?? 3000;
 
 const reload = () => {
   slideRepository.getAllSlides().then((response) => {
     if (response.data.status === 0) {
       slides.value = response.data.slides;
-      console.log(slides.value);
     }
     if (response.data.status === 1) {
-      alert(response.data.error.message);
+      toast.error(response.data.error.message, {
+        duration: duration_time,
+        action: [
+          {
+            text: `OK`,
+            onClick: (_, toastObject) => {
+              toastObject.goAway(0);
+            },
+          },
+        ],
+      });
     }
     if (response.data.status !== 0 && response.data.status !== 1) {
-      alert(response.data);
+      console.log(response.data);
     }
   });
 };

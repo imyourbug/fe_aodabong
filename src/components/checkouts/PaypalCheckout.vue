@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import { onMounted, defineProps, inject } from "vue";
+import { onMounted, defineProps, inject, onUnmounted } from "vue";
 
 const emitter = inject("emitter");
 
@@ -49,13 +49,17 @@ const reload = () => {
     .render("#paypal-button");
 };
 
-onMounted(() => {
-  reload();
-});
-
 // change vnd to usd
 const VNDtoUSD = (money) => {
   return Math.round((money / 24000) * 100) / 100;
 };
+
+onMounted(() => {
+  reload();
+});
+
+onUnmounted(() => {
+  emitter.off("checkoutSuccess");
+});
 </script>
 <style scoped></style>

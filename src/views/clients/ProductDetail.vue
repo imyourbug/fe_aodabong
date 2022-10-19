@@ -21,7 +21,9 @@
               <div class="col-12" style="font-size: 24px; font-weight: bold">
                 Đánh giá sản phẩm
               </div>
-              <div class="col-12"><Rating /></div>
+              <div class="col-12">
+                <Rating :product_id="product_id" :user="user" />
+              </div>
             </div>
             <div class="block-khuyenmai">
               <div class="khuyenmai">
@@ -39,6 +41,12 @@
           <p class="text-1"></p>
           <div class="block-soluong">
             <h3>{{ data.name }}</h3>
+            <p>
+              {{ level_star }}&ensp;<i
+                style="color: orange"
+                class="fa-solid fa-star"
+              ></i>
+            </p>
             <div v-if="data.product_details && data.product_details.length > 0">
               <div class="price">
                 {{ formatCash(choice.price) }}<sup>đ</sup>
@@ -236,20 +244,25 @@
 <script setup>
 // import dateFormat, { masks } from "dateformat";
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
-import { reactive, ref, inject } from "vue";
-import { useRouter } from "vue-router";
+import { reactive, ref, inject, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import ntc from "ntc-hi-js";
 import Rating from "@/components/rates/Rating.vue";
 import Comment from "@/components/comments/Comment.vue";
+import { useToasted } from "@hoppscotch/vue-toasted";
 
+const toast = useToasted();
+const router = useRouter();
+const route = useRoute();
 const clientRepository = RepositoryFactory.get("client");
 const commentRepository = RepositoryFactory.get("comment");
-const router = useRouter();
 const emitter = inject("emitter");
 
 const domain = process.env.VUE_APP_DOMAIN_URL;
+const duration_time = process.env.VUE_APP_DURATION_TOAST ?? 3000;
 const product_id = parseInt(router.currentRoute.value.params.id);
 const showRepComment = ref(-1);
+const level_star = ref(null);
 const showEditComment = ref([]);
 const showChildComment = ref([]);
 const data = ref([]);
@@ -276,6 +289,10 @@ const comment = reactive({
   reply_id: 0,
 });
 
+emitter.on("reloadProductDetail", () => {
+  reload();
+});
+
 // show edit comment
 emitter.on("showEdit", (comment_id) => {
   if (!showEditComment.value.includes(comment_id)) {
@@ -297,51 +314,17 @@ emitter.on("showReply", (comment_id) => {
 
 // edit comment
 emitter.on("editComment", (comment) => {
-  commentRepository
-    .updateContentComment(comment.id, comment.content)
-    .then((response) => {
-      if (response.data.status === 0) {
-        reload();
-      }
-      if (response.data.status === 1) {
-        alert(response.data.error.message);
-      }
-      if (response.data.status !== 0 && response.data.status !== 1) {
-        alert(response.data);
-      }
-    });
+  editComment(comment);
 });
 
 // rep comment
 emitter.on("repComment", (comment) => {
-  commentRepository.createComment(comment).then((response) => {
-    if (response.data.status === 0) {
-      reload();
-    }
-    if (response.data.status === 1) {
-      alert(response.data.error.message);
-    }
-    if (response.data.status !== 0 && response.data.status !== 1) {
-      alert(response.data);
-    }
-  });
+  repComment(comment);
 });
 
 // delete comment
 emitter.on("deleteComment", (comment_id) => {
-  if (confirm("Bạn có muốn xóa bình luận này không?")) {
-    commentRepository.deleteComment(comment_id).then((response) => {
-      if (response.data.status === 0) {
-        reload();
-      }
-      if (response.data.status === 1) {
-        alert(response.data.error.message);
-      }
-      if (response.data.status !== 0 && response.data.status !== 1) {
-        alert(response.data);
-      }
-    });
-  }
+  deleteComment(comment_id);
 });
 
 // parse flat structure to tree structure
@@ -368,25 +351,168 @@ const parseTree = (arr) =>
       children: traverse(arr, comment.id),
     }));
 
-// addComment
+// add comment
 const addComment = () => {
   if (!user.id) {
-    alert("Bạn cần đăng nhập để bình luận");
+    toast.error("Bạn cần đăng nhập để bình luận", {
+      duration: duration_time,
+      action: [
+        {
+          text: `OK`,
+          onClick: (_, toastObject) => {
+            toastObject.goAway(0);
+          },
+        },
+      ],
+    });
     return;
   }
   if (comment.content.trim()) {
     commentRepository.createComment(comment).then((response) => {
       if (response.data.status === 0) {
         reload();
+        toast.success("Bình luận thành công", {
+          duration: duration_time,
+          action: [
+            {
+              text: `OK`,
+              onClick: (_, toastObject) => {
+                toastObject.goAway(0);
+              },
+            },
+          ],
+        });
       }
       if (response.data.status === 1) {
-        alert(response.data.error.message);
+        toast.error(response.data.error.message, {
+          duration: duration_time,
+          action: [
+            {
+              text: `OK`,
+              onClick: (_, toastObject) => {
+                toastObject.goAway(0);
+              },
+            },
+          ],
+        });
       }
       if (response.data.status !== 0 && response.data.status !== 1) {
-        alert(response.data);
+        console.log(response.data);
       }
     });
   }
+};
+
+//edit comment
+const editComment = (comment) => {
+  commentRepository
+    .updateContentComment(comment.id, comment.content)
+    .then((response) => {
+      if (response.data.status === 0) {
+        toast.success("Chỉnh sửa bình luận thành công", {
+          duration: duration_time,
+          action: [
+            {
+              text: `OK`,
+              onClick: (_, toastObject) => {
+                toastObject.goAway(0);
+              },
+            },
+          ],
+        });
+        reload();
+      }
+      if (response.data.status === 1) {
+        toast.error(response.data.error.message, {
+          duration: duration_time,
+          action: [
+            {
+              text: `OK`,
+              onClick: (_, toastObject) => {
+                toastObject.goAway(0);
+              },
+            },
+          ],
+        });
+      }
+      if (response.data.status !== 0 && response.data.status !== 1) {
+        console.log(response.data);
+      }
+    });
+};
+
+// delete comment
+const deleteComment = (comment_id) => {
+  if (confirm("Bạn có muốn xóa bình luận này không?")) {
+    commentRepository.deleteComment(comment_id).then((response) => {
+      if (response.data.status === 0) {
+        toast.success("Xóa bình luận thành công", {
+          duration: duration_time,
+          action: [
+            {
+              text: `OK`,
+              onClick: (_, toastObject) => {
+                toastObject.goAway(0);
+              },
+            },
+          ],
+        });
+        reload();
+      }
+      if (response.data.status === 1) {
+        toast.success(response.data.error.message, {
+          duration: duration_time,
+          action: [
+            {
+              text: `OK`,
+              onClick: (_, toastObject) => {
+                toastObject.goAway(0);
+              },
+            },
+          ],
+        });
+      }
+      if (response.data.status !== 0 && response.data.status !== 1) {
+        console.log(response.data);
+      }
+    });
+  }
+};
+
+// rep comment
+const repComment = (comment) => {
+  commentRepository.createComment(comment).then((response) => {
+    if (response.data.status === 0) {
+      toast.success("Phản hồi thành công", {
+        duration: duration_time,
+        action: [
+          {
+            text: `OK`,
+            onClick: (_, toastObject) => {
+              toastObject.goAway(0);
+            },
+          },
+        ],
+      });
+      reload();
+    }
+    if (response.data.status === 1) {
+      toast.error(response.data.error.message, {
+        duration: duration_time,
+        action: [
+          {
+            text: `OK`,
+            onClick: (_, toastObject) => {
+              toastObject.goAway(0);
+            },
+          },
+        ],
+      });
+    }
+    if (response.data.status !== 0 && response.data.status !== 1) {
+      console.log(response.data);
+    }
+  });
 };
 
 // get name color
@@ -411,9 +537,9 @@ const reload = () => {
     getUnitInStock();
     // get comments
     comments.value = parseTree(data.value.comments ?? []);
-    console.log(comments.value);
     comment.content = "";
-    //
+    // level star
+    level_star.value = response.data.data.level_star.toFixed(1);
     // reply_content.value = "";
     showEditComment.value = [];
     showRepComment.value = -1;
@@ -472,11 +598,31 @@ const increaseQuantity = () => {
 // add product to carts
 const addProductToCart = () => {
   if (!choice.new_size || !choice.new_color) {
-    alert("Chưa chọn đủ thông tin sản phẩm");
+    toast.error("Chưa chọn đủ thông tin sản phẩm", {
+      duration: duration_time,
+      action: [
+        {
+          text: `OK`,
+          onClick: (_, toastObject) => {
+            toastObject.goAway(0);
+          },
+        },
+      ],
+    });
     return false;
   }
   if (unit_in_stock.value === 0) {
-    alert("Sản phẩm đã hết");
+    toast.error("Sản phẩm đã hết", {
+      duration: duration_time,
+      action: [
+        {
+          text: `OK`,
+          onClick: (_, toastObject) => {
+            toastObject.goAway(0);
+          },
+        },
+      ],
+    });
     return false;
   }
   // get carts in localStorage
@@ -496,9 +642,29 @@ const addProductToCart = () => {
         count++;
         if (item.quantity + choice.quantity <= unit_in_stock.value) {
           item.quantity += choice.quantity;
-          alert("Thêm sản phẩm vào giỏ hàng thành công");
+          toast.success("Thêm sản phẩm vào giỏ hàng thành công", {
+            duration: duration_time,
+            action: [
+              {
+                text: `OK`,
+                onClick: (_, toastObject) => {
+                  toastObject.goAway(0);
+                },
+              },
+            ],
+          });
         } else {
-          alert("Sản phẩm trong giỏ hàng đã đạt số lượng tối đa");
+          toast.error("Sản phẩm trong giỏ hàng đã đạt số lượng tối đa", {
+            duration: duration_time,
+            action: [
+              {
+                text: `OK`,
+                onClick: (_, toastObject) => {
+                  toastObject.goAway(0);
+                },
+              },
+            ],
+          });
           return false;
         }
       }
@@ -516,7 +682,17 @@ const addProductToCart = () => {
       thumb: data.value.thumb,
       name: data.value.name,
     });
-    alert("Thêm sản phẩm vào giỏ hàng thành công");
+    toast.success("Thêm sản phẩm vào giỏ hàng thành công", {
+      duration: duration_time,
+      action: [
+        {
+          text: `OK`,
+          onClick: (_, toastObject) => {
+            toastObject.goAway(0);
+          },
+        },
+      ],
+    });
   }
   localStorage.setItem("carts", JSON.stringify(carts));
   // change count quantity cart
@@ -542,6 +718,13 @@ const formatCash = (str) => {
       return (index % 3 ? next : next + ".") + prev;
     });
 };
+
+watch(
+  () => route.params.id,
+  (new_id) => {
+    console.log(new_id);
+  }
+);
 </script>
 
 <style scoped>

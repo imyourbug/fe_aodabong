@@ -33,4 +33,12 @@ export default {
       user: user,
     });
   },
+  ratingProduct(user_id, product_id, level_star) {
+    console.log(user_id, product_id, level_star);
+    return Repository.post(`${baseUrl}/rates/product`, {
+      user_id: user_id,
+      product_id: product_id,
+      level_star: level_star,
+    });
+  },
 };

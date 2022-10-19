@@ -7,13 +7,17 @@
         </div>
         <br />
         <div class="option" v-if="groups && groups.length > 0">
-          <div class="" v-for="(menu, key) in groups" :key="key">
-            <a href="#" v-if="menu.parent_id === 0"
+          <div v-for="(data, key) in groups" :key="key">
+            <router-link
+              :to="{
+                path: getUrlByCategory(data.category),
+              }"
+              v-if="data.category.parent_id === 0"
               ><i class="fas fa-arrow-circle-right"></i>&ensp;{{
-                menu.category_name
-              }}</a
+                data.category.name
+              }}</router-link
             >
-            <hr v-if="menu.parent_id === 0" />
+            <hr v-if="data.category.parent_id === 0" />
           </div>
         </div>
       </div>
@@ -29,24 +33,32 @@
         <div class="container">
           <div class="block-text-1">
             <div class="block-text-left">
-              <a class="btn-left" @click="groupProduct(group.category_id)"
+              <router-link
+                class="btn-left"
+                :to="{
+                  path: getUrlByCategory(group.category),
+                }"
                 >&ensp;<i class="far fa-futbol"></i>&ensp;{{
-                  group.category_name
-                }}&emsp;</a
+                  group.category.name
+                }}&emsp;</router-link
               >
             </div>
             <div class="block-text-right">
-              <a class="btn-right"
+              <router-link
+                class="btn-right"
+                :to="{
+                  path: getUrlByCategory(group.category),
+                }"
                 >Xem thêm <i class="fas fa-chevron-right"></i
                 ><i class="fas fa-chevron-right"></i
-              ></a>
+              ></router-link>
             </div>
           </div>
           <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3">
             <div
               class="col"
               v-for="(product, key) in group.products"
-              v-bind:key="key"
+              :key="key"
             >
               <router-link :to="`/products/detail/${product.product.id}`">
                 <div class="block-product">
@@ -110,16 +122,27 @@ import { useRouter } from "vue-router";
 import { ref, inject } from "vue";
 
 const clientRepository = RepositoryFactory.get("client");
+const categoryRepository = RepositoryFactory.get("category");
 
 const router = useRouter();
 
 const groups = ref([]);
+const categories = ref([]);
 
 const reload = () => {
   clientRepository
     .getAllProductGroup()
     .then((response) => {
-      groups.value = response.data.data;
+      if (response.data.status === 0) {
+        groups.value = response.data.data;
+        getAllCategories();
+      }
+      if (response.data.status === 1) {
+        console.log(response.data.error.message);
+      }
+      if (response.data.status !== 0 && response.data.status !== 1) {
+        console.log(response.data);
+      }
     })
     .catch((e) => {
       console.log(e);
@@ -127,6 +150,25 @@ const reload = () => {
 };
 
 reload();
+
+const getAllCategories = () => {
+  categoryRepository
+    .getAllCategories()
+    .then((response) => {
+      if (response.data.status === 0) {
+        categories.value = response.data.categories;
+      }
+      if (response.data.status === 1) {
+        console.log(response.data.error.message);
+      }
+      if (response.data.status !== 0 && response.data.status !== 1) {
+        console.log(response.data);
+      }
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+};
 
 const formatCash = (str) => {
   return str
@@ -138,18 +180,26 @@ const formatCash = (str) => {
     });
 };
 
-const detailProduct = (id) => {
-  router.push({
-    path: "/products/detail/" + id,
-    params: {
-      id: id,
-    },
-  });
+const getUrlByCategory = (category) => {
+  return `/categories/${getNameParent(category, categories.value, [])
+    .reverse()
+    .join("/")}/id=${category.id}`;
 };
-const groupProduct = (id) => {
-  router.push({
-    path: "/categories/" + id,
+
+const getNameParent = (category, categories, urls = []) => {
+  urls.push(category.slug);
+  categories.forEach((item) => {
+    if (item.id === category.parent_id) {
+      getNameParent(
+        item,
+        categories.filter((cate) => {
+          return cate.id !== item.id;
+        }),
+        urls
+      );
+    }
   });
+  return urls;
 };
 </script>
 
@@ -174,13 +224,14 @@ a {
   font-size: 17px;
   font-weight: bold;
 }
-.option a {
+.option div a {
   font-size: 16px;
   color: #2e3094;
   width: 100%;
   padding: 10px;
 }
-.option a:hover {
+.option div a:hover {
+  cursor: pointer;
   color: #ed1a29;
 }
 
@@ -205,12 +256,14 @@ a {
   font-weight: bold;
 }
 .btn-left:hover {
+  cursor: pointer;
   color: white;
 }
 .btn-right {
   background-color: #393a44;
 }
 .btn-right:hover {
+  cursor: pointer;
   background-color: #ed1a29;
   color: white;
 }

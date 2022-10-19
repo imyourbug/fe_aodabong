@@ -23,13 +23,14 @@
     <div class="about-right col-4">
       <p class="text-head">Kết nối với chúng tôi</p>
       <hr />
-      <div class="list-mxh">
+      <!--<div class="list-mxh">
         <a href="https://www.facebook.com/duongvan.khai.547"
           ><i class="fab fa-facebook"></i
         ></a>
         <a href="#"><i class="fab fa-instagram"></i></a>
         <a href="#"><i class="fab fa-twitter"></i></a>
-      </div>
+      </div> -->
+      <ListSocial />
     </div>
   </div>
   <div class="block-end">
@@ -38,6 +39,7 @@
 </template>
 
 <script setup>
+import ListSocial from "@/components/footers/ListSocial.vue";
 </script>
 
 <style scoped>

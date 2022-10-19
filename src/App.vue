@@ -1,14 +1,18 @@
 <template>
-  <Header />
-  <!-- <MegaMenu /> -->
+  <!-- <Header v-if="user.role !== 1" /> -->
+  <!-- <MegaMenu v-if="user.role !== 1" /> -->
   <router-view />
-  <Footer />
+  <!-- <Footer v-if="user.role !== 1" /> -->
 </template>
 
 <script setup>
+import { ref, inject } from "vue";
+import { useRouter } from "vue-router";
+import MegaMenu from "@/components/menus/MegaMenu.vue";
 import Header from "@/views/clients/Header.vue";
 import Footer from "@/views/clients/Footer.vue";
-import MegaMenu from "@/components/menus/MegaMenu.vue";
+
+const user = localStorage.getItem("user");
 </script>
 
 <style>

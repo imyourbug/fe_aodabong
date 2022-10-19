@@ -1,4 +1,5 @@
 <template>
+  <!-- :style="ids === category.id ? 'background-color: #ed1a29;' : ''" -->
   <nav class="navbar navbar-expand-sm navbar-dark bg-info">
     <router-link class="navbar-brand" to="/home">Trang chủ</router-link>
 
@@ -15,15 +16,20 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav mr-auto" v-if="categories && categories.length > 0">
+      <ul
+        class="navbar-nav mr-auto"
+        v-if="tree_categories && tree_categories.length > 0"
+      >
         <li
           class="nav-item dropdown"
-          v-for="category in categories"
+          v-for="category in tree_categories"
           :key="category.id"
         >
-          <a
+          <router-link
+            :to="{
+              path: getUrlByCategory(category),
+            }"
             class="nav-link catogary"
-            @click="reloadGroupProduct(category.id)"
             id="navbarDropdown"
             role="button"
             data-toggle="dropdown"
@@ -35,7 +41,7 @@
               v-if="category.children && category.children.length > 0"
               class="fa-solid fa-caret-down icon-catgory"
             ></i>
-          </a>
+          </router-link>
           <div
             class="dropdown-menu"
             aria-labelledby="navbarDropdown"
@@ -50,16 +56,22 @@
                 >
                   <ul class="nav flex-column">
                     <li class="nav-item">
-                      <a
+                      <router-link
+                        :to="{
+                          path: getUrlByCategory(cate),
+                        }"
                         class="nav-link active"
-                        @click="reloadGroupProduct(cate.id)"
-                        >{{ cate.name }}</a
+                        >{{ cate.name }}</router-link
                       >
                     </li>
                     <li class="nav-item" v-for="c in cate.children" :key="c.id">
-                      <a class="nav-link i" @click="reloadGroupProduct(c.id)">{{
-                        c.name
-                      }}</a>
+                      <router-link
+                        :to="{
+                          path: getUrlByCategory(c),
+                        }"
+                        class="nav-link i"
+                        >{{ c.name }}</router-link
+                      >
                     </li>
                   </ul>
                 </div>
@@ -70,36 +82,34 @@
       </ul>
     </div>
   </nav>
-  <!-- <router-view /> -->
 </template>
 
 <script setup>
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory";
-import { ref, inject, computed } from "vue";
-import { useRouter } from "vue-router";
+import { onUpdated, ref, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
 
 const router = useRouter();
-const emitter = inject("emitter");
+const route = useRoute();
 const cateRepository = RepositoryFactory.get("category");
-const child_categories = ref([]);
 
-const category_id = ref(router.currentRoute.value.params.id_category ?? "");
 const categories = ref([]);
+const tree_categories = ref([]);
+// const ids = ref(0);
 
-const reloadGroupProduct = (cate_id) => {
-  console.log(getUrlByIdCategory(cate_id, categories.value, ""));
-  // router.push({
-  //   path: `${getUrlByIdCategory(cate_id)}id=${cate_id}`,
-  // });
+// console.log(router.currentRoute.value.params.id_category);
 
-  // emitter.emit("reloadGroupProduct", cate_id);
+const getUrlByCategory = (category) => {
+  return `/categories/${getNameParent(category, categories.value, [])
+    .reverse()
+    .join("/")}/id=${category.id}`;
 };
 
 const reload = () => {
   cateRepository.getAllCategories().then((response) => {
     if (response.data.status === 0) {
-      categories.value = parseTree(response.data.categories);
-      console.log(categories.value);
+      categories.value = response.data.categories;
+      tree_categories.value = parseTree(response.data.categories);
     }
     if (response.data.status === 1) {
       alert(response.data.error.message);
@@ -136,28 +146,21 @@ const parseTree = (arr) =>
       children: traverse(arr, category.id),
     }));
 
-const getUrlByIdCategory = () => {};
-
-// const getAllUrl = (urls = [], categories, url = "") => {
-//   categories.forEach((item) => {
-//     if (item.children && item.children.length > 0) {
-//       url += `${item.slug}/`;
-//       getAllUrl(urls, item.children, url);
-//       urls.push({
-//         id: item.id,
-//         url: url,
-//       });
-//     } else {
-//       url = `${item.slug}/`;
-//       urls.push({
-//         id: item.id,
-//         url: url,
-//       });
-//       url = "";
-//     }
-//   });
-//   return urls;
-// };
+const getNameParent = (category, categories, urls = []) => {
+  urls.push(category.slug);
+  categories.forEach((item) => {
+    if (item.id === category.parent_id) {
+      getNameParent(
+        item,
+        categories.filter((cate) => {
+          return cate.id !== item.id;
+        }),
+        urls
+      );
+    }
+  });
+  return urls;
+};
 </script>
 
 <style scoped>

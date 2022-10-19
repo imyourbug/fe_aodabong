@@ -52,7 +52,6 @@
       </div>
     </div>
   </div>
-  <MegaMenu />
 </template>
 
 <script setup>
@@ -132,7 +131,7 @@ a:hover {
   border: 1px solid #2e3094;
   border-radius: 5px;
   position: absolute;
-  z-index: 9;
+  z-index: 9999;
   background-color: white;
   padding: 10px 15px;
   text-align: left;
@@ -151,7 +150,7 @@ a:hover {
   top: 80px;
   right: 300px;
   position: absolute;
-  z-index: 9;
+  z-index: 9999;
 }
 sup.cart-quantity {
   color: #ed1a29;
