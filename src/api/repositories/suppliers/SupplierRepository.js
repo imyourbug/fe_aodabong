@@ -1,7 +1,7 @@
 import Repository from "@/api/repositories/Repository";
 
 const baseDomain = "http://localhost:8000";
-const baseUrl = `${baseDomain}/api/products`;
+const baseUrl = `${baseDomain}/api/suppliers`;
 
 // const access_token = localStorage.getItem('access_token') ?? '';
 
@@ -15,10 +15,9 @@ export default {
   create(product) {
     return Repository.post(`${baseUrl}/create`, {
       name: product.name,
-      category_id: product.category_id,
-      supplier_id: product.supplier_id,
+      parent_id: product.parent_id,
+      description: product.description,
       active: product.active,
-      thumb: product.thumb,
     });
   },
   remove(product_id) {
@@ -26,19 +25,13 @@ export default {
       data: { id: product_id },
     });
   },
-  removeAll(ids) {
-    return Repository.delete(`${baseUrl}/delete_all`, {
-      data: { ids: ids },
-    });
-  },
   edit(product) {
     return Repository.put(`${baseUrl}/update`, {
       id: product.id,
       name: product.name,
-      category_id: product.category_id,
-      supplier_id: product.supplier_id,
+      parent_id: product.parent_id,
+      description: product.description,
       active: product.active,
-      thumb: product.thumb,
     });
   },
 };

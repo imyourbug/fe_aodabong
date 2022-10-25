@@ -38,11 +38,12 @@ const logInByGoogle = async () => {
       };
       authRepository.googleLogin(account).then((response) => {
         if (response.data.status === 0) {
-          saveGoogleUser(response.data.data[1].user);
+          let user = response.data.data[1].user;
+          saveGoogleUser(user);
           // Change name
           emitter.emit("reloadHeader");
           //
-          router.push({ name: "home" });
+          router.push({ name: user.role === 0 ? "home" : "admin-home" });
         }
         if (response.data.status === 1) {
           alert(response.data.error.message);

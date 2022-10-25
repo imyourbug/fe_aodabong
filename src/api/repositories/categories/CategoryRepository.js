@@ -12,4 +12,26 @@ export default {
   getDetailCategory(category_id) {
     return Repository.get(`${baseUrl}/detail/${category_id}`);
   },
+  create(category) {
+    return Repository.post(`${baseUrl}/create`, {
+      name: category.name,
+      parent_id: category.parent_id,
+      description: category.description,
+      active: category.active,
+    });
+  },
+  remove(category_id) {
+    return Repository.delete(`${baseUrl}/delete`, {
+      data: { id: category_id },
+    });
+  },
+  edit(category) {
+    return Repository.put(`${baseUrl}/update`, {
+      id: category.id,
+      name: category.name,
+      parent_id: category.parent_id,
+      description: category.description,
+      active: category.active,
+    });
+  },
 };
