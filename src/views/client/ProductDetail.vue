@@ -66,8 +66,8 @@
                       :value="size"
                       @click="setSize(size)"
                     />
-                    <span>{{ size }}</span
-                    >&ensp;
+                    <span class="option-size">{{ size }}</span>
+                    &ensp;
                   </label>
                 </div>
               </div>
@@ -86,8 +86,12 @@
                       :value="color"
                       @click="setColor(color)"
                     />
-                    <span>{{ getNameByHexColor(color.toString()) }}</span
-                    >&ensp;
+                    <span
+                      class="option-color"
+                      :style="`background-color: ${color};`"
+                    ></span>
+
+                    &ensp;
                   </label>
                 </div>
               </div>
@@ -244,16 +248,15 @@
 <script setup>
 // import dateFormat, { masks } from "dateformat";
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
-import { reactive, ref, inject, watch } from "vue";
-import { useRouter, useRoute } from "vue-router";
-import ntc from "ntc-hi-js";
+import { reactive, ref, inject } from "vue";
+import { useRouter } from "vue-router";
 import Rating from "@/components/rates/Rating.vue";
 import Comment from "@/components/comments/Comment.vue";
 import { useToasted } from "@hoppscotch/vue-toasted";
+import { formatCash } from "@/helpers/helper";
 
 const toast = useToasted();
 const router = useRouter();
-const route = useRoute();
 const clientRepository = RepositoryFactory.get("client");
 const commentRepository = RepositoryFactory.get("comment");
 const emitter = inject("emitter");
@@ -297,6 +300,12 @@ emitter.on("reloadProductDetail", () => {
 emitter.on("showEdit", (comment_id) => {
   if (!showEditComment.value.includes(comment_id)) {
     showEditComment.value.push(comment_id);
+  } else {
+    let index = showEditComment.value.indexOf(comment_id);
+    if (index > -1) {
+      // only splice array when item is found
+      showEditComment.value.splice(index, 1); // 2nd parameter means remove one item only
+    }
   }
 });
 
@@ -515,15 +524,11 @@ const repComment = (comment) => {
   });
 };
 
-// get name color
-const getNameByHexColor = (hexCode) => {
-  return ntc.name(hexCode, "en").color.name;
-};
-
 const reload = () => {
   // get detail product
   clientRepository.getDetailProduct(product_id).then((response) => {
     data.value = response.data.data.product;
+    console.log(data.value);
     // get sizes and colors
     let size = [];
     let color = [];
@@ -535,6 +540,7 @@ const reload = () => {
     colors.value = color.filter((v, i, a) => a.indexOf(v) === i);
     // get unit in stock
     getUnitInStock();
+    choice.price = data.value.price ?? 0;
     // get comments
     comments.value = parseTree(data.value.comments ?? []);
     comment.content = "";
@@ -575,11 +581,9 @@ const getUnitInStock = () => {
   });
   if (correctItem) {
     choice.detail_id = correctItem.id;
-    choice.price = correctItem.price_sale ?? correctItem.price;
     unit_in_stock.value = correctItem.unit_in_stock;
   } else {
     unit_in_stock.value = 0;
-    choice.price = 0;
   }
 };
 
@@ -708,23 +712,6 @@ const buyNow = () => {
     });
   }
 };
-// format money
-const formatCash = (str) => {
-  return str
-    .toString()
-    .split("")
-    .reverse()
-    .reduce((prev, next, index) => {
-      return (index % 3 ? next : next + ".") + prev;
-    });
-};
-
-watch(
-  () => route.params.id,
-  (new_id) => {
-    console.log(new_id);
-  }
-);
 </script>
 
 <style scoped>
@@ -902,19 +889,21 @@ label.radio input {
 }
 
 label.radio span {
-  padding: 3px 9px;
-  border: 1px solid #8f37aa;
+  padding: 6px 12px;
+  border: 1px solid #ed1a29;
   display: inline-block;
-  color: #8f37aa;
-  border-radius: 5px;
+  color: #ed1a29;
   font-size: 11px;
+  font-weight: bold;
   text-transform: uppercase;
 }
 
 label.radio input:checked + span {
-  border-color: #8f37aa;
-  background-color: #8f37aa;
-  color: #fff;
+  border: none;
+  background-color: white;
+  box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 4px,
+    rgba(6, 24, 44, 0.65) 0px 6px 8px -2px,
+    rgba(255, 255, 255, 0.08) 0px 2px 0px inset;
 }
 /* block-comment */
 
@@ -946,5 +935,12 @@ label.radio input:checked + span {
 .btn-send:hover {
   background-color: #ed1a29;
   outline: 1px solid #ed1a29;
+}
+.option-color:hover {
+  cursor: pointer;
+}
+.option-color {
+  width: 30px;
+  height: 30px;
 }
 </style>

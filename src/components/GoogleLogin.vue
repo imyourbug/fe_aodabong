@@ -3,11 +3,8 @@
     <div class="col-md-12 block-btn">
       <a
         class="btn btn-lg btn-google btn-block text-uppercase btn-outline"
-        @click="logInByGoogle"
-        href="#"
-        ><img src="https://img.icons8.com/color/16/000000/google-logo.png" />
-        Đăng nhập bằng Google</a
-      >
+        @click="logInByGoogle"><img src="https://img.icons8.com/color/16/000000/google-logo.png" />
+        Đăng nhập bằng Google</a>
     </div>
   </div>
 </template>
@@ -25,32 +22,33 @@ const authRepository = RepositoryFactory.get("auth");
 
 const logInByGoogle = async () => {
   try {
-    const googleUser = await Vue3GoogleOauth.instance.signIn();
-    // save user login
-    if (googleUser) {
-      let account = {
-        id: googleUser.getBasicProfile().getId(),
-        name: googleUser.getBasicProfile().getName(),
-        email: googleUser.getBasicProfile().getEmail(),
-        access_token: googleUser.Cc.access_token,
-        avatar: googleUser.getBasicProfile().getImageUrl(),
-        type: "social",
-      };
-      authRepository.googleLogin(account).then((response) => {
-        if (response.data.status === 0) {
-          saveGoogleUser(response.data.data[1].user);
-          // Change name
-          emitter.emit("reloadHeader");
-          //
-          router.push({ name: "home" });
-        }
-        if (response.data.status === 1) {
-          alert(response.data.error.message);
-        }
-        if (response.data.status !== 0 && response.data.status !== 1) {
-          alert(response.data);
-        }
-      });
+  const googleUser = await Vue3GoogleOauth.instance.signIn();
+  // save user login
+  if (googleUser) {
+  let account = {
+    id: googleUser.getBasicProfile().getId(),
+    name: googleUser.getBasicProfile().getName(),
+    email: googleUser.getBasicProfile().getEmail(),
+    access_token: googleUser.Cc.access_token,
+    avatar: googleUser.getBasicProfile().getImageUrl(),
+    type: "social",
+  };
+  authRepository.googleLogin(account).then((response) => {
+    if (response.data.status === 0) {
+      let user = response.data.data[1].user;
+      saveGoogleUser(user);
+      // Change name
+      emitter.emit("reloadHeader");
+      //
+      router.push({ name: user.role === 0 ? "home" : "admin-home" });
+    }
+    if (response.data.status === 1) {
+      alert(response.data.error.message);
+    }
+    if (response.data.status !== 0 && response.data.status !== 1) {
+      alert(response.data);
+    }
+  });
     }
   } catch (e) {
     console.log(e);

@@ -6,29 +6,29 @@
           <i class="fas fa-bars"></i>&ensp;DANH MỤC SẢN PHẨM
         </div>
         <br />
-        <div class="option" v-if="groups && groups.length > 0">
-          <div v-for="(data, key) in groups" :key="key">
+        <div class="option" v-if="categories && categories.length > 0">
+          <div v-for="(category, key) in categories" :key="key">
             <router-link
               :to="{
-                path: getUrlByCategory(data.category),
+                path: getUrlByCategory(category),
               }"
-              v-if="data.category.parent_id === 0"
+              v-if="category.parent_id === 0"
               ><i class="fas fa-arrow-circle-right"></i>&ensp;{{
-                data.category.name
+                category.name
               }}</router-link
             >
-            <hr v-if="data.category.parent_id === 0" />
+            <hr v-if="category.parent_id === 0" />
           </div>
         </div>
       </div>
     </div>
     <div class="col-8"><SlideHome /></div>
   </div>
-  <main v-if="groups && groups.length > 0">
-    <div class="group-product" v-for="(group, key) in groups" :key="key">
+  <main v-if="categories && categories.length > 0">
+    <div class="group-product" v-for="(category, key) in categories" :key="key">
       <div
         class="album bg-light"
-        v-if="group.products && group.products.length > 0"
+        v-if="category.products && category.products.length > 0"
       >
         <div class="container">
           <div class="block-text-1">
@@ -36,10 +36,10 @@
               <router-link
                 class="btn-left"
                 :to="{
-                  path: getUrlByCategory(group.category),
+                  path: getUrlByCategory(category),
                 }"
                 >&ensp;<i class="far fa-futbol"></i>&ensp;{{
-                  group.category.name
+                  category.name
                 }}&emsp;</router-link
               >
             </div>
@@ -47,7 +47,7 @@
               <router-link
                 class="btn-right"
                 :to="{
-                  path: getUrlByCategory(group.category),
+                  path: getUrlByCategory(category),
                 }"
                 >Xem thêm <i class="fas fa-chevron-right"></i
                 ><i class="fas fa-chevron-right"></i
@@ -57,21 +57,16 @@
           <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3">
             <div
               class="col"
-              v-for="(product, key) in group.products"
+              v-for="(product, key) in category.products"
               :key="key"
             >
-              <router-link :to="`/products/detail/${product.product.id}`">
+              <router-link :to="`/products/detail/${product.id}`">
                 <div class="block-product">
-                  <a> <img :src="product.product.thumb" /></a>
+                  <a> <img :src="product.thumb" /></a>
                   <a>
-                    <p>{{ product.product.name }}</p>
+                    <p>{{ product.name }}</p>
                   </a>
-                  {{ formatCash(product.min_price) }}đ
-                  {{
-                    product.max_price > product.min_price
-                      ? ` - ${product.max_price}đ`
-                      : ""
-                  }}
+                  <p v-html="showPrice(product.price, product.price_sale)"></p>
                   <br />
                   <br />
                   <a class="detail"> Chi tiết</a>
@@ -119,66 +114,25 @@
 import SlideHome from "@/components/sliders/SlideHome.vue";
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
 import { useRouter } from "vue-router";
-import { ref, inject } from "vue";
+import { ref, inject, computed } from "vue";
+import { useStore } from "vuex";
+import { formatCash } from "@/helpers/helper.js";
 
 const clientRepository = RepositoryFactory.get("client");
 const categoryRepository = RepositoryFactory.get("category");
 
 const router = useRouter();
+const store = useStore();
 
-const groups = ref([]);
-const categories = ref([]);
+const categories = computed(() => {
+  return store.state.categories.all;
+});
 
 const reload = () => {
-  clientRepository
-    .getAllProductGroup()
-    .then((response) => {
-      if (response.data.status === 0) {
-        groups.value = response.data.data;
-        getAllCategories();
-      }
-      if (response.data.status === 1) {
-        console.log(response.data.error.message);
-      }
-      if (response.data.status !== 0 && response.data.status !== 1) {
-        console.log(response.data);
-      }
-    })
-    .catch((e) => {
-      console.log(e);
-    });
+  store.dispatch("categories/getAll");
 };
 
 reload();
-
-const getAllCategories = () => {
-  categoryRepository
-    .getAllCategories()
-    .then((response) => {
-      if (response.data.status === 0) {
-        categories.value = response.data.categories;
-      }
-      if (response.data.status === 1) {
-        console.log(response.data.error.message);
-      }
-      if (response.data.status !== 0 && response.data.status !== 1) {
-        console.log(response.data);
-      }
-    })
-    .catch((e) => {
-      console.log(e);
-    });
-};
-
-const formatCash = (str) => {
-  return str
-    .toString()
-    .split("")
-    .reverse()
-    .reduce((prev, next, index) => {
-      return (index % 3 ? next : next + ".") + prev;
-    });
-};
 
 const getUrlByCategory = (category) => {
   return `/categories/${getNameParent(category, categories.value, [])
@@ -200,6 +154,17 @@ const getNameParent = (category, categories, urls = []) => {
     }
   });
   return urls;
+};
+
+const showPrice = (price, price_sale) => {
+  if (price_sale !== null) {
+    return `${formatCash(
+      price
+    )}đ <sup style="text-decoration-line:line-through; opacity:0.6">${formatCash(
+      price_sale
+    )}đ</sup>`;
+  }
+  return `${formatCash(price)}đ`;
 };
 </script>
 

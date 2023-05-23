@@ -49,7 +49,12 @@
             <div class="col-md-12 block-btn">
               <input
                 type="submit"
-                class="btn btn-primary btn-md btn-block waves-effect text-center m-b-20"
+                class="
+                  btn btn-primary btn-md btn-block
+                  waves-effect
+                  text-center
+                  m-b-20
+                "
                 name="submit"
                 value="Đăng nhập"
                 @click="handleLogin"

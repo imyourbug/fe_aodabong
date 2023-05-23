@@ -1,86 +1,86 @@
 // export default router
 import { createRouter, createWebHistory } from "vue-router";
-import Login from "@/views/clients/Login.vue";
-import About from "@/views/clients/About.vue";
-import Home from "@/views/clients/Home.vue";
-import ProductDetail from "@/views/clients/ProductDetail.vue";
-import SearchProduct from "@/views/clients/SearchProduct.vue";
-import Cart from "@/views/clients/Cart.vue";
-import Register from "@/views/clients/Register.vue";
+import Login from "@/views/client/Login.vue";
+import Home from "@/views/client/Home.vue";
+import ProductDetail from "@/views/client/ProductDetail.vue";
+import SearchProduct from "@/views/client/SearchProduct.vue";
+import Cart from "@/views/client/Cart.vue";
+import Register from "@/views/client/Register.vue";
 import Checkout from "@/components/checkouts/PaypalCheckout.vue";
-import InfoUser from "@/views/clients/InfoUser.vue";
-import ChangePassword from "@/views/clients/ChangePassword.vue";
-import GroupProduct from "@/views/clients/GroupProduct.vue";
-import RecoverPassword from "@/views/clients/RecoverPassword.vue";
-import AdminHome from "@/views/admins/Home.vue";
-import ListProduct from "@/views/admins/products/ListProduct.vue";
-import ListCategory from "@/views/admins/categories/ListCategory.vue";
+import InfoUser from "@/views/client/InfoUser.vue";
+import ChangePassword from "@/views/client/ChangePassword.vue";
+import GroupProduct from "@/views/client/GroupProduct.vue";
+import Main from "@/views/client/Main.vue";
+import RecoverPassword from "@/views/client/RecoverPassword.vue";
+import AdminHome from "@/views/admin/Home.vue";
+import ListCategory from "@/views/admin/categories/ListCategory.vue";
+import ListProduct from "@/views/admin/products/ListProduct.vue";
+import ImportProduct from "@/views/admin/products/ImportProduct.vue";
 
 const routes = [
   {
-    path: "/home",
-    name: "home",
-    component: Home,
-    // meta: {
-    //     requiresAuth: true
-    // },
+    path: "/",
+    name: "main",
+    component: Main,
+    children: [
+      {
+        path: "home",
+        name: "home",
+        component: Home,
+      },
+      {
+        path: "/login",
+        name: "login",
+        component: Login,
+      },
+      {
+        path: "/register",
+        name: "register",
+        component: Register,
+      },
+      {
+        path: "/change_password",
+        name: "change_password",
+        component: ChangePassword,
+      },
+      {
+        path: "/password/recover",
+        name: "recover-password",
+        component: RecoverPassword,
+      },
+      {
+        path: "/carts",
+        name: "cart",
+        component: Cart,
+      },
+      {
+        path: "/user/info",
+        name: "info_user",
+        component: InfoUser,
+      },
+      {
+        path: "/checkout",
+        name: "checkout",
+        component: Checkout,
+      },
+      {
+        path: "/products/search/q=:key_word",
+        name: "search_product",
+        component: SearchProduct,
+      },
+      {
+        path: "/products/detail/:id",
+        name: "product_detail",
+        component: ProductDetail,
+      },
+      {
+        path: "/categories/:chapters+/id=:id_category",
+        name: "group_product",
+        component: GroupProduct,
+      },
+    ],
   },
-  {
-    path: "/products/search/q=:key_word",
-    name: "search_product",
-    component: SearchProduct,
-  },
-  ,
-  {
-    path: "/categories/:chapters+/id=:id_category",
-    name: "group_product",
-    component: GroupProduct,
-  },
-  {
-    path: "/products/detail/:id",
-    name: "product_detail",
-    component: ProductDetail,
-  },
-  {
-    path: "/carts",
-    name: "cart",
-    component: Cart,
-  },
-  {
-    path: "/about",
-    name: "about",
-    component: About,
-  },
-  {
-    path: "/login",
-    name: "login",
-    component: Login,
-  },
-  {
-    path: "/register",
-    name: "register",
-    component: Register,
-  },
-  {
-    path: "/change_password",
-    name: "change_password",
-    component: ChangePassword,
-  },
-  {
-    path: "/checkout",
-    name: "checkout",
-    component: Checkout,
-  },
-  {
-    path: "/user/info",
-    name: "info_user",
-    component: InfoUser,
-  },
-  {
-    path: "/password/recover",
-    name: "recover-password",
-    component: RecoverPassword,
-  },
+  //
   {
     path: "/admin",
     name: "admin-home",
@@ -88,10 +88,21 @@ const routes = [
     meta: {
       requiresAuth: true,
     },
-    child: [
+    children: [
       {
         path: "categories/list",
+        name: "list-category",
         component: ListCategory,
+      },
+      {
+        path: "products/list",
+        name: "list-product",
+        component: ListProduct,
+      },
+      {
+        path: "products/import",
+        name: "import-product",
+        component: ImportProduct,
       },
     ],
   },

@@ -15,3 +15,6 @@ npm i vue-dk-toast --save
 npm i @vue-stripe/vue-stripe --save
 npm i @vueuse/core --save
 npm i @hoppscotch/vue-toasted
+npm i vue-sidebar-menu --save
+npm i vuex@next --save
+npm i jw-vue-pagination --save

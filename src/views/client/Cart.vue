@@ -460,9 +460,8 @@ const reload = async () => {
   });
   //
   await voucherRepository.getAllVouchers().then((response) => {
-    let data = [];
     response.data.data.forEach((item) => {
-      data.push({
+      vouchers.value.push({
         // text is require to show value in screen
         // id is require to select an option
         id: item.id,
@@ -470,7 +469,6 @@ const reload = async () => {
         discount: item.discount,
       });
     });
-    vouchers.value = data;
   });
   //
   carts.value = JSON.parse(localStorage.getItem("carts"));

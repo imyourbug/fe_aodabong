@@ -1,12 +1,12 @@
-import Repository from '@/api/repositories/Repository';
+import Repository from "@/api/repositories/Repository";
 
-const baseDomain = 'http://localhost:8000';
+const baseDomain = process.env.VUE_APP_DOMAIN_URL;
 const baseUrl = `${baseDomain}/api/vouchers`;
 
 // const access_token = localStorage.getItem('access_token') ?? '';
 
 export default {
-    getAllVouchers() {
-        return Repository.get(`${baseUrl}/list`);
-    },
-}
+  getAllVouchers() {
+    return Repository.get(`${baseUrl}/list`);
+  },
+};

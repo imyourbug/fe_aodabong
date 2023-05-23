@@ -35,6 +35,7 @@
 </template>
 
 <script setup>
+import { formatCash } from "@/helpers/helper";
 import { defineProps } from "vue";
 
 const props = defineProps({
@@ -45,17 +46,6 @@ const props = defineProps({
 const domain = process.env.VUE_APP_DOMAIN_URL ?? "";
 
 const reload = () => {};
-
-// format cash
-const formatCash = (str) => {
-  return str
-    .toString()
-    .split("")
-    .reverse()
-    .reduce((prev, next, index) => {
-      return (index % 3 ? next : next + ".") + prev;
-    });
-};
 </script>
 
 <style scoped>
@@ -83,11 +73,6 @@ a {
 .user,
 .product {
   align-items: center;
-}
-.user-avt {
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
 }
 .thumb {
   width: 40px;

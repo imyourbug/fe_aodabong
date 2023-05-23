@@ -1,5 +1,6 @@
 function formatCash(str) {
   return str
+    .toString()
     .split("")
     .reverse()
     .reduce((prev, next, index) => {
@@ -32,6 +33,4 @@ function parseTree(arr) {
     }));
 }
 
-export default {
-  parseTree,
-};
+export { parseTree, formatCash };

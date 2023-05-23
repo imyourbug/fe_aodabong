@@ -59,8 +59,6 @@ import { ref, inject } from "vue";
 import { useRouter } from "vue-router";
 import CartHeader from "@/components/CartHeader.vue";
 import UserHeader from "@/components/UserHeader.vue";
-import MegaMenu from "@/components/menus/MegaMenu.vue";
-import SlideHome from "@/components/sliders/SlideHome.vue";
 
 const router = useRouter();
 const Vue3GoogleOauth = inject("Vue3GoogleOauth");
