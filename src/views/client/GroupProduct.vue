@@ -3,7 +3,9 @@
     <div class="row">
       <div class="block-head-2">
         <div class="head-text">
-          <router-link to="/home" style="color: #ed1a29">Trang chủ</router-link>
+          <router-link :to="{ name: 'home' }" style="color: #ed1a29"
+            >Trang chủ</router-link
+          >
           >> <a style="color: #ed1a29" href="#"> {{ category.detail.name }} </a>
         </div>
       </div>
@@ -76,12 +78,13 @@
                   <a>
                     <p>{{ product.product.name }}</p>
                   </a>
-                  {{ formatCash(product.min_price) }}đ
-                  {{
-                    product.max_price > product.min_price
-                      ? ` - ${product.max_price}đ`
+                  <!-- {{ formatCash(product.price) }}đ -->
+                  {{ product.price }}đ
+                  <!-- {{
+                    product.price_sale
+                      ? ` - ${product.price_sale}đ`
                       : ""
-                  }}
+                  }} -->
                   <br />
                   <br />
                   <a class="detail"> Chi tiết</a>
@@ -131,6 +134,7 @@
 <script setup>
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
 import { ref, watch } from "vue";
+// import { formatCash } from "@/helpers/helper";
 import { useRouter, useRoute } from "vue-router";
 import ProductEmpty from "../../components/products/ProductEmpty.vue";
 
@@ -143,11 +147,13 @@ const categories = ref([]);
 
 const reload = (category_id) => {
   let id = category_id ?? "";
+  console.log("reload", id);
   categoryRepository
     .getDetailCategory(id)
     .then((response) => {
       if (response.data.status === 0) {
         category.value = response.data.category;
+        console.log(category.value);
         getAllCategories();
       }
       if (response.data.status === 1) {
@@ -181,16 +187,6 @@ const getAllCategories = () => {
     });
 };
 
-const formatCash = (str) => {
-  return str
-    .toString()
-    .split("")
-    .reverse()
-    .reduce((prev, next, index) => {
-      return (index % 3 ? next : next + ".") + prev;
-    });
-};
-
 reload(router.currentRoute.value.params.id_category);
 
 const reloadGroupProduct = (cate) => {
@@ -221,9 +217,23 @@ const getNameParent = (category, categories, urls = []) => {
 watch(
   () => route.params.id_category,
   (new_id_category) => {
+    console.log("reload watch");
     reload(new_id_category);
   }
 );
+
+function formatCash(str) {
+  console.log(str);
+  if (str) {
+    return str
+      .toString()
+      .split("")
+      .reverse()
+      .reduce((prev, next, index) => {
+        return (index % 3 ? next : next + ".") + prev;
+      });
+  }
+}
 </script>
 
 <style scoped>

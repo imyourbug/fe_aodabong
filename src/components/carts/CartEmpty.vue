@@ -14,7 +14,7 @@
               <h3><strong>Giỏ hàng hiện chưa có sản phẩm nào :(</strong></h3>
               <h4>Thêm một vài thứ vào giỏ sẽ khiến bạn vui hơn :)</h4>
               <div class="button-home mt-4">
-                <router-link class="btn-home" to="/home">
+                <router-link class="btn-home" :to="{ name: 'home' }">
                   <i class="fas fa-arrow-left"></i> Tiếp tục mua hàng
                 </router-link>
               </div>

@@ -136,7 +136,7 @@
             <div v-else>
               Sản phẩm đã hết hàng, vẫn còn rất nhiều sản phẩm tương tự chất
               lượng khác đang chờ bạn
-              <router-link to="/home"> Click vào đây</router-link>
+              <router-link :to="{ name: 'home' }"> Click vào đây</router-link>
             </div>
           </div>
           <hr />

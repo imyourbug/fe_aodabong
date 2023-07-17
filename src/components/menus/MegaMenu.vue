@@ -1,7 +1,9 @@
 <template>
   <!-- :style="ids === category.id ? 'background-color: #ed1a29;' : ''" -->
   <nav class="navbar navbar-expand-sm navbar-dark bg-info">
-    <router-link class="navbar-brand" to="/home">Trang chủ</router-link>
+    <router-link class="navbar-brand" :to="{ name: 'home' }"
+      >Trang chủ</router-link
+    >
 
     <button
       class="navbar-toggler"
@@ -95,9 +97,6 @@ const cateRepository = RepositoryFactory.get("category");
 
 const categories = ref([]);
 const tree_categories = ref([]);
-// const ids = ref(0);
-
-// console.log(router.currentRoute.value.params.id_category);
 
 const getUrlByCategory = (category) => {
   return `/categories/${getNameParent(category, categories.value, [])

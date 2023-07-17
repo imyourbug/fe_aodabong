@@ -16,7 +16,7 @@
                 Vẫn còn rất nhiều sản phẩm hấp dẫn khác đang đợi bạn khám phá :)
               </h4>
               <div class="button-home mt-4">
-                <router-link class="btn-home" to="/home">
+                <router-link class="btn-home" :to="{ name: 'home' }">
                   <i class="fas fa-arrow-left"></i> Tiếp tục mua hàng
                 </router-link>
               </div>

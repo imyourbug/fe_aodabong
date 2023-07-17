@@ -1,11 +1,14 @@
 function formatCash(str) {
-  return str
-    .toString()
-    .split("")
-    .reverse()
-    .reduce((prev, next, index) => {
-      return (index % 3 ? next : next + ".") + prev;
-    });
+  console.log(str);
+  if (str) {
+    return str
+      .toString()
+      .split("")
+      .reverse()
+      .reduce((prev, next, index) => {
+        return (index % 3 ? next : next + ".") + prev;
+      });
+  }
 }
 
 function traverse(arr, parentId) {

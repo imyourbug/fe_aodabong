@@ -1,7 +1,7 @@
 <template>
   <div class="row block-head">
     <div class="col-6 block-head-left">
-      <router-link to="/home">Trang chủ</router-link>&emsp;
+      <router-link :to="{ name: 'home' }">Trang chủ</router-link>&emsp;
       <a href="#">Giới thiệu</a>&emsp;
       <a href="#">Dịch vụ in ấn</a>
     </div>
@@ -13,7 +13,7 @@
   </div>
   <div class="row menu-header">
     <div class="col-4">
-      <router-link class="text-menu-header" to="/home"
+      <router-link class="text-menu-header" :to="{ name: 'home' }"
         ><img class="logo" src="@/assets/logo.png" /></router-link
       >&emsp;
     </div>

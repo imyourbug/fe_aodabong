@@ -2,7 +2,9 @@
   <div class="block-content">
     <div class="block-head-2">
       <div class="head-text">
-        <router-link to="/home" style="color: #ed1a29">Trang chủ</router-link>
+        <router-link :to="{ name: 'home' }" style="color: #ed1a29"
+          >Trang chủ</router-link
+        >
         >> Giỏ hàng
       </div>
     </div>
@@ -95,7 +97,7 @@
           <CartEmpty />
         </div>
         <div class="button-home" v-if="carts && carts.length > 0">
-          <router-link class="btn-home" to="/home">
+          <router-link class="btn-home" :to="{ name: 'home' }">
             <i class="fas fa-arrow-left"></i> Tiếp tục mua hàng
           </router-link>
         </div>
@@ -485,12 +487,8 @@ const decreaseQuantity = (detail_id, quantity) => {
       }
     });
   } else {
-    if (confirm("Bạn muốn xóa sản phẩm này khỏi giỏ hàng?")) {
-      removeProduct(detail_id);
-      // change count quantity cart
-      emitter.emit("reloadHeader");
-      return;
-    }
+    removeProduct(detail_id);
+    return;
   }
   localStorage.setItem("carts", JSON.stringify(carts.value));
   reload();
@@ -551,21 +549,26 @@ const formatCash = (str) => {
 
 // remove product from carts
 const removeProduct = (id) => {
-  let storageProducts = JSON.parse(localStorage.getItem("carts"));
-  let products = storageProducts.filter((product) => product.detail_id !== id);
-  localStorage.setItem("carts", JSON.stringify(products));
-  toast.success("Xóa sản phẩm khỏi giỏ hàng thành công", {
-    duration: duration_time,
-    action: [
-      {
-        text: `OK`,
-        onClick: (_, toastObject) => {
-          toastObject.goAway(0);
+  if (confirm("Bạn muốn xóa sản phẩm này khỏi giỏ hàng?")) {
+    let storageProducts = JSON.parse(localStorage.getItem("carts"));
+    let products = storageProducts.filter(
+      (product) => product.detail_id !== id
+    );
+    localStorage.setItem("carts", JSON.stringify(products));
+    toast.success("Xóa sản phẩm khỏi giỏ hàng thành công", {
+      duration: duration_time,
+      action: [
+        {
+          text: `OK`,
+          onClick: (_, toastObject) => {
+            toastObject.goAway(0);
+          },
         },
-      },
-    ],
-  });
-  reload();
+      ],
+    });
+    emitter.emit("reloadHeader");
+    reload();
+  }
 };
 
 // check out
