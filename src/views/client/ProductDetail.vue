@@ -17,14 +17,6 @@
         <div class="col-6">
           <div class="detail-pro">
             <img class="img-detail" :src="data.thumb" />
-            <div class="row">
-              <div class="col-12" style="font-size: 24px; font-weight: bold">
-                Đánh giá sản phẩm
-              </div>
-              <div class="col-12">
-                <Rating :product_id="product_id" :user="user" />
-              </div>
-            </div>
             <div class="block-khuyenmai">
               <div class="khuyenmai">
                 <i class="far fa-star"></i> Tặng ngay quả bóng đá, giày bóng đá,
@@ -56,18 +48,13 @@
                 <div class="col-3"><label>Kích cỡ</label>&ensp;</div>
                 <div class="col-9" v-if="sizes && sizes.length > 0">
                   <label
-                    class="radio"
                     v-for="(size, key) in sizes"
                     v-bind:key="key"
+                    class="radio"
+                    @click="setSize(size)"
                   >
-                    <input
-                      type="radio"
-                      name="size"
-                      :value="size"
-                      @click="setSize(size)"
-                    />
-                    <span class="option-size">{{ size }}</span>
-                    &ensp;
+                    <input type="radio" name="size" />
+                    <span>{{ size }}</span>
                   </label>
                 </div>
               </div>
@@ -76,22 +63,13 @@
                 <div class="col-3"><label>Màu sắc</label>&ensp;</div>
                 <div class="col-9" v-if="colors && colors.length > 0">
                   <label
-                    class="radio"
                     v-for="(color, key) in colors"
                     v-bind:key="key"
+                    class="radio"
+                    @click="setColor(color)"
                   >
-                    <input
-                      type="radio"
-                      name="color"
-                      :value="color"
-                      @click="setColor(color)"
-                    />
-                    <span
-                      class="option-color"
-                      :style="`background-color: ${color};`"
-                    ></span>
-
-                    &ensp;
+                    <input type="radio" name="color" />
+                    <span :style="`background-color: ${color};`"></span>
                   </label>
                 </div>
               </div>
@@ -205,69 +183,43 @@
         <br />
       </div>
       <br />
-      <div class="out-texthead">
-        <div class="text-head">
-          <i class="far fa-comment-dots"></i>&ensp;ĐÁNH GIÁ SẢN PHẨM
-        </div>
-      </div>
-      <div class="block-comment mt-2 col-6">
-        <div class="head-comment">
-          <div class="txt-cmt">
-            Viết bình luận ..... <i class="fas fa-pencil-alt"></i>
-          </div>
-        </div>
-        <div class="content-comment mt-2">
-          <img class="avatar" :src="user.avatar" />&emsp;
-          <input
-            class="form-control"
-            placeholder="Nhập bình luận của bạn tại đây"
-            v-model="comment.content"
-            @keyup.enter="addComment"
-          />
-          <br />
-        </div>
-        <div style="text-align: right">
-          <button @click="addComment" class="btn-send my-2">Gửi</button>
-        </div>
-      </div>
-      <div v-if="comments && comments.length > 0">
-        <Comment
-          v-for="comment in comments"
-          :key="comment.id"
-          :comment="comment"
-          :showRepComment="showRepComment"
-          :showEditComment="showEditComment"
-          :showChildComment="showChildComment"
-          :domain="domain"
-        />
-      </div>
+      <Rating
+        :product_id="product_id"
+        :user="user"
+        :comments="comments"
+        :showEditComment="showEditComment"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
-// import dateFormat, { masks } from "dateformat";
-import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
-import { reactive, ref, inject } from "vue";
-import { useRouter } from "vue-router";
-import Rating from "@/components/rates/Rating.vue";
-import Comment from "@/components/comments/Comment.vue";
-import { useToasted } from "@hoppscotch/vue-toasted";
-import { formatCash } from "@/helpers/helper";
+import {
+  inject,
+  reactive,
+  ref,
+  watch,
+} from 'vue';
+
+import { useRouter } from 'vue-router';
+
+import { RepositoryFactory } from '@/api/repositories/RepositoryFactory.js';
+import Rating from '@/components/rates/Rating.vue';
+import { formatCash } from '@/helpers/helper';
+import { useToasted } from '@hoppscotch/vue-toasted';
 
 const toast = useToasted();
 const router = useRouter();
 const clientRepository = RepositoryFactory.get("client");
-const commentRepository = RepositoryFactory.get("comment");
 const emitter = inject("emitter");
 
 const domain = process.env.VUE_APP_DOMAIN_URL;
 const duration_time = process.env.VUE_APP_DURATION_TOAST ?? 3000;
 const product_id = parseInt(router.currentRoute.value.params.id);
 const showRepComment = ref(-1);
-const level_star = ref(null);
 const showEditComment = ref([]);
-const showChildComment = ref([]);
+
+const level_star = ref(null);
 const data = ref([]);
 const sizes = ref([]);
 const colors = ref([]);
@@ -280,17 +232,8 @@ const choice = reactive({
   price: 0,
   quantity: unit_in_stock.value === 0 ? 0 : 1,
 });
-const user = localStorage.getItem("user")
-  ? JSON.parse(localStorage.getItem("user"))
-  : {
-      avatar: `${domain}/storage/uploads/default.jpg`,
-    };
-const comment = reactive({
-  user_id: user.id ?? "",
-  product_id: product_id,
-  content: "",
-  reply_id: 0,
-});
+
+const user = ref(null);
 
 emitter.on("reloadProductDetail", () => {
   reload();
@@ -309,247 +252,41 @@ emitter.on("showEdit", (comment_id) => {
   }
 });
 
-// show child comment
-emitter.on("showChild", (comment_id) => {
-  if (!showChildComment.value.includes(comment_id)) {
-    showChildComment.value.push(comment_id);
-  }
-});
-
 // show reply comment
 emitter.on("showReply", (comment_id) => {
   showRepComment.value = comment_id;
 });
 
-// edit comment
-emitter.on("editComment", (comment) => {
-  editComment(comment);
-});
-
-// rep comment
-emitter.on("repComment", (comment) => {
-  repComment(comment);
-});
-
-// delete comment
-emitter.on("deleteComment", (comment_id) => {
-  deleteComment(comment_id);
-});
-
-// parse flat structure to tree structure
-const traverse = (arr, parentId) =>
-  arr
-    .filter((comment) => comment.reply_id === parentId)
-    .reduce(
-      (result, current) => [
-        ...result,
-        {
-          ...current,
-          children: traverse(arr, current.id),
-        },
-      ],
-      []
-    );
-
-const parseTree = (arr) =>
-  arr
-    .sort(({ order }) => order)
-    .filter(({ reply_id }) => !reply_id)
-    .map((comment) => ({
-      ...comment,
-      children: traverse(arr, comment.id),
-    }));
-
-// add comment
-const addComment = () => {
-  if (!user.id) {
-    toast.error("Bạn cần đăng nhập để bình luận", {
-      duration: duration_time,
-      action: [
-        {
-          text: `OK`,
-          onClick: (_, toastObject) => {
-            toastObject.goAway(0);
-          },
-        },
-      ],
-    });
-    return;
-  }
-  if (comment.content.trim()) {
-    commentRepository.createComment(comment).then((response) => {
-      if (response.data.status === 0) {
-        reload();
-        toast.success("Bình luận thành công", {
-          duration: duration_time,
-          action: [
-            {
-              text: `OK`,
-              onClick: (_, toastObject) => {
-                toastObject.goAway(0);
-              },
-            },
-          ],
-        });
-      }
-      if (response.data.status === 1) {
-        toast.error(response.data.error.message, {
-          duration: duration_time,
-          action: [
-            {
-              text: `OK`,
-              onClick: (_, toastObject) => {
-                toastObject.goAway(0);
-              },
-            },
-          ],
-        });
-      }
-      if (response.data.status !== 0 && response.data.status !== 1) {
-        console.log(response.data);
-      }
-    });
-  }
-};
-
-//edit comment
-const editComment = (comment) => {
-  commentRepository
-    .updateContentComment(comment.id, comment.content)
-    .then((response) => {
-      if (response.data.status === 0) {
-        toast.success("Chỉnh sửa bình luận thành công", {
-          duration: duration_time,
-          action: [
-            {
-              text: `OK`,
-              onClick: (_, toastObject) => {
-                toastObject.goAway(0);
-              },
-            },
-          ],
-        });
-        reload();
-      }
-      if (response.data.status === 1) {
-        toast.error(response.data.error.message, {
-          duration: duration_time,
-          action: [
-            {
-              text: `OK`,
-              onClick: (_, toastObject) => {
-                toastObject.goAway(0);
-              },
-            },
-          ],
-        });
-      }
-      if (response.data.status !== 0 && response.data.status !== 1) {
-        console.log(response.data);
-      }
-    });
-};
-
-// delete comment
-const deleteComment = (comment_id) => {
-  if (confirm("Bạn có muốn xóa bình luận này không?")) {
-    commentRepository.deleteComment(comment_id).then((response) => {
-      if (response.data.status === 0) {
-        toast.success("Xóa bình luận thành công", {
-          duration: duration_time,
-          action: [
-            {
-              text: `OK`,
-              onClick: (_, toastObject) => {
-                toastObject.goAway(0);
-              },
-            },
-          ],
-        });
-        reload();
-      }
-      if (response.data.status === 1) {
-        toast.success(response.data.error.message, {
-          duration: duration_time,
-          action: [
-            {
-              text: `OK`,
-              onClick: (_, toastObject) => {
-                toastObject.goAway(0);
-              },
-            },
-          ],
-        });
-      }
-      if (response.data.status !== 0 && response.data.status !== 1) {
-        console.log(response.data);
-      }
-    });
-  }
-};
-
-// rep comment
-const repComment = (comment) => {
-  commentRepository.createComment(comment).then((response) => {
-    if (response.data.status === 0) {
-      toast.success("Phản hồi thành công", {
-        duration: duration_time,
-        action: [
-          {
-            text: `OK`,
-            onClick: (_, toastObject) => {
-              toastObject.goAway(0);
-            },
-          },
-        ],
-      });
-      reload();
-    }
-    if (response.data.status === 1) {
-      toast.error(response.data.error.message, {
-        duration: duration_time,
-        action: [
-          {
-            text: `OK`,
-            onClick: (_, toastObject) => {
-              toastObject.goAway(0);
-            },
-          },
-        ],
-      });
-    }
-    if (response.data.status !== 0 && response.data.status !== 1) {
-      console.log(response.data);
-    }
-  });
-};
 
 const reload = () => {
   // get detail product
   clientRepository.getDetailProduct(product_id).then((response) => {
-    data.value = response.data.data.product;
-    console.log(data.value);
+    data.value = response.data.product;
     // get sizes and colors
     let size = [];
     let color = [];
     data.value.product_details.forEach((item) => {
-      size.push(item.code_size);
-      color.push(item.code_color);
+      if (!size.includes(item.code_size)) {
+        size.push(item.code_size);
+      }
+      if (!color.includes(item.code_color)) {
+        color.push(item.code_color);
+      }
     });
-    sizes.value = size.filter((v, i, a) => a.indexOf(v) === i);
-    colors.value = color.filter((v, i, a) => a.indexOf(v) === i);
+    sizes.value = size;
+    colors.value = color;
     // get unit in stock
     getUnitInStock();
     choice.price = data.value.price ?? 0;
     // get comments
-    comments.value = parseTree(data.value.comments ?? []);
-    comment.content = "";
+    comments.value = response.data.product.comments;
     // level star
-    level_star.value = response.data.data.level_star.toFixed(1);
+    level_star.value = response.data.level_star;
     // reply_content.value = "";
-    showEditComment.value = [];
     showRepComment.value = -1;
+    showEditComment.value = [];
     //
+    user.value = JSON.parse(localStorage.getItem("user"));
   });
 };
 
@@ -733,6 +470,14 @@ a {
 .head-text {
   padding: 15px 0px;
 }
+.img-size {
+  width: 100%;
+  height: 100%;
+}
+.img-detail {
+  width: 400px;
+  height: 400px;
+}
 /* .block-content */
 .block-content {
   margin: 0 10%;
@@ -839,47 +584,9 @@ td.txt-end {
   font-style: italic;
 }
 
-/* block-commnet */
-
-.out-texthead {
-  border-bottom: 1px solid #2e3094;
+label.radio {
+  cursor: pointer;
 }
-
-.out-texthead .text-head {
-  font-size: 20px;
-  padding: 5px 0px 5px 10px;
-  background-color: #2e3094;
-  width: 30%;
-  color: white;
-}
-
-.content-comment {
-  display: flex;
-  justify-content: center;
-}
-
-.btn-send {
-  border: none;
-  border-radius: 10px;
-  padding: 5px 10px 5px 10px;
-  color: white;
-  background-color: #2e3094;
-}
-
-.btn-send:hover {
-  background-color: #ed1a29;
-  outline: 1px solid #ed1a29;
-}
-.img-size {
-  width: 100%;
-  height: 100%;
-}
-.img-detail {
-  width: 400px;
-  height: 400px;
-}
-/*  */
-
 label.radio input {
   position: absolute;
   top: 0;
@@ -887,60 +594,18 @@ label.radio input {
   visibility: hidden;
   pointer-events: none;
 }
-
 label.radio span {
-  padding: 6px 12px;
-  border: 1px solid #ed1a29;
+  margin-right: 10px;
+  padding: 7px 14px;
+  border: 1px solid black;
   display: inline-block;
-  color: #ed1a29;
-  font-size: 11px;
-  font-weight: bold;
+  color: black;
+  border-radius: 3px;
   text-transform: uppercase;
 }
-
 label.radio input:checked + span {
-  border: none;
-  background-color: white;
-  box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 4px,
-    rgba(6, 24, 44, 0.65) 0px 6px 8px -2px,
-    rgba(255, 255, 255, 0.08) 0px 2px 0px inset;
-}
-/* block-comment */
-
-.avatar {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-}
-.out-texthead {
-  border-bottom: 1px solid #2e3094;
-}
-.out-texthead .text-head {
-  font-size: 20px;
-  padding: 5px 0px 5px 10px;
   background-color: #2e3094;
-  width: 30%;
-  color: white;
-}
-.content-comment textarea {
-  padding: 10px;
-}
-.btn-send {
-  border: none;
-  border-radius: 10px;
-  padding: 5px 10px 5px 10px;
-  color: white;
-  background-color: #2e3094;
-}
-.btn-send:hover {
-  background-color: #ed1a29;
-  outline: 1px solid #ed1a29;
-}
-.option-color:hover {
-  cursor: pointer;
-}
-.option-color {
-  width: 30px;
-  height: 30px;
+  box-shadow: 0 3px 3px rgb(6, 5, 5);
+  color: #fff;
 }
 </style>

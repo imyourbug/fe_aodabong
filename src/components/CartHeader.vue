@@ -35,17 +35,14 @@
 </template>
 
 <script setup>
-import { formatCash } from "@/helpers/helper";
-import { defineProps } from "vue";
+import { defineProps } from 'vue';
+
+import { formatCash } from '@/helpers/helper';
 
 const props = defineProps({
   carts: Object,
   user: Object,
 });
-
-const domain = process.env.VUE_APP_DOMAIN_URL ?? "";
-
-const reload = () => {};
 </script>
 
 <style scoped>

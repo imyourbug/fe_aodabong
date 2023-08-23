@@ -1,12 +1,14 @@
 <template>
-  <main>
+  <div>
     <div class="row">
       <div class="block-head-2">
         <div class="head-text">
           <router-link :to="{ name: 'home' }" style="color: #ed1a29"
             >Trang chủ</router-link
-          >
-          >> <a style="color: #ed1a29" href="#"> {{ category.detail.name }} </a>
+          >>>
+          <a v-if="category.detail" style="color: #ed1a29" href="#">
+            {{ category.detail.name }}
+          </a>
         </div>
       </div>
     </div>
@@ -22,7 +24,7 @@
               v-for="(child, key) in category.children"
               :key="key"
             >
-              <a @click="reloadGroupProduct(child)">
+              <a @click="reloadGroupProduct(child.id)">
                 <div class="block-product">
                   <a>
                     <img
@@ -42,7 +44,7 @@
     </div>
     <div class="group-product">
       <div class="album bg-light">
-        <div class="container">
+        <div v-if="category.detail" class="container" >
           <div class="block-text-1">
             <div class="block-text-left">
               <a class="btn-left"
@@ -60,31 +62,27 @@
           </div>
           <div
             class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3"
-            v-if="category.products && category.products.length > 0"
+            v-if="
+              category.detail.products && category.detail.products.length > 0
+            "
           >
             <div
               class="col"
-              v-for="(product, key) in category.products"
+              v-for="(product, key) in category.detail.products"
               :key="key"
             >
               <router-link
                 :to="{
                   name: 'product_detail',
-                  params: { id: product.product.id },
+                  params: { id: product.id },
                 }"
               >
                 <div class="block-product">
-                  <a> <img :src="product.product.thumb" /></a>
+                  <a> <img :src="product.thumb" /></a>
                   <a>
-                    <p>{{ product.product.name }}</p>
+                    <p>{{ product.name }}</p>
                   </a>
-                  <!-- {{ formatCash(product.price) }}đ -->
-                  {{ product.price }}đ
-                  <!-- {{
-                    product.price_sale
-                      ? ` - ${product.price_sale}đ`
-                      : ""
-                  }} -->
+                  <p v-html="showPrice(product.price, product.price_sale)"></p>
                   <br />
                   <br />
                   <a class="detail"> Chi tiết</a>
@@ -128,112 +126,53 @@
         </div>
       </div>
     </div>
-  </main>
+  </div>
 </template>
 
 <script setup>
-import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
-import { ref, watch } from "vue";
-// import { formatCash } from "@/helpers/helper";
-import { useRouter, useRoute } from "vue-router";
-import ProductEmpty from "../../components/products/ProductEmpty.vue";
+import {
+  computed,
+  watch,
+} from 'vue';
+
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+
+import { showPrice } from '@/helpers/helper.js';
+
+import ProductEmpty from '../../components/products/ProductEmpty.vue';
 
 const router = useRouter();
-const route = useRoute();
-const categoryRepository = RepositoryFactory.get("category");
+const store = useStore();
 
-const category = ref([]);
-const categories = ref([]);
+const category_id = computed(() => {
+  return router.currentRoute.value.params.id_category;
+});
 
-const reload = (category_id) => {
-  let id = category_id ?? "";
-  console.log("reload", id);
-  categoryRepository
-    .getDetailCategory(id)
-    .then((response) => {
-      if (response.data.status === 0) {
-        category.value = response.data.category;
-        console.log(category.value);
-        getAllCategories();
-      }
-      if (response.data.status === 1) {
-        alert(response.data.error.message);
-      }
-      if (response.data.status !== 0 && response.data.status !== 1) {
-        alert(response.data);
-      }
-    })
-    .catch((e) => {
-      console.log(e);
-    });
+const category = computed(() => {
+  return store.state.categories.detail;
+});
+
+const reload = () => {
+  store.dispatch("categories/getDetailCategory", category_id.value);
+  console.log("error", category.value);
 };
 
-const getAllCategories = () => {
-  categoryRepository
-    .getAllCategories()
-    .then((response) => {
-      if (response.data.status === 0) {
-        categories.value = response.data.categories;
-      }
-      if (response.data.status === 1) {
-        alert(response.data.error.message);
-      }
-      if (response.data.status !== 0 && response.data.status !== 1) {
-        alert(response.data);
-      }
-    })
-    .catch((e) => {
-      console.log(e);
-    });
-};
+reload();
 
-reload(router.currentRoute.value.params.id_category);
-
-const reloadGroupProduct = (cate) => {
+const reloadGroupProduct = (cate_id) => {
   router.push({
-    path: `/categories/${getNameParent(cate, categories.value, [])
-      .reverse()
-      .join("/")}/id=${cate.id}`,
+    path: `/categories/${cate_id}`,
   });
-  reload(cate.id);
-};
-
-const getNameParent = (category, categories, urls = []) => {
-  urls.push(category.slug);
-  categories.forEach((item) => {
-    if (item.id === category.parent_id) {
-      getNameParent(
-        item,
-        categories.filter((cate) => {
-          return cate.id !== item.id;
-        }),
-        urls
-      );
-    }
-  });
-  return urls;
+  store.dispatch("categories/getDetailCategory", cate_id);
 };
 
 watch(
-  () => route.params.id_category,
-  (new_id_category) => {
-    console.log("reload watch");
-    reload(new_id_category);
+  () => category_id.value,
+  (newValue) => {
+    store.dispatch("categories/getDetailCategory", newValue);
   }
 );
-
-function formatCash(str) {
-  console.log(str);
-  if (str) {
-    return str
-      .toString()
-      .split("")
-      .reverse()
-      .reduce((prev, next, index) => {
-        return (index % 3 ? next : next + ".") + prev;
-      });
-  }
-}
 </script>
 
 <style scoped>

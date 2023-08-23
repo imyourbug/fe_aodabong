@@ -1,26 +1,30 @@
-import Repository from "@/api/repositories/Repository";
+import axios from 'axios';
+
+import { getAxios } from '@/api/repositories/Repository';
 
 const baseDomain = process.env.VUE_APP_DOMAIN_URL;
 const baseUrl = `${baseDomain}/api/authentications`;
 
 export default {
   login(account) {
-    return Repository.post(`${baseUrl}/login`, {
+    return getAxios().post(`${baseUrl}/login`, {
       email: account.email,
       password: account.password,
     });
   },
-  googleLogin(account) {
+  socialLogin(account) {
     console.log(account);
-    return Repository.post(`${baseUrl}/socials/google_login`, {
+    return getAxios().post(`${baseUrl}/socials/login`, {
       email: account.email,
       provider_user_id: account.id,
       avatar: account.avatar,
       name: account.name,
+      type: account.type,
     });
   },
   changePassword(account) {
-    return Repository.post(`${baseUrl}/change_password`, {
+    console.log(account);
+    return getAxios().post(`${baseUrl}/change_password`, {
       email: account.email,
       password: account.password,
       new_password: account.new_password,
@@ -28,8 +32,13 @@ export default {
     });
   },
   resetPassword(email) {
-    return Repository.post(`${baseUrl}/reset_password`, {
+    return getAxios().post(`${baseUrl}/reset_password`, {
       email: email,
     });
+  },
+  getInforByAccessTokenFB(access_token) {
+    return axios.get(
+      `https://graph.facebook.com/me?fields=id,name,first_name,last_name,email,picture&access_token=${access_token}`
+    );
   },
 };

@@ -1,5 +1,6 @@
 npm i
 npm i vue3-google-oauth2 --save
+npm i vue3-google-login --save
 npm i vue3-storage --save
 npm i vue3-route@next --save
 npm i bootstrap --save
@@ -18,3 +19,8 @@ npm i @hoppscotch/vue-toasted
 npm i vue-sidebar-menu --save
 npm i vuex@next --save
 npm i jw-vue-pagination --save
+npm i jwt-decode --save
+npm i vue3-google-facebook-signin --save // edit permisson email
+npm i https-localhost --save
+npm i vue3-carousel --save
+npm i vue3-tab --save

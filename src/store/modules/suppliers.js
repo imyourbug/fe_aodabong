@@ -1,4 +1,4 @@
-import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
+import { RepositoryFactory } from '@/api/repositories/RepositoryFactory.js';
 
 const supplierRepository = RepositoryFactory.get("supplier");
 

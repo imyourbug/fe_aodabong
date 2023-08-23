@@ -1,0 +1,139 @@
+<template>
+   <div
+    class="modal fade"
+    id="modalEdit"
+    tabindex="-1"
+    role="dialog"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Chỉnh sửa chi tiết sản phẩm</h5>
+          <button
+            class="close"
+            type="button"
+            data-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Sản phẩm</label>
+            <select
+              disabled
+              class="form-control"
+              v-model="detail_product.product_id"
+              v-if="products && products.length > 0"
+            >
+              <option
+                :value="product.id"
+                v-for="product in products"
+                :key="product.id"
+              >
+                {{ product.name }}
+              </option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Màu sắc</label>
+            <input
+              type="color"
+              class="form-control"
+              v-model="detail_product.color"
+            />
+            <div :class="{ error: v$.color.$errors.length }">
+              <div
+                class="input-errors"
+                v-for="error of v$.color.$errors"
+                :key="error.$uid"
+              >
+                <div class="error-msg">{{ error.$message }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Size</label>
+            <select class="form-control" v-model="detail_product.size">
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+              <option value="XXL">XXL</option>
+            </select>
+            <div :class="{ error: v$.size.$errors.length }">
+              <div
+                class="input-errors"
+                v-for="error of v$.size.$errors"
+                :key="error.$uid"
+              >
+                <div class="error-msg">{{ error.$message }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Số lượng trong kho</label>
+            <input
+              type="number"
+              class="form-control"
+              v-model="detail_product.quantity"
+            />
+            <div :class="{ error: v$.quantity.$errors.length }">
+              <div
+                class="input-errors"
+                v-for="error of v$.quantity.$errors"
+                :key="error.$uid"
+              >
+                <div class="error-msg">{{ error.$message }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Ảnh</label>
+            <input @change="uploadImage" type="file" class="form-control" />
+            <img :src="detail_product.thumb" />
+            <div :class="{ error: v$.thumb.$errors.length }">
+              <div
+                class="input-errors"
+                v-for="error of v$.thumb.$errors"
+                :key="error.$uid"
+              >
+                <div class="error-msg">{{ error.$message }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-edit" class="btn btn-success" @click="edit">Lưu</button>
+          <button class="btn btn-danger" type="button" data-dismiss="modal">
+            Thoát
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<script setup>
+import { defineProps } from 'vue';
+
+import { useVuelidate } from '@vuelidate/core';
+
+const props = defineProps({
+  detail_product: Object,
+  products: Array,
+  edit: Function,
+  uploadImage: Function,
+  rules: Object,
+});
+
+const v$ = useVuelidate(props.rules, props.detail_product);
+</script>
+<style scoped>
+.error-msg {
+  color: #ed1a29;
+  font-size: 14px;
+  align-items: center;
+}
+</style>

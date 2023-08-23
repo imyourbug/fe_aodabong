@@ -136,26 +136,23 @@
 </template>
 
 <script setup>
-import { ref, inject } from "vue";
-import { useRouter } from "vue-router";
-import CartHeader from "@/components/CartHeader.vue";
-import UserHeader from "@/components/UserHeader.vue";
-import Sidebar from "@/views/admin/Sidebar.vue";
+import { ref } from 'vue';
+
+import { useRouter } from 'vue-router';
+
+import Sidebar from '@/views/admin/Sidebar.vue';
 
 const router = useRouter();
-const Vue3GoogleOauth = inject("Vue3GoogleOauth");
-const emitter = inject("emitter");
 const user = JSON.parse(localStorage.getItem("user"));
 
 const isLogged = ref(false);
 
 const handleSignOut = async () => {
   try {
-    await Vue3GoogleOauth.instance.signOut();
     unSaveUser();
     isLogged.value = false;
 
-    router.push({ name: "login" });
+    router.push({ name: "home" });
   } catch (error) {
     console.log(error);
   }
@@ -167,7 +164,6 @@ const unSaveUser = () => {
 </script>
 
 <style scoped>
-/* @import "../../../public/css/sb-admin-2.min.css"; */
 .dropdown-item {
   cursor: pointer;
 }

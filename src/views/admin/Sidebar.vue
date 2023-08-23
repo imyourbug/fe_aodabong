@@ -82,46 +82,136 @@
         </div>
       </div>
     </li>
-
-    <!-- Divider -->
-    <hr class="sidebar-divider" />
-
-    <!-- Heading -->
-    <div class="sidebar-heading">Thống kê</div>
-
-    <!-- Nav Item - Pages Collapse Menu -->
     <li class="nav-item">
       <a
         class="nav-link collapsed"
         href="#"
         data-toggle="collapse"
-        data-target="#collapsePages"
+        data-target="#orders"
         aria-expanded="true"
-        aria-controls="collapsePages"
+        aria-controls="orders"
       >
         <i class="fas fa-fw fa-folder"></i>
-        <span>Hóa đơn</span>
+        <span>Đơn hàng</span>
       </a>
       <div
-        id="collapsePages"
+        id="orders"
         class="collapse"
         aria-labelledby="headingPages"
         data-parent="#accordionSidebar"
       >
         <div class="bg-white py-2 collapse-inner rounded">
-          <h6 class="collapse-header">Hóa đơn nhập</h6>
+          <router-link class="collapse-item" :to="{ name: 'list-order' }"
+            >Danh sách</router-link
+          >
         </div>
       </div>
     </li>
-
-    <!-- Nav Item - Charts -->
     <li class="nav-item">
-      <a class="nav-link" href="charts.html">
-        <i class="fas fa-fw fa-chart-area"></i>
-        <span>Doanh thu</span></a
+      <a
+        class="nav-link collapsed"
+        href="#"
+        data-toggle="collapse"
+        data-target="#vouchers"
+        aria-expanded="true"
+        aria-controls="vouchers"
       >
+        <i class="fas fa-fw fa-folder"></i>
+        <span>Khuyến mãi</span>
+      </a>
+      <div
+        id="vouchers"
+        class="collapse"
+        aria-labelledby="headingPages"
+        data-parent="#accordionSidebar"
+      >
+        <div class="bg-white py-2 collapse-inner rounded">
+          <router-link class="collapse-item" :to="{ name: 'list-voucher' }"
+            >Danh sách</router-link
+          >
+        </div>
+      </div>
     </li>
-    <!-- Divider -->
+    <li class="nav-item">
+      <a
+        class="nav-link collapsed"
+        href="#"
+        data-toggle="collapse"
+        data-target="#shipments"
+        aria-expanded="true"
+        aria-controls="shipments"
+      >
+        <i class="fas fa-fw fa-folder"></i>
+        <span>Vận chuyển</span>
+      </a>
+      <div
+        id="shipments"
+        class="collapse"
+        aria-labelledby="headingPages"
+        data-parent="#accordionSidebar"
+      >
+        <div class="bg-white py-2 collapse-inner rounded">
+          <router-link class="collapse-item" :to="{ name: 'list-shipment' }"
+            >Danh sách</router-link
+          >
+        </div>
+      </div>
+    </li>
+    <hr class="sidebar-divider" />
+
+    <div class="sidebar-heading">Thống kê</div>
+    <li class="nav-item">
+      <a
+        class="nav-link collapsed"
+        href="#"
+        data-toggle="collapse"
+        data-target="#statistics"
+        aria-expanded="true"
+        aria-controls="statistics"
+      >
+        <i class="fas fa-fw fa-folder"></i>
+        <span>Thống kê</span>
+      </a>
+      <div
+        id="statistics"
+        class="collapse"
+        aria-labelledby="headingPages"
+        data-parent="#accordionSidebar"
+      >
+        <div class="bg-white py-2 collapse-inner rounded">
+          <router-link class="collapse-item" :to="{ name: 'statistics-revenue' }"
+            >Doanh thu</router-link
+          >
+        </div>
+      </div>
+    </li>
+    <hr class="sidebar-divider d-none d-md-block" />
+    <div class="sidebar-heading">Cài đặt</div>
+    <li class="nav-item">
+      <a
+        class="nav-link collapsed"
+        href="#"
+        data-toggle="collapse"
+        data-target="#slides"
+        aria-expanded="true"
+        aria-controls="slides"
+      >
+        <i class="fas fa-fw fa-folder"></i>
+        <span>Slide</span>
+      </a>
+      <div
+        id="slides"
+        class="collapse"
+        aria-labelledby="headingPages"
+        data-parent="#accordionSidebar"
+      >
+        <div class="bg-white py-2 collapse-inner rounded">
+          <router-link class="collapse-item" :to="{ name: 'list-slide' }"
+            >Danh sách</router-link
+          >
+        </div>
+      </div>
+    </li>
     <hr class="sidebar-divider d-none d-md-block" />
   </ul>
 </template>

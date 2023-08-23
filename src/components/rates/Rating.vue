@@ -1,99 +1,144 @@
 <template>
-  <div class="row">
-    <div class="col-md-12">
-      <div class="stars">
-        <input
-          class="star star-5"
-          id="star-5"
-          type="radio"
-          name="star"
-          @click="rate(5)"
-        />
-        <label class="star star-5" for="star-5"></label>
-
-        <input
-          class="star star-4"
-          id="star-4"
-          type="radio"
-          name="star"
-          @click="rate(4)"
-        />
-        <label class="star star-4" for="star-4"></label>
-
-        <input
-          class="star star-3"
-          id="star-3"
-          type="radio"
-          name="star"
-          @click="rate(3)"
-        />
-        <label class="star star-3" for="star-3"></label>
-
-        <input
-          class="star star-2"
-          id="star-2"
-          type="radio"
-          name="star"
-          @click="rate(2)"
-        />
-        <label class="star star-2" for="star-2"></label>
-
-        <input
-          class="star star-1"
-          id="star-1"
-          type="radio"
-          name="star"
-          @click="rate(1)"
-        />
-        <label class="star star-1" for="star-1"></label>
+  <div class="out-texthead">
+    <div class="text-head">
+      <i class="far fa-comment-dots"></i>&ensp;ĐÁNH GIÁ SẢN PHẨM
+    </div>
+  </div>
+  <div class="block-comment mt-2 col-6">
+    <div class="head-comment">
+      <div class="txt-cmt">
+        Viết bình luận ..... <i class="fas fa-pencil-alt"></i>
       </div>
     </div>
+    <div class="content-comment mt-2">
+      <img class="avatar" :src="user ==null ? `${domain}/storage/uploads/default.jpg` : user.avatar" />&emsp;
+      <input
+        class="form-control"
+        placeholder="Nhập bình luận của bạn tại đây"
+        v-model="comment.content"
+        @keyup.enter="addComment"
+      />
+      <br />
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <br />
+        <div class="stars">
+          <i
+            v-for="index in comment.level_star"
+            class="fa-solid fa-star"
+            @click="setLevelStar(index)"
+          ></i>
+          <i
+            v-for="index in 5 - comment.level_star"
+            class="fa-regular fa-star"
+            @click="setLevelStar(comment.level_star + index)"
+          ></i>
+        </div>
+      </div>
+    </div>
+    <div style="text-align: right">
+      <button @click="addComment" class="btn-send my-2">Gửi</button>
+    </div>
+  </div>
+  <div v-if="comments && comments.length > 0">
+    <Comment
+      v-for="com in comments"
+      :key="com.id"
+      :comment="com"
+      :showRepComment="showRepComment"
+      :showEditComment="showEditComment"
+      :domain="domain"
+      :duration_time="duration_time"
+      :user="user"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, defineProps, inject, onUnmounted } from "vue";
-import { useToasted } from "@hoppscotch/vue-toasted";
-import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
+import {
+  defineProps,
+  inject,
+  onMounted,
+  reactive,
+  ref,
+  watch,
+} from 'vue';
 
-const emitter = inject("emitter");
+import { useRouter } from 'vue-router';
+
+import { RepositoryFactory } from '@/api/repositories/RepositoryFactory.js';
+import Comment from '@/components/comments/Comment.vue';
+import { useToasted } from '@hoppscotch/vue-toasted';
+
 const toast = useToasted();
-const clientRepository = RepositoryFactory.get("client");
+const router = useRouter();
+const commentRepository = RepositoryFactory.get("comment");
+const emitter = inject("emitter");
 
 const props = defineProps({
   user: Object,
-  product_id: Int32Array,
+  comments: Array,
+  product_id: Number,
+  showEditComment: Array,
 });
-const duration_time = process.env.VUE_APP_DURATION_TOAST ?? 3000;
 
-const rate = (level_star) => {
-  if (!props.user) {
-    toast.error("Bạn cần đăng nhập để đánh giá sản phẩm này", {
+const domain = process.env.VUE_APP_DOMAIN_URL;
+const duration_time = process.env.VUE_APP_DURATION_TOAST ?? 3000;
+const product_id = parseInt(router.currentRoute.value.params.id);
+const showRepComment = ref(-1);
+
+const comment = reactive({
+  user_id: '',
+  product_id: product_id,
+  content: "",
+  reply_id: 0,
+  level_star: 5,
+});
+
+const reset = () => {
+  comment.content = "";
+  comment.reply_id = 0;
+  comment.level_star = 5;
+};
+
+// add comment
+const addComment = () => {
+  if (!comment.user_id) {
+    toast.error("Bạn cần đăng nhập để bình luận", {
       duration: duration_time,
       action: [
         {
-          text: `Đăng nhập`,
+          text: `OK`,
           onClick: (_, toastObject) => {
             toastObject.goAway(0);
-            // to do
-            // show form popup login
           },
         },
       ],
     });
-  } else {
-    ratingProduct(level_star);
+    return;
   }
-};
-
-const ratingProduct = (level_star) => {
-  clientRepository
-    .ratingProduct(props.user.id, props.product_id, level_star)
-    .then((response) => {
+  if (comment.content.trim()) {
+    $(".btn-send").prop("disabled", true);
+    commentRepository.createComment(comment).then((response) => {
       if (response.data.status === 0) {
+        $(".btn-send").prop("disabled", false);
+        reset();
         emitter.emit("reloadProductDetail");
+        toast.success("Bình luận thành công", {
+          duration: duration_time,
+          action: [
+            {
+              text: `OK`,
+              onClick: (_, toastObject) => {
+                toastObject.goAway(0);
+              },
+            },
+          ],
+        });
       }
       if (response.data.status === 1) {
+        $(".btn-send").prop("disabled", false);
         toast.error(response.data.error.message, {
           duration: duration_time,
           action: [
@@ -107,64 +152,93 @@ const ratingProduct = (level_star) => {
         });
       }
       if (response.data.status !== 0 && response.data.status !== 1) {
+        $(".btn-send").prop("disabled", false);
         console.log(response.data);
       }
     });
+  }
 };
+
+const setLevelStar = (level) => {
+  comment.level_star = level;
+};
+
+watch(() => props.user, (newValue, oldValue) => {
+  comment.user_id = newValue.id;
+})
 </script>
 
 <style scoped>
 body {
   background-color: #eee;
 }
+.out-texthead {
+  border-bottom: 1px solid #2e3094;
+}
 
+.out-texthead .text-head {
+  font-size: 20px;
+  padding: 5px 0px 5px 10px;
+  background-color: #2e3094;
+  width: 30%;
+  color: white;
+}
+
+.content-comment {
+  display: flex;
+  justify-content: center;
+}
+
+.btn-send {
+  border: none;
+  border-radius: 10px;
+  padding: 5px 10px 5px 10px;
+  color: white;
+  background-color: #2e3094;
+}
+
+.btn-send:hover {
+  background-color: #ed1a29;
+  outline: 1px solid #ed1a29;
+}
+/*  */
+
+.avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+}
+.out-texthead {
+  border-bottom: 1px solid #2e3094;
+}
+.out-texthead .text-head {
+  font-size: 20px;
+  padding: 5px 0px 5px 10px;
+  background-color: #2e3094;
+  width: 30%;
+  color: white;
+}
+.content-comment textarea {
+  padding: 10px;
+}
+.btn-send {
+  border: none;
+  border-radius: 10px;
+  padding: 5px 10px 5px 10px;
+  color: white;
+  background-color: #2e3094;
+}
+.btn-send:hover {
+  background-color: #ed1a29;
+  outline: 1px solid #ed1a29;
+}
 div.stars {
   width: max-content;
 
   display: inline-block;
 }
-
-input.star {
-  display: none;
-}
-
-label.star {
-  float: right;
-
-  padding: 10px;
-
-  font-size: 36px;
-
-  color: #4a148c;
-
-  transition: all 0.2s;
-}
-
-input.star:checked ~ label.star:before {
-  content: "\f005";
-
-  color: #fd4;
-
-  transition: all 0.25s;
-}
-
-input.star-5:checked ~ label.star:before {
-  color: #fe7;
-
-  text-shadow: 0 0 20px #952;
-}
-
-input.star-1:checked ~ label.star:before {
-  color: #f62;
-}
-
-label.star:hover {
-  transform: rotate(-15deg) scale(1.3);
-}
-
-label.star:before {
-  content: "\f006";
-
-  font-family: FontAwesome;
+.fa-star {
+  color: orange;
+  margin-right: 10px;
 }
 </style>

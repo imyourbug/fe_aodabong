@@ -1,16 +1,19 @@
-import Repository from "@/api/repositories/Repository";
+import axios from 'axios';
 
 const baseDomain = "https://provinces.open-api.vn";
 const baseUrl = `${baseDomain}/api`;
+const axs = axios.create({
+  baseUrl,
+});
 
 export default {
   getAllProvinces() {
-    return Repository.get(`${baseUrl}/p/`);
+    return axs.get(`${baseUrl}/p/`);
   },
   getDistrictsByCodeProvince(code_province) {
-    return Repository.get(`${baseUrl}/p/${code_province}?depth=2`);
+    return axs.get(`${baseUrl}/p/${code_province}?depth=2`);
   },
   getWardsByCodeDistrict(code_district) {
-    return Repository.get(`${baseUrl}/d/${code_district}?depth=2`);
+    return axs.get(`${baseUrl}/d/${code_district}?depth=2`);
   },
 };

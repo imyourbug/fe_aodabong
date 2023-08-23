@@ -1,8 +1,29 @@
+// import axios from 'axios';
+
+// import { getCookie } from '@/helpers/helper.js';
+
+// const baseDomain = "";
+// const baseUrl = ``;
+
+// console.log('init axios');
+
+// export default axios.create({
+//   baseUrl,
+//   headers: {
+//     Authorization: `Bearer ${getCookie("access_token")}`,
+//   },
+// });
+
 import axios from 'axios';
 
-const baseDomain = '';
-const baseUrl = ``;
+import { getCookie } from '../../helpers/helper';
 
-export default axios.create({
-    baseUrl,
-});
+function getAxios() {
+  return axios.create({
+    headers: {
+      Authorization: `Bearer ${getCookie('access_token')}`,
+    },
+  });
+}
+
+export { getAxios };

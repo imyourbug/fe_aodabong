@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-2" :style="commentMargin">
+  <div class="mt-2">
     <div class="row comment">
       <div class="col-1 user-img mt-2">
         <img
@@ -12,6 +12,14 @@
       <div class="col-6 infor-comment mt-1">
         <div class="name-user">
           <a href="#">{{ comment.user.name }}</a>
+          <br /><i
+            v-for="index in comment.level_star"
+            class="fa-solid fa-star"
+          ></i>
+          <i
+            v-for="index in 5 - comment.level_star"
+            class="fa-regular fa-star"
+          ></i>
         </div>
         <div class="line-comment" v-if="showEditComment.includes(comment.id)">
           <input
@@ -24,14 +32,14 @@
         <a class="like-comment"
           ><small><i class="fa-regular fa-thumbs-up"></i> Like</small> </a
         >&ensp;
-        <a class="reply-comment" @click="showReply(comment.id)"
+        <!-- <a class="reply-comment" @click="showReply(comment.id)"
           ><small> &bull; Phản hồi</small>
         </a>
-        &ensp;
+        &ensp; -->
         <a
           class="change-comment"
           @click="showEdit(comment.id)"
-          v-if="comment.user.id === user.id"
+          v-if="comment.user.id === (user == null ? '' : user.id)"
           ><small> &bull; Sửa</small>
         </a>
         &ensp;
@@ -39,7 +47,7 @@
         <a
           class="delete-comment"
           @click="deleteComment(comment.id)"
-          v-if="comment.user.id === user.id"
+          v-if="comment.user.id === (user == null ? '' : user.id)"
           ><small> &bull; Xóa</small>
         </a>
       </div>
@@ -53,72 +61,37 @@
       />
     </div>
   </div>
-  <p
-    class="show-child-comment mt-1"
-    v-if="hasChildren"
-    @click="showChild(comment.id)"
-    :style="
-      showChildComment.includes(comment.id)
-        ? 'display:none'
-        : `margin-left:${spacing + 100}px;`
-    "
-  >
-    <i class="fa-solid fa-arrow-right"></i>&ensp;Hiển thị
-    {{ comment.children.length }} phản hồi
-  </p>
-  <div v-if="hasChildren && showChildComment.includes(comment.id)">
-    <Comment
-      v-for="cmt in comment.children"
-      :key="cmt.id"
-      :comment="cmt"
-      :spacing="spacing + 70"
-      :showRepComment="showRepComment"
-      :showEditComment="showEditComment"
-      :showChildComment="showChildComment"
-      :reply_content="reply_content"
-      :domain="domain"
-    />
-  </div>
 </template>
 
 <script setup>
-import { computed, defineProps, inject, onUnmounted, ref } from "vue";
-import Comment from "@/components/comments/Comment.vue";
+import {
+  computed,
+  defineProps,
+  inject,
+  onUnmounted,
+  ref,
+} from 'vue';
 
+import { RepositoryFactory } from '@/api/repositories/RepositoryFactory.js';
+import { useToasted } from '@hoppscotch/vue-toasted';
+
+const toast = useToasted();
+const commentRepository = RepositoryFactory.get("comment");
 const emitter = inject("emitter");
 
 const reply_content = ref("");
-const user = localStorage.getItem("user")
-  ? JSON.parse(localStorage.getItem("user"))
-  : "";
 
 const props = defineProps({
   comment: Object,
-  spacing: {
-    type: Number,
-    default: 0,
-  },
+  user: Object,
   showEditComment: Array,
-  showChildComment: Array,
   showRepComment: Number,
   domain: String,
-});
-
-const commentMargin = computed(() => {
-  return `margin-left:${props.spacing}px`;
-});
-
-const hasChildren = computed(() => {
-  const { children } = props.comment;
-  return children && children.length > 0;
+  duration_time: String,
 });
 
 const showEdit = (comment_id) => {
   emitter.emit("showEdit", comment_id);
-};
-
-const showChild = (comment_id) => {
-  emitter.emit("showChild", comment_id);
 };
 
 const showReply = (comment_id) => {
@@ -127,39 +100,129 @@ const showReply = (comment_id) => {
 };
 
 const editComment = (comment_id, new_content) => {
-  let new_comment = {
-    id: comment_id,
-    content: new_content,
-  };
   if (new_content.trim()) {
-    emitter.emit("editComment", new_comment);
+    commentRepository
+      .updateContentComment(comment_id, new_content)
+      .then((response) => {
+        if (response.data.status === 0) {
+          toast.success("Chỉnh sửa bình luận thành công", {
+            duration: props.duration_time,
+            action: [
+              {
+                text: `OK`,
+                onClick: (_, toastObject) => {
+                  toastObject.goAway(0);
+                },
+              },
+            ],
+          });
+          emitter.emit("reloadProductDetail");
+        }
+        if (response.data.status === 1) {
+          toast.error(response.data.error.message, {
+            duration: props.duration_time,
+            action: [
+              {
+                text: `OK`,
+                onClick: (_, toastObject) => {
+                  toastObject.goAway(0);
+                },
+              },
+            ],
+          });
+        }
+        if (response.data.status !== 0 && response.data.status !== 1) {
+          console.log(response.data);
+        }
+      });
   }
 };
 
-const repComment = (comment) => {
-  if (!user.id) {
+const repComment = (com) => {
+  if (!props.comment.user_id) {
     alert("Bạn cần đăng nhập để bình luận");
   } else {
     if (reply_content.value.trim()) {
       let rep_comment = {
-        user_id: user.id,
-        product_id: comment.product_id,
-        reply_id: comment.id,
+        user_id: props.comment.user_id,
+        product_id: com.product_id,
+        reply_id: com.id,
         content: reply_content.value,
       };
-      emitter.emit("repComment", rep_comment);
+      commentRepository.createComment(rep_comment).then((response) => {
+        if (response.data.status === 0) {
+          toast.success("Phản hồi thành công", {
+            duration: props.duration_time,
+            action: [
+              {
+                text: `OK`,
+                onClick: (_, toastObject) => {
+                  toastObject.goAway(0);
+                },
+              },
+            ],
+          });
+          emitter.emit("reloadProductDetail");
+        }
+        if (response.data.status === 1) {
+          toast.error(response.data.error.message, {
+            duration: props.duration_time,
+            action: [
+              {
+                text: `OK`,
+                onClick: (_, toastObject) => {
+                  toastObject.goAway(0);
+                },
+              },
+            ],
+          });
+        }
+        if (response.data.status !== 0 && response.data.status !== 1) {
+          console.log(response.data);
+        }
+      });
     }
   }
 };
 
+// delete comment
 const deleteComment = (comment_id) => {
-  emitter.emit("deleteComment", comment_id);
+  console.log(comment_id);
+  if (confirm("Bạn có muốn xóa bình luận này không?")) {
+    commentRepository.deleteComment(comment_id).then((response) => {
+      if (response.data.status === 0) {
+        toast.success("Xóa bình luận thành công", {
+          duration: props.duration_time,
+          action: [
+            {
+              text: `OK`,
+              onClick: (_, toastObject) => {
+                toastObject.goAway(0);
+              },
+            },
+          ],
+        });
+        emitter.emit("reloadProductDetail");
+      }
+      if (response.data.status === 1) {
+        toast.error(response.data.error.message, {
+          duration: props.duration_time,
+          action: [
+            {
+              text: `OK`,
+              onClick: (_, toastObject) => {
+                toastObject.goAway(0);
+              },
+            },
+          ],
+        });
+      }
+      if (response.data.status !== 0 && response.data.status !== 1) {
+        console.log(response.data);
+      }
+    });
+  }
 };
-
-onUnmounted(() => {
-  emitter.off("repComment");
-  emitter.off("deleteComment");
-});
 </script>
 
 <style scoped>
@@ -211,5 +274,51 @@ label.radio {
 }
 .show-child-comment i {
   color: rgb(39, 36, 36);
+}
+
+div.stars {
+  width: max-content;
+
+  display: inline-block;
+}
+input.star {
+  display: none;
+}
+label.star {
+  float: right;
+  padding: 10px;
+  color: #4a148c;
+  transition: all 0.2s;
+}
+
+input.star:checked ~ label.star:before {
+  content: "\f005";
+
+  color: #fd4;
+
+  transition: all 0.25s;
+}
+
+input.star-5:checked ~ label.star:before {
+  color: #fe7;
+
+  text-shadow: 0 0 20px #952;
+}
+
+input.star-1:checked ~ label.star:before {
+  color: #f62;
+}
+
+label.star:hover {
+  transform: rotate(-15deg) scale(1.3);
+}
+
+label.star:before {
+  content: "\f006";
+
+  font-family: FontAwesome;
+}
+.fa-star {
+  color: orange;
 }
 </style>

@@ -1,4 +1,4 @@
-import Repository from "@/api/repositories/Repository";
+import { getAxios } from '@/api/repositories/Repository';
 
 const baseDomain = process.env.VUE_APP_DOMAIN_URL;
 const baseUrl = `${baseDomain}/api/uploads`;
@@ -7,7 +7,7 @@ const baseUrl = `${baseDomain}/api/uploads`;
 
 export default {
   uploadImage(formData) {
-    return Repository.post(`${baseUrl}/image`, formData, {
+    return getAxios().post(`${baseUrl}/image`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

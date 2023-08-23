@@ -1,4 +1,4 @@
-import Repository from "@/api/repositories/Repository";
+import { getAxios } from '@/api/repositories/Repository';
 
 const baseDomain = process.env.VUE_APP_DOMAIN_URL;
 const baseUrl = `${baseDomain}/api/sizes`;
@@ -7,6 +7,6 @@ const baseUrl = `${baseDomain}/api/sizes`;
 
 export default {
   getAllSizes() {
-    return Repository.get(`${baseUrl}/list`);
+    return getAxios().get(`${baseUrl}/list`);
   },
 };

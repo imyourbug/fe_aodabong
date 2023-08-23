@@ -1,110 +1,152 @@
 <template>
-  <main>
-    <div class="album bg-light">
-      <div class="container">
-        <div class="block-text-1">
-          <div class="block-text-left">
-            <a class="btn-left"
-              >&ensp;<i class="far fa-futbol"></i>&ensp;Sản phẩm tìm
-              kiếm&emsp;</a
-            >
-          </div>
-          <div class="block-text-right">
-            <a class="btn-right"
-              >Xem thêm <i class="fas fa-chevron-right"></i
-              ><i class="fas fa-chevron-right"></i
-            ></a>
-          </div>
-        </div>
-        <div
-          class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3"
-          v-if="products && products.length > 0"
-        >
-          <div class="col" v-for="(info, key) in products" v-bind:key="key">
-            <router-link :to="`/products/detail/${info.product.id}`">
-              <div class="block-product">
-                <a> <img :src="info.product.thumb" /></a>
-                <a>
-                  <p>{{ info.product.name }}</p>
-                </a>
-                {{ formatCash(info.min_price) }}đ
-                {{
-                  info.max_price > info.min_price ? ` - ${info.max_price}đ` : ""
-                }}
-                <br />
-                <br />
-                <a class="detail"> Chi tiết</a>
-                <br />&ensp;
-              </div>
-            </router-link>
-          </div>
-        </div>
-        <div class="row" v-else><SearchEmpty /></div>
+  <div class="row">
+    <div class="block-head-2">
+      <div class="head-text">
+        <router-link :to="{ name: 'home' }" style="color: #ed1a29"
+          >Trang chủ</router-link
+        >>>
+        <a style="color: #ed1a29" href="#">
+          Tìm kiếm
+        </a>
+        >>
+        <a style="color: #ed1a29" href="#">
+          {{ key_word }}
+        </a>
       </div>
     </div>
-    <br />
-  </main>
+  </div>
+  <div class="album bg-light">
+    <div class="container">
+      <div class="block-text-1">
+        <div class="block-text-left">
+          <a class="btn-left"
+            >&ensp;<i class="far fa-futbol"></i>&ensp;Sản phẩm tìm kiếm&emsp;</a
+          >
+        </div>
+        <div class="block-text-right">
+          <a class="btn-right"
+            >Xem thêm <i class="fas fa-chevron-right"></i
+            ><i class="fas fa-chevron-right"></i
+          ></a>
+        </div>
+      </div>
+      <div
+        class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3"
+        v-if="products && products.length > 0"
+      >
+        <div class="col" v-for="(info, key) in products" v-bind:key="key">
+          <router-link :to="`/products/detail/${info.id}`">
+            <div class="block-product">
+              <a> <img :src="info.thumb" /></a>
+              <a>
+                <p>{{ info.name }}</p>
+              </a>
+              <p v-html="showPrice(info.price, info.price_sale)"></p>
+              <br />
+              <br />
+              <a class="detail"> Chi tiết</a>
+              <br />&ensp;
+            </div>
+          </router-link>
+        </div>
+      </div>
+      <div class="row" v-else><SearchEmpty /></div>
+      <div class="block-text-1" v-if="other_products && other_products.length > 0">
+        <div class="block-text-left">
+          <a class="btn-left"
+            >&ensp;<i class="far fa-futbol"></i>&ensp;Sản phẩm khác&emsp;</a
+          >
+        </div>
+        <div class="block-text-right">
+          <a class="btn-right"
+            >Xem thêm <i class="fas fa-chevron-right"></i
+            ><i class="fas fa-chevron-right"></i
+          ></a>
+        </div>
+      </div>
+      <div
+        class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3"
+        v-if="other_products && other_products.length > 0"
+      >
+        <div class="col" v-for="(info, key) in other_products" v-bind:key="key">
+          <router-link :to="`/products/detail/${info.id}`">
+            <div class="block-product">
+              <a> <img :src="info.thumb" /></a>
+              <a>
+                <p>{{ info.name }}</p>
+              </a>
+              <p v-html="showPrice(info.price, info.price_sale)"></p>
+              <br />
+              <br />
+              <a class="detail"> Chi tiết</a>
+              <br />&ensp;
+            </div>
+          </router-link>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
-import { ref, inject } from "vue";
-import { useRouter } from "vue-router";
-import SearchEmpty from "@/components/searchs/SearchEmpty.vue";
+import {
+  computed,
+  inject,
+  ref,
+} from 'vue';
 
-const clientRepository = RepositoryFactory.get("client");
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+
+import SearchEmpty from '@/components/searchs/SearchEmpty.vue';
+import { showPrice } from '@/helpers/helper.js';
+
 const emitter = inject("emitter");
 const router = useRouter();
+const store = useStore();
 
-const products = ref([]);
-const other_products = ref([]);
-const key_word = ref(router.currentRoute.value.params.key_word ?? "");
-
-emitter.on("searchProduct", (key) => {
-  reload(key);
+const key_word = computed(() => {
+  return router.currentRoute.value.params.key_word;
 });
 
-const reload = (key) => {
-  clientRepository
-    .searchProductByKeyWord(key)
-    .then((response) => {
-      products.value = response.data.data.like;
-      other_products.value = response.data.data.not_like;
-      console.log(products.value);
-      console.log(other_products.value);
-    })
-    .catch((e) => {
-      console.log(e);
-    });
+const products = computed(() => {
+  return store.state.products.search.like;
+});
+
+const other_products = computed(() => {
+  return store.state.products.search.not_like;
+});
+
+emitter.on("searchProduct", (key) => {
+  store.dispatch("products/searchProductByKeyWord", key);
+});
+
+const reload = () => {
+  store.dispatch("products/searchProductByKeyWord", key_word.value);
 };
 
-reload(key_word.value);
-
-const formatCash = (str) => {
-  return str
-    .toString()
-    .split("")
-    .reverse()
-    .reduce((prev, next, index) => {
-      return (index % 3 ? next : next + ".") + prev;
-    });
-};
-
-const detailProduct = (id) => {
-  this.$router.push({
-    path: "/products/detail/" + id,
-    params: {
-      id: id,
-    },
-  });
-};
+reload();
 </script>
 
 <style scoped>
 a {
   text-decoration: none;
 }
+.block-head-2 {
+  align-items: center;
+  padding: 10px 0px 0px 10px;
+}
 
+.block-head-2 a {
+  color: black;
+}
+
+.block-head-2 a:hover {
+  text-decoration: underline;
+}
+.head-text {
+  padding: 15px 160px;
+}
 .album {
   margin: 0px 145px;
 }

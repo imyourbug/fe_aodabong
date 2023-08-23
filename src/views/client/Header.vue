@@ -25,9 +25,9 @@
         v-model.trim="key_word"
         @keyup.enter="searchProduct"
       />
-      <a @click.prevent="searchProduct" class="btn btn-outline-success">
+      <button @click.prevent="searchProduct" class="btn btn-success">
         <i class="fa-solid fa-magnifying-glass"></i>
-      </a>
+      </button>
     </div>
     <div class="col-4 block-user">
       <div class="block-left-header">
@@ -39,12 +39,18 @@
             :carts="carts"
             :user="user" /></router-link
         >&emsp;
-        <router-link class="btn-login" to="/login" v-if="!isLogged"
-          ><img
+        <div
+          class="btn-login"
+          data-target="#modalLogin"
+          data-toggle="modal"
+          v-if="!isLogged"
+        >
+          <img
             class="nav-avatar"
             src="http://localhost:8000/storage/uploads/default.jpg"
-        /></router-link>
-        <div class="btn-logout btn-user" v-if="isLogged">
+          />
+        </div>
+        <div class="btn-logout btn-user" v-else>
           <img class="nav-avatar" :src="user.avatar" />
           &ensp;
           <div class="user-header"><UserHeader :user="user" /></div>
@@ -52,16 +58,32 @@
       </div>
     </div>
   </div>
+  <ModalLogin class="modal fade" id="modalLogin" :add="add" />
+  <ModalRegister class="modal fade" id="modalRegister" />
+  <ModalForgetPass class="modal fade" id="modalForgetPass" />
+  <ModalChangePassword
+    :user="user"
+    class="modal fade"
+    id="modalChangePassword"
+  />
 </template>
 
 <script setup>
-import { ref, inject } from "vue";
-import { useRouter } from "vue-router";
-import CartHeader from "@/components/CartHeader.vue";
-import UserHeader from "@/components/UserHeader.vue";
+import {
+  inject,
+  ref,
+} from 'vue';
+
+import { useRouter } from 'vue-router';
+
+import CartHeader from '@/components/CartHeader.vue';
+import UserHeader from '@/components/UserHeader.vue';
+import ModalChangePassword from '@/components/users/ChangePassword.vue';
+import ModalForgetPass from '@/components/users/ForgetPassword.vue';
+import ModalLogin from '@/components/users/Login.vue';
+import ModalRegister from '@/components/users/Register.vue';
 
 const router = useRouter();
-const Vue3GoogleOauth = inject("Vue3GoogleOauth");
 const emitter = inject("emitter");
 
 const user = ref([]);
@@ -73,21 +95,6 @@ emitter.on("reloadHeader", () => {
   reload();
 });
 
-const handleSignOut = async () => {
-  try {
-    await Vue3GoogleOauth.instance.signOut();
-    unSaveUser();
-    isLogged.value = false;
-
-    router.push({ name: "login" });
-  } catch (error) {
-    console.log(error);
-  }
-};
-const unSaveUser = () => {
-  // localStorage.removeItem("user");
-  localStorage.clear();
-};
 const searchProduct = () => {
   if (key_word.value.trim()) {
     emitter.emit("searchProduct", key_word.value.trim());
@@ -98,11 +105,12 @@ const searchProduct = () => {
   }
 };
 const reload = () => {
-  isLogged.value = JSON.parse(localStorage.getItem("user")) ? true : false;
+  isLogged.value = localStorage.getItem("user") ? true : false;
   carts.value = JSON.parse(localStorage.getItem("carts")) ?? [];
   if (isLogged.value) {
-    user.value = JSON.parse(localStorage.getItem("user")) ?? "";
+    user.value = JSON.parse(localStorage.getItem("user"));
   }
+  // console.log(user.value);
 };
 
 reload();
@@ -206,5 +214,10 @@ sup.cart-quantity {
 }
 .nav-icon {
   font-size: 22px;
+}
+.btn-logout:hover,
+.btn-login:hover {
+  cursor: pointer;
+  color: #ed1a29;
 }
 </style>

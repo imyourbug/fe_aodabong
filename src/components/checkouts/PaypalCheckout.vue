@@ -3,7 +3,11 @@
 </template>
 
 <script setup>
-import { defineProps, inject, onUnmounted } from "vue";
+import {
+  defineProps,
+  inject,
+  onUnmounted,
+} from 'vue';
 
 const emitter = inject("emitter");
 
@@ -28,7 +32,7 @@ loadAsync(
           color: "gold",
           shape: "rect",
           label: "paypal",
-          height: 45,
+          height: 40,
           tagline: false,
           layout: "horizontal",
         },

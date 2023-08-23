@@ -95,9 +95,14 @@
 </template>
 
 <script setup>
-import { RepositoryFactory } from "@/api/repositories/RepositoryFactory";
-import { ref, inject } from "vue";
-import { useRouter } from "vue-router";
+import {
+  inject,
+  ref,
+} from 'vue';
+
+import { useRouter } from 'vue-router';
+
+import { RepositoryFactory } from '@/api/repositories/RepositoryFactory';
 
 const router = useRouter();
 const emitter = inject("emitter");

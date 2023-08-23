@@ -33,7 +33,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(product, key) in carts" v-bind:key="key">
+            <tr v-for="(product, key) in carts" :key="key">
               <td class="col-img">
                 <img :src="product.thumb" />&emsp;
                 {{ product.name }}
@@ -198,6 +198,21 @@
               </div>
             </div>
           </div>
+          <div class="text-hint">* Phương thức thanh toán</div>
+          <select class="form-select" v-model="payment_method">
+            <option value="0">Tiền mặt</option>
+            <option value="1">Ngân hàng</option>
+          </select>
+          <div class="text-hint">* Phương thức vận chuyển</div>
+          <select class="form-select" v-model="shipment">
+            <option
+              v-for="(shipment, key) in shipments"
+              :key="key"
+              :value="shipment"
+            >
+              {{ shipment.name }}
+            </option>
+          </select>
           <div class="text-hint">* Ghi chú</div>
           <textarea
             id="mota"
@@ -225,7 +240,9 @@
             </tr>
             <tr>
               <td>Phí vận chuyển</td>
-              <td class="col-infor2">30.000<sup>đ</sup></td>
+              <td class="col-infor2">
+                {{ formatCash(shipment.fee ?? 30000) }}<sup>đ</sup>
+              </td>
             </tr>
             <tr>
               <td>Mã giảm giá</td>
@@ -246,111 +263,82 @@
               <td class="col-infor2 total-money">
                 {{
                   formatCash(
-                    voucherSelected.discount
+                    (voucherSelected.discount
                       ? parseInt(
-                          (1 - voucherSelected.discount / 100) * totalMoney() +
-                            30000
+                          (1 - voucherSelected.discount / 100) * totalMoney()
                         )
-                      : parseInt(totalMoney() + 30000)
+                      : parseInt(totalMoney())) + shipment.fee
                   )
                 }}<sup>đ</sup>
               </td>
             </tr>
           </table>
           <br />
-          <button type="submit" class="btn-buy" @click="order">
+          <button
+            data-target="#modalConfirm"
+            data-toggle="modal"
+            class="btn-buy"
+            @click="order"
+          >
             <i class="fas fa-dollar-sign"></i> Đặt hàng
           </button>
         </div>
       </div>
     </div>
   </div>
-  <div name="popup" class="form-popup" v-if="showCheckOut" ref="target">
-    <div class="title">Xác nhận</div>
-    <div class="row">
-      <div class="col-4">Họ tên</div>
-      <div class="col-8">
-        {{ customer.name }}
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-4">Email</div>
-      <div class="col-8">{{ customer.email }}</div>
-    </div>
-    <div class="row">
-      <div class="col-4">Địa chỉ</div>
-      <div class="col-8">{{ customer.address }}</div>
-    </div>
-    <div class="row">
-      <div class="col-4">Số điện thoại</div>
-      <div class="col-8">{{ customer.phone }}</div>
-    </div>
-    <div class="row">
-      <div class="col-4">Ghi chú</div>
-      <div class="col-8">{{ customer.note ?? "Trống" }}</div>
-    </div>
-    <div class="row">
-      <div class="col-4">Tổng tiền</div>
-      <div class="col-8">
-        {{
-          formatCash(
-            voucherSelected.discount
-              ? parseInt(
-                  (1 - voucherSelected.discount / 100) * totalMoney() + 30000
-                )
-              : parseInt(totalMoney() + 30000)
-          )
-        }}<sup>đ</sup>
-      </div>
-    </div>
-    <br />
-    <div class="row">
-      <div class="col-9">
-        <PaypalCheckout
-          class="btn-paypal"
-          :total_money="
-            voucherSelected.discount
-              ? parseInt(
-                  (1 - voucherSelected.discount / 100) * totalMoney() + 30000
-                )
-              : parseInt(totalMoney() + 30000)
-          "
-        ></PaypalCheckout>
-      </div>
-      <div class="col-3">
-        <button class="btn-exit" @click="close">
-          <i class="fa-sharp fa-solid fa-circle-xmark"></i>&ensp;Thoát
-        </button>
-      </div>
-    </div>
-  </div>
+  <ModalConfirm
+    v-if="!v$.$invalid"
+    :voucherSelected="voucherSelected"
+    :customer="customer"
+    :totalMoney="
+      (voucherSelected.discount
+        ? parseInt((1 - voucherSelected.discount / 100) * totalMoney())
+        : parseInt(totalMoney())) + shipment.fee
+    "
+    :checkOut="checkOut"
+    :toast="toast"
+    :payment_method="payment_method"
+    :duration_time="duration_time"
+  />
 </template>
 
 <script setup>
-import ntc from "ntc-hi-js";
-import { ref, inject, reactive } from "vue";
-import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
-import { useVuelidate } from "@vuelidate/core";
-import { required, email, helpers, integer } from "@vuelidate/validators";
-import { onClickOutside } from "@vueuse/core";
-import PaypalCheckout from "@/components/checkouts/PaypalCheckout.vue";
-import CartEmpty from "@/components/carts/CartEmpty.vue";
-import { useToasted } from "@hoppscotch/vue-toasted";
+import {
+  computed,
+  inject,
+  reactive,
+  ref,
+  watch,
+} from 'vue';
+
+import ntc from 'ntc-hi-js';
+import { useStore } from 'vuex';
+
+import { RepositoryFactory } from '@/api/repositories/RepositoryFactory.js';
+import CartEmpty from '@/components/carts/CartEmpty.vue';
+import ModalConfirm from '@/components/carts/ModalConfirm.vue';
+import { formatCash } from '@/helpers/helper.js';
+import { useToasted } from '@hoppscotch/vue-toasted';
+import { useVuelidate } from '@vuelidate/core';
+import {
+  email,
+  helpers,
+  required,
+} from '@vuelidate/validators';
 
 const toast = useToasted();
+const store = useStore();
 const clientRepository = RepositoryFactory.get("client");
-const voucherRepository = RepositoryFactory.get("voucher");
 const emitter = inject("emitter");
 
 const duration_time = process.env.VUE_APP_DURATION_TOAST ?? 3000;
 const domain = process.env.VUE_APP_DOMAIN_URL ?? "";
-const target = ref(null);
-const showCheckOut = ref(false);
-const carts = ref([]);
-const data = ref([]);
-const vouchers = ref([]);
+const payment_method = ref(0);
+const shipment = ref([]);
 const voucherSelected = ref([]);
+// const user = JSON.parse(localStorage.getItem("user"));
 const user = JSON.parse(localStorage.getItem("user"));
+
 const customer = reactive({
   name: user?.name ?? "",
   email: user?.email ?? "",
@@ -362,24 +350,58 @@ const customer = reactive({
   note: "",
 });
 
-onClickOutside(target, (event) => (showCheckOut.value = false));
+const data = computed(() => {
+  return store.state.detail_products.all;
+});
+
+const shipments = computed(() => {
+  shipment.value = store.state.shipments.all[0] ?? [];
+  return store.state.shipments.all;
+});
+
+const carts = ref([]);
+
+const vouchers = computed(() => {
+  return store.state.vouchers.all.map((item) => {
+    return {
+      text: item.name,
+      ...item,
+    };
+  });
+});
 
 emitter.on("checkoutSuccess", (total_money) => {
   // insert data to database
+  checkOut(total_money);
+});
+
+const closeModal = (modal) => {
+  $("#" + modal).hide();
+  $("body").removeClass("modal-open");
+  $(".modal-backdrop").remove();
+};
+
+const checkOut = (total_money) => {
   let data = {
     customer: customer,
     carts: carts.value,
     discount: voucherSelected.value.discount ?? 0,
     total_money: total_money,
+    payment_method: payment_method.value,
+    payment_status: payment_method.value === 0 ? 0 : 1,
+    shipment_id: shipment.value.id,
   };
+  $("#btn-confirm").prop("disabled", true);
   clientRepository.createOrder(data).then((response) => {
     if (response.data.status === 0) {
       // reset carts
-      localStorage.removeItem("carts");
+      carts.value = [];
+      localStorage.setItem("carts", JSON.stringify(carts.value));
       localStorage.removeItem("customer");
-      showCheckOut.value = false;
       emitter.emit("reloadHeader");
-      reload();
+      $("#btn-confirm").prop("disabled", false);
+      closeModal("modalConfirm");
+      loadCart();
       toast.success("Thanh toán thành công", {
         duration: duration_time,
         action: [
@@ -393,6 +415,7 @@ emitter.on("checkoutSuccess", (total_money) => {
       });
     }
     if (response.data.status === 1) {
+      $("#btn-confirm").prop("disabled", false);
       toast.error(response.data.error.message, {
         duration: duration_time,
         action: [
@@ -406,13 +429,18 @@ emitter.on("checkoutSuccess", (total_money) => {
       });
     }
     if (response.data.status !== 1 && response.data.status !== 0) {
+      $("#btn-confirm").prop("disabled", false);
       console.log(response);
     }
   });
-});
+};
+
+const loadCart = () => {
+  carts.value = JSON.parse(localStorage.getItem("carts"));
+};
 
 // validate
-const alpha = helpers.regex(/^0\d{9}$/);
+const valid_number_phone = helpers.regex(/^0\d{9}$/);
 
 const rules = {
   name: { required: helpers.withMessage("Không được để trống!", required) },
@@ -423,7 +451,10 @@ const rules = {
   address: { required: helpers.withMessage("Không được để trống!", required) },
   phone: {
     required: helpers.withMessage("Không được để trống!", required),
-    alpha: helpers.withMessage("Số điện thoại không hợp lệ!", alpha),
+    valid_number_phone: helpers.withMessage(
+      "Số điện thoại không hợp lệ!",
+      valid_number_phone
+    ),
   },
 };
 
@@ -445,35 +476,18 @@ const order = () => {
     });
   } else {
     localStorage.setItem("customer", JSON.stringify(customer));
-    showCheckOut.value = true;
   }
 };
 
-const close = () => {
-  showCheckOut.value = false;
-};
 const selectVoucher = (voucher) => {
   voucherSelected.value = voucher;
 };
 
 const reload = async () => {
-  await clientRepository.getAllDetailProduct().then((response) => {
-    data.value = response.data.data;
-  });
-  //
-  await voucherRepository.getAllVouchers().then((response) => {
-    response.data.data.forEach((item) => {
-      vouchers.value.push({
-        // text is require to show value in screen
-        // id is require to select an option
-        id: item.id,
-        text: item.name,
-        discount: item.discount,
-      });
-    });
-  });
-  //
-  carts.value = JSON.parse(localStorage.getItem("carts"));
+  store.dispatch("shipments/getAll");
+  store.dispatch("vouchers/getAll");
+  store.dispatch("detail_products/getAll");
+  loadCart();
 };
 
 reload();
@@ -491,7 +505,6 @@ const decreaseQuantity = (detail_id, quantity) => {
     return;
   }
   localStorage.setItem("carts", JSON.stringify(carts.value));
-  reload();
 };
 
 // increase quantity
@@ -516,7 +529,6 @@ const increaseQuantity = (detail_id, quantity) => {
     });
   }
   localStorage.setItem("carts", JSON.stringify(carts.value));
-  reload();
 };
 
 // get name color
@@ -536,25 +548,12 @@ const getQuantity = (detail_id) => {
   return unit_in_stock;
 };
 
-// format cash
-const formatCash = (str) => {
-  return str
-    .toString()
-    .split("")
-    .reverse()
-    .reduce((prev, next, index) => {
-      return (index % 3 ? next : next + ".") + prev;
-    });
-};
-
 // remove product from carts
 const removeProduct = (id) => {
   if (confirm("Bạn muốn xóa sản phẩm này khỏi giỏ hàng?")) {
-    let storageProducts = JSON.parse(localStorage.getItem("carts"));
-    let products = storageProducts.filter(
-      (product) => product.detail_id !== id
-    );
-    localStorage.setItem("carts", JSON.stringify(products));
+    let products = carts.value.filter((product) => product.detail_id !== id);
+    carts.value = products;
+    localStorage.setItem("carts", JSON.stringify(carts.value));
     toast.success("Xóa sản phẩm khỏi giỏ hàng thành công", {
       duration: duration_time,
       action: [
@@ -567,15 +566,7 @@ const removeProduct = (id) => {
       ],
     });
     emitter.emit("reloadHeader");
-    reload();
   }
-};
-
-// check out
-const checkOut = () => {
-  clientRepository.getUrlCheckOut().then((response) => {
-    console.log(response.data);
-  });
 };
 
 // total money
@@ -586,54 +577,15 @@ const totalMoney = () => {
       total += item.quantity * item.unit_price;
     });
   }
+
   return total;
 };
 </script>
 
 <style scoped>
-.btn-paypal {
-  float: right;
-}
-/* Popup form */
-.form-popup {
-  padding: 20px;
-  /* display: block; */
-  position: fixed;
-  bottom: 250px;
-  right: 550px;
-  z-index: 9;
-  border-radius: 10px;
-  background-color: white;
-  width: 500px;
-  border: 3px solid #2e3094;
-  -moz-box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
-  -webkit-box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
-}
-
 .row button {
   border: none;
   border-radius: 5px;
-}
-.btn-exit {
-  text-align: right;
-  background-color: #ed1a29;
-  color: white;
-  padding: 10px 15px;
-}
-.btn-checkout {
-  background-color: #2e3094;
-  color: white;
-  border: none;
-  text-align: left;
-  padding: 10px 15px;
-}
-.title {
-  text-align: center;
-  font-size: 24px;
-  padding-bottom: 10px;
-  font-weight: bold;
-  border-bottom: 1px solid rgb(241, 215, 231);
 }
 .table-payment {
   width: 100%;
@@ -803,7 +755,6 @@ a.info-product {
 .input-text {
   display: flex;
 }
-.input-text input,
 textarea {
   border-radius: 5px;
   border: 1px solid rgb(208, 212, 216);
@@ -825,5 +776,13 @@ textarea {
 }
 .btn-buy:hover {
   background-color: red;
+}
+
+.form-select,
+.input-text input {
+  border-radius: 5px;
+  border: 1px solid rgb(208, 212, 216);
+  width: 80%;
+  padding: 10px 10px;
 }
 </style>

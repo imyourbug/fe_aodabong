@@ -1,4 +1,4 @@
-import Repository from "@/api/repositories/Repository";
+import { getAxios } from '@/api/repositories/Repository';
 
 const baseDomain = process.env.VUE_APP_DOMAIN_URL;
 const baseUrl = `${baseDomain}/api/accounts`;
@@ -7,7 +7,7 @@ const baseUrl = `${baseDomain}/api/accounts`;
 
 export default {
   register(account) {
-    return Repository.post(`${baseUrl}/create`, {
+    return getAxios().post(`${baseUrl}/create`, {
       name: account.name,
       email: account.email,
       password: account.password,

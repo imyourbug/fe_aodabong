@@ -1,52 +1,45 @@
 // export default router
-import { createRouter, createWebHistory } from "vue-router";
-import Login from "@/views/client/Login.vue";
-import Home from "@/views/client/Home.vue";
-import ProductDetail from "@/views/client/ProductDetail.vue";
-import SearchProduct from "@/views/client/SearchProduct.vue";
-import Cart from "@/views/client/Cart.vue";
-import Register from "@/views/client/Register.vue";
-import Checkout from "@/components/checkouts/PaypalCheckout.vue";
-import InfoUser from "@/views/client/InfoUser.vue";
-import ChangePassword from "@/views/client/ChangePassword.vue";
-import GroupProduct from "@/views/client/GroupProduct.vue";
-import Main from "@/views/client/Main.vue";
-import RecoverPassword from "@/views/client/RecoverPassword.vue";
-import AdminHome from "@/views/admin/Home.vue";
-import ListCategory from "@/views/admin/categories/ListCategory.vue";
-import ListProduct from "@/views/admin/products/ListProduct.vue";
-import ImportProduct from "@/views/admin/products/ImportProduct.vue";
+import {
+  createRouter,
+  createWebHistory,
+} from 'vue-router';
+
+import Checkout from '@/components/checkouts/PaypalCheckout.vue';
+import { getCookie } from '@/helpers/helper.js';
+import ListCategory from '@/views/admin/categories/List.vue';
+import AdminHome from '@/views/admin/Home.vue';
+import ListOrder from '@/views/admin/orders/List.vue';
+import ImportProduct from '@/views/admin/products/import/Index.vue';
+import ListProduct from '@/views/admin/products/list/Index.vue';
+import ListShipment from '@/views/admin/shipments/List.vue';
+import ListSlide from '@/views/admin/slides/List.vue';
+import StatisticsRevenue from '@/views/admin/statistics/Revenue.vue';
+import ListVoucher from '@/views/admin/vouchers/List.vue';
+import Cart from '@/views/client/Cart.vue';
+import GroupProduct from '@/views/client/GroupProduct.vue';
+import Home from '@/views/client/Home.vue';
+import InfoUser from '@/views/client/InfoUser.vue';
+import Main from '@/views/client/Main.vue';
+import ProductDetail from '@/views/client/ProductDetail.vue';
+import SearchProduct from '@/views/client/SearchProduct.vue';
+
+const JWT_TOKEN = getCookie("access_token");
+const user = JSON.parse(localStorage.getItem("user"));
 
 const routes = [
   {
     path: "/",
     name: "main",
     component: Main,
+    meta: {
+      requiresAuth: false,
+      isAdmin: false,
+    },
     children: [
       {
         path: "/",
         name: "home",
         component: Home,
-      },
-      {
-        path: "/login",
-        name: "login",
-        component: Login,
-      },
-      {
-        path: "/register",
-        name: "register",
-        component: Register,
-      },
-      {
-        path: "/change_password",
-        name: "change_password",
-        component: ChangePassword,
-      },
-      {
-        path: "/password/recover",
-        name: "recover-password",
-        component: RecoverPassword,
       },
       {
         path: "/carts",
@@ -57,6 +50,10 @@ const routes = [
         path: "/user/info",
         name: "info_user",
         component: InfoUser,
+        meta: {
+          requiresAuth: true,
+          isAdmin: false,
+        },
       },
       {
         path: "/checkout",
@@ -74,7 +71,7 @@ const routes = [
         component: ProductDetail,
       },
       {
-        path: "/categories/:chapters+/id=:id_category",
+        path: "/categories/:id_category",
         name: "group_product",
         component: GroupProduct,
       },
@@ -87,6 +84,7 @@ const routes = [
     component: AdminHome,
     meta: {
       requiresAuth: true,
+      isAdmin: true,
     },
     children: [
       {
@@ -104,6 +102,31 @@ const routes = [
         name: "import-product",
         component: ImportProduct,
       },
+      {
+        path: "orders/list",
+        name: "list-order",
+        component: ListOrder,
+      },
+      {
+        path: "statistics/list",
+        name: "statistics-revenue",
+        component: StatisticsRevenue,
+      },
+      {
+        path: "vouchers/list",
+        name: "list-voucher",
+        component: ListVoucher,
+      },
+      {
+        path: "shipments/list",
+        name: "list-shipment",
+        component: ListShipment,
+      },
+      {
+        path: "slides/list",
+        name: "list-slide",
+        component: ListSlide,
+      },
     ],
   },
 ];
@@ -113,10 +136,19 @@ const router = createRouter({ history: createWebHistory(), routes });
 // Middleware
 router.beforeEach((to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuth)) {
-    if (!localStorage.getItem("user")) {
+    if (!user || JWT_TOKEN == null) {
       next("/login");
     } else {
-      next();
+      if (to.matched.some((record) => record.meta.isAdmin)) {
+        if (user.role == 1) {
+          console.log("admin-home");
+          next();
+        } else {
+          next("/");
+        }
+      } else {
+        next();
+      }
     }
   } else {
     next();

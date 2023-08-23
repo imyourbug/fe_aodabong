@@ -1,28 +1,29 @@
-import Repository from "@/api/repositories/Repository";
+import { getAxios } from '@/api/repositories/Repository';
 
 const baseDomain = process.env.VUE_APP_DOMAIN_URL;
 const baseUrl = `${baseDomain}/api/comments`;
 
 export default {
   getAllComments() {
-    return Repository.get(`${baseUrl}/list`);
+    return getAxios().get(`${baseUrl}/list`);
   },
   createComment(comment) {
-    return Repository.post(`${baseUrl}/create`, {
+    return getAxios().post(`${baseUrl}/create`, {
       user_id: comment.user_id,
       product_id: comment.product_id,
       reply_id: comment.reply_id,
       content: comment.content,
+      level_star: comment.level_star,
     });
   },
   updateContentComment(comment_id, content) {
-    return Repository.put(`${baseUrl}/update`, {
+    return getAxios().put(`${baseUrl}/update`, {
       id: comment_id,
       content: content,
     });
   },
   deleteComment(comment_id) {
-    return Repository.delete(`${baseUrl}/delete`, {
+    return getAxios().delete(`${baseUrl}/delete`, {
       data: {
         id: comment_id,
       },

@@ -1,73 +1,88 @@
 <template>
-  <div class="row">
-    <div class="col-md-12 block-btn">
-      <a
-        class="btn btn-lg btn-google btn-block text-uppercase btn-outline"
-        @click="logInByGoogle"><img src="https://img.icons8.com/color/16/000000/google-logo.png" />
-        Đăng nhập bằng Google</a>
-    </div>
-  </div>
+  <GoogleLogin :callback="logInByGoogle" class="GoogleLogin" />
 </template>
 
 <script setup>
-import { inject } from "vue";
-import { useRouter } from "vue-router";
-import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
+import {
+  defineProps,
+  inject,
+} from 'vue';
 
-const Vue3GoogleOauth = inject("Vue3GoogleOauth");
+import jwt_decode from 'jwt-decode';
+import { useRouter } from 'vue-router';
+
+import { RepositoryFactory } from '@/api/repositories/RepositoryFactory.js';
+import {
+  saveUser,
+  setCookie,
+  showToastSuccess,
+} from '@/helpers/helper.js';
+
 const emitter = inject("emitter");
 const router = useRouter();
 
 const authRepository = RepositoryFactory.get("auth");
 
-const logInByGoogle = async () => {
+const props = defineProps({
+  closeModal: Function,
+  toast: Object,
+  duration_time: String,
+})
+
+const logInByGoogle = (response) => {
   try {
-  const googleUser = await Vue3GoogleOauth.instance.signIn();
-  // save user login
-  if (googleUser) {
-  let account = {
-    id: googleUser.getBasicProfile().getId(),
-    name: googleUser.getBasicProfile().getName(),
-    email: googleUser.getBasicProfile().getEmail(),
-    access_token: googleUser.Cc.access_token,
-    avatar: googleUser.getBasicProfile().getImageUrl(),
-    type: "social",
-  };
-  authRepository.googleLogin(account).then((response) => {
-    if (response.data.status === 0) {
-      let user = response.data.data[1].user;
-      saveGoogleUser(user);
-      // Change name
-      emitter.emit("reloadHeader");
-      //
-      router.push({ name: user.role === 0 ? "home" : "admin-home" });
-    }
-    if (response.data.status === 1) {
-      alert(response.data.error.message);
-    }
-    if (response.data.status !== 0 && response.data.status !== 1) {
-      alert(response.data);
-    }
-  });
+    const googleUser = jwt_decode(response.credential);
+    // save user login
+    if (googleUser) {
+      let account = {
+        id: googleUser.sub,
+        name: googleUser.name,
+        email: googleUser.email,
+        avatar: googleUser.picture,
+        type: "GOOGLE",
+      };
+      authRepository.socialLogin(account).then((response) => {
+        if (response.data.status === 0) {
+          setCookie("access_token", response.data.access_token, 1);
+          let user = response.data.user.user;
+          saveUser(user);
+          props.toast.success("Đăng nhập thành công", {
+            duration: props.duration_time,
+            action: [
+              {
+                text: `OK`,
+                onClick: (_, toastObject) => {
+                  toastObject.goAway(0);
+                },
+              },
+            ],
+          });
+          props.closeModal("modalLogin");
+          // reload user
+          emitter.emit("reloadHeader");
+          emitter.emit("reloadProductDetail");
+        }
+        if (response.data.status === 1) {
+          props.toast.error(response.data.error.message, {
+            duration: props.duration_time,
+            action: [
+              {
+                text: `OK`,
+                onClick: (_, toastObject) => {
+                  toastObject.goAway(0);
+                },
+              },
+            ],
+          });
+        }
+        if (response.data.status !== 0 && response.data.status !== 1) {
+          console.log(response.data);
+        }
+      });
     }
   } catch (e) {
     console.log(e);
   }
 };
-
-const saveGoogleUser = (account) => {
-  localStorage.setItem("user", JSON.stringify(account));
-};
 </script>
-
-<style scoped>
-.btn-google {
-  color: #545454;
-  background-color: #ffffff;
-  box-shadow: 0 1px 2px 1px #ddd;
-  font-size: 14px;
-}
-.btn-google img {
-  padding-bottom: 3px;
-}
-</style>
+<style scoped></style>

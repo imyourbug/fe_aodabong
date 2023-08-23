@@ -1,4 +1,4 @@
-import Repository from "@/api/repositories/Repository";
+import { getAxios } from '@/api/repositories/Repository';
 
 const baseDomain = process.env.VUE_APP_DOMAIN_URL;
 const baseUrl = `${baseDomain}/api/products`;
@@ -7,10 +7,10 @@ const baseUrl = `${baseDomain}/api/products`;
 
 export default {
   getAll() {
-    return Repository.get(`${baseUrl}/list`);
+    return getAxios().get(`${baseUrl}/list`);
   },
   create(product) {
-    return Repository.post(`${baseUrl}/create`, {
+    return getAxios().post(`${baseUrl}/create`, {
       name: product.name,
       category_id: product.category_id,
       supplier_id: product.supplier_id,
@@ -21,17 +21,17 @@ export default {
     });
   },
   remove(product_id) {
-    return Repository.delete(`${baseUrl}/delete`, {
+    return getAxios().delete(`${baseUrl}/delete`, {
       data: { id: product_id },
     });
   },
-  removeAll(ids) {
-    return Repository.delete(`${baseUrl}/delete_all`, {
-      data: { ids: ids },
-    });
-  },
+  // removeAll(ids) {
+  //   return getAxios().delete(`${baseUrl}/delete_all`, {
+  //     data: { ids: ids },
+  //   });
+  // },
   edit(product) {
-    return Repository.put(`${baseUrl}/update`, {
+    return getAxios().put(`${baseUrl}/update`, {
       id: product.id,
       name: product.name,
       category_id: product.category_id,

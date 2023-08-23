@@ -1,6 +1,7 @@
-import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
+import { RepositoryFactory } from '@/api/repositories/RepositoryFactory.js';
 
 const detailRepository = RepositoryFactory.get("detail_product");
+const clientRepository = RepositoryFactory.get("client");
 
 // initial state
 const state = {

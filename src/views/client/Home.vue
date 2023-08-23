@@ -1,5 +1,6 @@
 <template>
-  <div class="row slider">
+  <div>
+    <div class="row slider">
     <div class="list-danhmuc col-3">
       <div class="danhmuc">
         <div class="text-top">
@@ -10,7 +11,7 @@
           <div v-for="(category, key) in categories" :key="key">
             <router-link
               :to="{
-                path: getUrlByCategory(category),
+                path: getUrlByCategory(category.id),
               }"
               v-if="category.parent_id === 0"
               ><i class="fas fa-arrow-circle-right"></i>&ensp;{{
@@ -22,7 +23,7 @@
         </div>
       </div>
     </div>
-    <div class="col-8"><SlideHome /></div>
+    <div class="col-8"><Slide :slides="slides" /></div>
   </div>
   <main v-if="categories && categories.length > 0">
     <div class="group-product" v-for="(category, key) in categories" :key="key">
@@ -36,7 +37,7 @@
               <router-link
                 class="btn-left"
                 :to="{
-                  path: getUrlByCategory(category),
+                  path: getUrlByCategory(category.id),
                 }"
                 >&ensp;<i class="far fa-futbol"></i>&ensp;{{
                   category.name
@@ -47,7 +48,7 @@
               <router-link
                 class="btn-right"
                 :to="{
-                  path: getUrlByCategory(category),
+                  path: getUrlByCategory(category.id),
                 }"
                 >Xem thêm <i class="fas fa-chevron-right"></i
                 ><i class="fas fa-chevron-right"></i
@@ -108,21 +109,22 @@
       </div>
     </div>
   </main>
+  </div>
 </template>
 
 <script setup>
-import SlideHome from "@/components/sliders/SlideHome.vue";
-import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
-import { useRouter } from "vue-router";
-import { ref, inject, computed } from "vue";
-import { useStore } from "vuex";
-import { formatCash } from "@/helpers/helper.js";
+import { computed } from 'vue';
 
-const clientRepository = RepositoryFactory.get("client");
-const categoryRepository = RepositoryFactory.get("category");
+import { useStore } from 'vuex';
 
-const router = useRouter();
+import { showPrice } from '@/helpers/helper.js';
+import Slide from '@/views/client/Slide.vue';
+
 const store = useStore();
+
+const slides = computed(() => {
+  return store.state.slides.all;
+});
 
 const categories = computed(() => {
   return store.state.categories.all;
@@ -130,41 +132,13 @@ const categories = computed(() => {
 
 const reload = () => {
   store.dispatch("categories/getAll");
+  store.dispatch("slides/getAll");
 };
 
 reload();
 
-const getUrlByCategory = (category) => {
-  return `/categories/${getNameParent(category, categories.value, [])
-    .reverse()
-    .join("/")}/id=${category.id}`;
-};
-
-const getNameParent = (category, categories, urls = []) => {
-  urls.push(category.slug);
-  categories.forEach((item) => {
-    if (item.id === category.parent_id) {
-      getNameParent(
-        item,
-        categories.filter((cate) => {
-          return cate.id !== item.id;
-        }),
-        urls
-      );
-    }
-  });
-  return urls;
-};
-
-const showPrice = (price, price_sale) => {
-  if (price_sale !== null) {
-    return `${formatCash(
-      price
-    )}đ <sup style="text-decoration-line:line-through; opacity:0.6">${formatCash(
-      price_sale
-    )}đ</sup>`;
-  }
-  return `${formatCash(price)}đ`;
+const getUrlByCategory = (category_id) => {
+  return `/categories/${category_id}`;
 };
 </script>
 
@@ -178,9 +152,7 @@ a {
 }
 
 .list-danhmuc {
-  border: 1px solid rgb(218, 209, 209);
   padding: 0px;
-  margin: 0px 96px 0px 11px;
 }
 .danhmuc .text-top {
   color: white;

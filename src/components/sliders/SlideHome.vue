@@ -57,9 +57,13 @@
 </template>
 
 <script setup>
-import { RepositoryFactory } from "@/api/repositories/RepositoryFactory";
-import { ref, inject } from "vue";
-import { useToasted } from "@hoppscotch/vue-toasted";
+import {
+  inject,
+  ref,
+} from 'vue';
+
+import { RepositoryFactory } from '@/api/repositories/RepositoryFactory';
+import { useToasted } from '@hoppscotch/vue-toasted';
 
 const toast = useToasted();
 const slideRepository = RepositoryFactory.get("slide");

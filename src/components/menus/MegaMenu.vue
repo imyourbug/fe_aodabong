@@ -1,10 +1,8 @@
 <template>
-  <!-- :style="ids === category.id ? 'background-color: #ed1a29;' : ''" -->
   <nav class="navbar navbar-expand-sm navbar-dark bg-info">
     <router-link class="navbar-brand" :to="{ name: 'home' }"
       >Trang chủ</router-link
     >
-
     <button
       class="navbar-toggler"
       type="button"
@@ -29,7 +27,7 @@
         >
           <router-link
             :to="{
-              path: getUrlByCategory(category),
+              path: getUrlByCategory(category.id),
             }"
             class="nav-link catogary"
             id="navbarDropdown"
@@ -60,7 +58,7 @@
                     <li class="nav-item">
                       <router-link
                         :to="{
-                          path: getUrlByCategory(cate),
+                          path: getUrlByCategory(cate.id),
                         }"
                         class="nav-link active"
                         >{{ cate.name }}</router-link
@@ -69,7 +67,7 @@
                     <li class="nav-item" v-for="c in cate.children" :key="c.id">
                       <router-link
                         :to="{
-                          path: getUrlByCategory(c),
+                          path: getUrlByCategory(c.id),
                         }"
                         class="nav-link i"
                         >{{ c.name }}</router-link
@@ -87,79 +85,13 @@
 </template>
 
 <script setup>
-import { RepositoryFactory } from "@/api/repositories/RepositoryFactory";
-import { onUpdated, ref, watch } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import { defineProps } from 'vue';
 
-const router = useRouter();
-const route = useRoute();
-const cateRepository = RepositoryFactory.get("category");
-
-const categories = ref([]);
-const tree_categories = ref([]);
-
-const getUrlByCategory = (category) => {
-  return `/categories/${getNameParent(category, categories.value, [])
-    .reverse()
-    .join("/")}/id=${category.id}`;
-};
-
-const reload = () => {
-  cateRepository.getAllCategories().then((response) => {
-    if (response.data.status === 0) {
-      categories.value = response.data.categories;
-      tree_categories.value = parseTree(response.data.categories);
-    }
-    if (response.data.status === 1) {
-      alert(response.data.error.message);
-    }
-    if (response.data.status !== 0 && response.data.status !== 1) {
-      alert(response.data);
-    }
-  });
-};
-
-reload();
-
-// parse flat structure to tree structure
-const traverse = (arr, parentId) =>
-  arr
-    .filter((category) => category.parent_id === parentId)
-    .reduce(
-      (result, current) => [
-        ...result,
-        {
-          ...current,
-          children: traverse(arr, current.id),
-        },
-      ],
-      []
-    );
-
-const parseTree = (arr) =>
-  arr
-    .sort(({ id }) => id)
-    .filter(({ parent_id }) => !parent_id)
-    .map((category) => ({
-      ...category,
-      children: traverse(arr, category.id),
-    }));
-
-const getNameParent = (category, categories, urls = []) => {
-  urls.push(category.slug);
-  categories.forEach((item) => {
-    if (item.id === category.parent_id) {
-      getNameParent(
-        item,
-        categories.filter((cate) => {
-          return cate.id !== item.id;
-        }),
-        urls
-      );
-    }
-  });
-  return urls;
-};
+const props = defineProps({
+  categories: Object,
+  tree_categories: Object,
+  getUrlByCategory: Function
+});
 </script>
 
 <style scoped>
