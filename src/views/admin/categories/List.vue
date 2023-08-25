@@ -324,7 +324,6 @@ const edit = () => {
 };
 
 const getCategory = (cate) => {
-  console.log(cate);
   category.id = cate.id;
   category.parent_id = cate.parent_id;
   category.name = cate.name;

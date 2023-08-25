@@ -6,7 +6,7 @@
           <router-link :to="{ name: 'home' }" style="color: #ed1a29"
             >Trang chủ</router-link
           >>>
-          <a v-if="category.detail" style="color: #ed1a29" href="#">
+          <a v-if="category.detail" style="color: #ed1a29">
             {{ category.detail.name }}
           </a>
         </div>

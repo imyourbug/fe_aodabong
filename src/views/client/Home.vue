@@ -1,114 +1,141 @@
 <template>
   <div>
     <div class="row slider">
-    <div class="list-danhmuc col-3">
-      <div class="danhmuc">
-        <div class="text-top">
-          <i class="fas fa-bars"></i>&ensp;DANH MỤC SẢN PHẨM
-        </div>
-        <br />
-        <div class="option" v-if="categories && categories.length > 0">
-          <div v-for="(category, key) in categories" :key="key">
-            <router-link
-              :to="{
-                path: getUrlByCategory(category.id),
-              }"
-              v-if="category.parent_id === 0"
-              ><i class="fas fa-arrow-circle-right"></i>&ensp;{{
-                category.name
-              }}</router-link
-            >
-            <hr v-if="category.parent_id === 0" />
+      <div class="list-danhmuc col-3">
+        <div class="danhmuc">
+          <div class="text-top">
+            <i class="fas fa-bars"></i>&ensp;DANH MỤC SẢN PHẨM
           </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-8"><Slide :slides="slides" /></div>
-  </div>
-  <main v-if="categories && categories.length > 0">
-    <div class="group-product" v-for="(category, key) in categories" :key="key">
-      <div
-        class="album bg-light"
-        v-if="category.products && category.products.length > 0"
-      >
-        <div class="container">
-          <div class="block-text-1">
-            <div class="block-text-left">
+          <br />
+          <div class="option" v-if="categories && categories.length > 0">
+            <div v-for="(category, key) in categories" :key="key">
               <router-link
-                class="btn-left"
                 :to="{
                   path: getUrlByCategory(category.id),
                 }"
-                >&ensp;<i class="far fa-futbol"></i>&ensp;{{
+                v-if="category.parent_id === 0"
+                ><i class="fas fa-arrow-circle-right"></i>&ensp;{{
                   category.name
-                }}&emsp;</router-link
+                }}</router-link
               >
+              <hr v-if="category.parent_id === 0" />
             </div>
-            <div class="block-text-right">
-              <router-link
-                class="btn-right"
-                :to="{
-                  path: getUrlByCategory(category.id),
-                }"
-                >Xem thêm <i class="fas fa-chevron-right"></i
-                ><i class="fas fa-chevron-right"></i
-              ></router-link>
-            </div>
-          </div>
-          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3">
-            <div
-              class="col"
-              v-for="(product, key) in category.products"
-              :key="key"
-            >
-              <router-link :to="`/products/detail/${product.id}`">
-                <div class="block-product">
-                  <a> <img :src="product.thumb" /></a>
-                  <a>
-                    <p>{{ product.name }}</p>
-                  </a>
-                  <p v-html="showPrice(product.price, product.price_sale)"></p>
-                  <br />
-                  <br />
-                  <a class="detail"> Chi tiết</a>
-                  <br />&ensp;
-                </div>
-              </router-link>
-            </div>
-          </div>
-        </div>
-        <br />
-      </div>
-    </div>
-    <div class="block-feature">
-      <div class="features">
-        <div class="feature">
-          <div class="in-feature"><i class="fas fa-tshirt"></i></div>
-          &ensp;
-          <div class="in-feature">
-            <div class="text-top">SẢN PHẨM ĐA DẠNG</div>
-            <div class="text-bot">Cung cấp nhiều mẫu mã đẹp</div>
-          </div>
-        </div>
-        <div class="feature">
-          <div class="in-feature"><i class="fas fa-dolly-flatbed"></i></div>
-          &ensp;
-          <div class="in-feature">
-            <div class="text-top">GIAO HÀNG SIÊU TỐC</div>
-            <div class="text-bot">Giao hàng ngay sau khi đặt mua</div>
-          </div>
-        </div>
-        <div class="feature">
-          <div class="in-feature"><i class="fas fa-handshake"></i></div>
-          &ensp;
-          <div class="in-feature">
-            <div class="text-top">CHÍNH SÁCH ƯU ÁI</div>
-            <div class="text-bot">Chính sách bảo hành dài hạn</div>
           </div>
         </div>
       </div>
+      <div class="col-8"><Slide :slides="slides" /></div>
     </div>
-  </main>
+    <br />
+    <ListProduct
+      title="SẢN PHẨM MỚI NHẤT"
+      :products="newestProducts"
+      itemsToShow="5"
+      autoplay="10000000"
+    />
+    <ListProduct
+      title="SẢN PHẨM NỔI BẬT"
+      :products="hottestProducts"
+      itemsToShow="5"
+      autoplay="10000000"
+    />
+    <main v-if="categories && categories.length > 0">
+      <div
+        class="group-product"
+        v-for="(category, key) in categories"
+        :key="key"
+      >
+        <div
+          class="album bg-light"
+          v-if="category.products && category.products.length > 0"
+        >
+          <div class="container">
+            <div class="block-text-1">
+              <div class="block-text-left">
+                <router-link
+                  class="btn-left"
+                  :to="{
+                    path: getUrlByCategory(category.id),
+                  }"
+                  >&ensp;<i class="far fa-futbol"></i>&ensp;{{
+                    category.name
+                  }}&emsp;</router-link
+                >
+              </div>
+              <div class="block-text-right">
+                <router-link
+                  class="btn-right"
+                  :to="{
+                    path: getUrlByCategory(category.id),
+                  }"
+                  >Xem thêm <i class="fas fa-chevron-right"></i
+                  ><i class="fas fa-chevron-right"></i
+                ></router-link>
+              </div>
+            </div>
+            <br />
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3">
+              <div
+                class="col"
+                v-for="(product, key) in category.products"
+                :key="key"
+              >
+                <router-link :to="`/products/detail/${product.id}`">
+                  <div class="block-product">
+                    <a> <img :src="product.thumb" /></a>
+                    <a>
+                      <p>{{ product.name }}</p>
+                    </a>
+                    <p
+                      v-html="showPrice(product.price, product.price_sale)"
+                    ></p>
+                    <div
+                      class=""
+                      style="
+                        display: flex;
+                        justify-content: space-around;
+                        align-items: center;
+                      "
+                    >
+                      <a class="detail"> Chi tiết</a>
+                      <p style="font-size: 12px">Đã bán {{ product.sold }}</p>
+                    </div>
+                  </div>
+                </router-link>
+              </div>
+            </div>
+          </div>
+          <br />
+        </div>
+      </div>
+      <div class="block-feature">
+        <div class="features">
+          <div class="feature">
+            <div class="in-feature"><i class="fas fa-tshirt"></i></div>
+            &ensp;
+            <div class="in-feature">
+              <div class="text-top">SẢN PHẨM ĐA DẠNG</div>
+              <div class="text-bot">Cung cấp nhiều mẫu mã đẹp</div>
+            </div>
+          </div>
+          <div class="feature">
+            <div class="in-feature"><i class="fas fa-dolly-flatbed"></i></div>
+            &ensp;
+            <div class="in-feature">
+              <div class="text-top">GIAO HÀNG SIÊU TỐC</div>
+              <div class="text-bot">Giao hàng ngay sau khi đặt mua</div>
+            </div>
+          </div>
+          <div class="feature">
+            <div class="in-feature"><i class="fas fa-handshake"></i></div>
+            &ensp;
+            <div class="in-feature">
+              <div class="text-top">CHÍNH SÁCH ƯU ÁI</div>
+              <div class="text-bot">Chính sách bảo hành dài hạn</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
   </div>
 </template>
 
@@ -117,13 +144,22 @@ import { computed } from 'vue';
 
 import { useStore } from 'vuex';
 
+import ListProduct from '@/components/sliders/ListProduct.vue';
+import Slide from '@/components/sliders/Slide.vue';
 import { showPrice } from '@/helpers/helper.js';
-import Slide from '@/views/client/Slide.vue';
 
 const store = useStore();
 
 const slides = computed(() => {
   return store.state.slides.all;
+});
+
+const newestProducts = computed(() => {
+  return store.state.products.newest;
+});
+
+const hottestProducts = computed(() => {
+  return store.state.products.hottest;
 });
 
 const categories = computed(() => {
@@ -133,6 +169,8 @@ const categories = computed(() => {
 const reload = () => {
   store.dispatch("categories/getAll");
   store.dispatch("slides/getAll");
+  store.dispatch("products/getNewestProduct");
+  store.dispatch("products/getHottestProduct");
 };
 
 reload();

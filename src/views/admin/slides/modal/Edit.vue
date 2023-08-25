@@ -38,7 +38,7 @@
               <input
                 v-model="slide.active"
                 class="form-check-input"
-                name="active1"
+                name="active"
                 value="1"
                 id="flexRadioDefault1"
                 type="radio"
@@ -51,7 +51,7 @@
               <input
                 v-model="slide.active"
                 class="form-check-input"
-                name="active1"
+                name="active"
                 id="flexRadioDefault2"
                 value="0"
                 type="radio"

@@ -91,10 +91,10 @@
               <input
                 v-model="product.active"
                 class="form-check-input"
-                name="active"
+                name="active1"
+                id="flexRadioDefault1"
                 value="1"
                 type="radio"
-                checked
               />
               <label class="form-check-label" for="flexRadioDefault1">
                 Có
@@ -104,7 +104,8 @@
               <input
                 v-model="product.active"
                 class="form-check-input"
-                name="active"
+                name="active1"
+                id="flexRadioDefault2"
                 value="0"
                 type="radio"
               />

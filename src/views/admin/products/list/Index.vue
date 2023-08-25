@@ -45,6 +45,7 @@
                 <th>STT</th>
                 <th>Tên sản phẩm</th>
                 <th>Ảnh</th>
+                <th>Đã bán</th>
                 <th>Giá gốc</th>
                 <th>Giá khuyến mãi</th>
                 <th>Danh mục</th>
@@ -58,6 +59,7 @@
                 <th>STT</th>
                 <th>Tên sản phẩm</th>
                 <th>Ảnh</th>
+                <th>Đã bán</th>
                 <th>Giá gốc</th>
                 <th>Giá khuyến mãi</th>
                 <th>Danh mục</th>
@@ -178,6 +180,12 @@ const columns = [
     data: null,
     render: function (data, type, row, meta) {
       return `<img style="width: 100px; height: 100px;" src="${data.thumb}" />`;
+    },
+  },
+  {
+    data: null,
+    render: function (data, type, row, meta) {
+      return data.sold;
     },
   },
   {

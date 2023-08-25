@@ -7,7 +7,15 @@
             <router-link :to="{ name: 'home' }" style="color: #ed1a29"
               >Trang chủ</router-link
             >
-            >><a style="color: #ed1a29" href=""> Sản phẩm </a>
+            >>
+            <router-link
+              v-if="data.category"
+              :to="{ name: 'group_product', params: { id_category: data.category.id } }"
+              style="color: #ed1a29"
+            >
+              {{ data.category.name }}
+              <!-- 123 -->
+            </router-link>
             >>
             {{ data.name }}
           </div>
@@ -257,11 +265,11 @@ emitter.on("showReply", (comment_id) => {
   showRepComment.value = comment_id;
 });
 
-
 const reload = () => {
   // get detail product
   clientRepository.getDetailProduct(product_id).then((response) => {
     data.value = response.data.product;
+    console.log(data.value);
     // get sizes and colors
     let size = [];
     let color = [];

@@ -187,7 +187,6 @@ const repComment = (com) => {
 
 // delete comment
 const deleteComment = (comment_id) => {
-  console.log(comment_id);
   if (confirm("Bạn có muốn xóa bình luận này không?")) {
     commentRepository.deleteComment(comment_id).then((response) => {
       if (response.data.status === 0) {

@@ -43,6 +43,7 @@
                 v-model="voucher.active"
                 class="form-check-input"
                 name="active1"
+                id="flexRadioDefault1"
                 value="1"
                 type="radio"
               />
@@ -54,6 +55,7 @@
               <input
                 v-model="voucher.active"
                 class="form-check-input"
+                id="flexRadioDefault2"
                 name="active1"
                 value="0"
                 type="radio"

@@ -18,7 +18,6 @@ export default {
     });
   },
   edit(order_id, status) {
-    console.log(order_id, status);
     return getAxios().put(`${baseUrl}/update`, {
       id: order_id,
       status: status,

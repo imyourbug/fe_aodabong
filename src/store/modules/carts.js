@@ -19,7 +19,6 @@ const actions = {
 // mutations
 const mutations = {
   setAll(state, carts) {
-    console.log(carts);
     state.all = carts;
   },
 };

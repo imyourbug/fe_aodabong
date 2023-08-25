@@ -13,7 +13,6 @@ export default {
     });
   },
   socialLogin(account) {
-    console.log(account);
     return getAxios().post(`${baseUrl}/socials/login`, {
       email: account.email,
       provider_user_id: account.id,
@@ -23,7 +22,6 @@ export default {
     });
   },
   changePassword(account) {
-    console.log(account);
     return getAxios().post(`${baseUrl}/change_password`, {
       email: account.email,
       password: account.password,

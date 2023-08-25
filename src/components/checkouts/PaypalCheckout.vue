@@ -50,7 +50,6 @@ loadAsync(
         },
         onApprove: async (data, actions) => {
           const order = await actions.order.capture();
-          console.log(order);
           if (order.status === "COMPLETED") {
             emitter.emit("checkoutSuccess", props.total_money);
           } else alert("Thanh toán thất bại");

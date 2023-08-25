@@ -247,7 +247,6 @@ const handleLogin = () => {
       authRepository.login(account).then((response) => {
         if (response.data.status === 0) {
           let user = response.data.user;
-          console.log(response.data);
           setCookie("access_token", response.data.access_token, 1);
           saveUser(user);
           // Change name

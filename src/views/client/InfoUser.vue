@@ -1,7 +1,7 @@
 <template>
   <div class="container rounded bg-white mt-2 mb-5">
     <Tab lazy-load>
-      <TabItem title="Thông tin cá nhân" active>
+      <TabItem title="Thông tin cá nhân" active style="overflow: hidden !important;">
         <InformationUser
           :save="save"
           :selectProvince="selectProvince"
@@ -161,7 +161,6 @@ const updateInfo = (user) => {
 
 const reload = () => {
   user.value = JSON.parse(localStorage.getItem("user")) ?? {};
-  console.log(user.value);
   // load provinces
   provinceRepository.getAllProvinces().then((response) => {
     response.data.forEach((item) => {

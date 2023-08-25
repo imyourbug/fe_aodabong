@@ -252,7 +252,6 @@ const addOrderId = (order_id) => {
 const getOrder = (ord) => {
   addOrderId(ord.id);
   order.value = ord;
-  console.log(order.value);
 };
 
 const closeModal = (modal) => {

@@ -12,14 +12,70 @@ const state = {
     not_like: [],
   },
   detail: [],
+  newest: [],
+  hottest: [],
   error: "",
 };
 
 // getters
 const getters = {};
 
+function getQuantitySold(product_details) {
+  let rs = 0;
+  product_details.forEach((detail) => {
+    rs += detail.order_details.reduce(
+      (quantity, product) => product.quantity + quantity,
+      0
+    );
+  });
+  return rs;
+}
+
 // actions
 const actions = {
+  getHottestProduct({ commit }) {
+    try {
+      productRepository.getAll().then((response) => {
+        if (response.data.status === 0) {
+          let hottest = response.data.products;
+          hottest
+            .sort((a, b) => {
+              return (
+                getQuantitySold(b.product_details) -
+                getQuantitySold(a.product_details)
+              );
+            })
+            .splice(5);
+          commit("setHottest", hottest);
+        }
+        if (response.data.status === 1) {
+          commit("setError", response.data.error.message);
+        }
+      });
+    } catch (e) {
+      commit("setError", e.message);
+    }
+  },
+  getNewestProduct({ commit }) {
+    try {
+      productRepository.getAll().then((response) => {
+        if (response.data.status === 0) {
+          let newest = response.data.products;
+          newest
+            .sort((a, b) => {
+              return b.id - a.id;
+            })
+            .splice(5);
+          commit("setNewest", newest);
+        }
+        if (response.data.status === 1) {
+          commit("setError", response.data.error.message);
+        }
+      });
+    } catch (e) {
+      commit("setError", e.message);
+    }
+  },
   getAll({ commit }) {
     try {
       productRepository.getAll().then((response) => {
@@ -78,7 +134,6 @@ const actions = {
     try {
       clientRepository.getDetailProduct(product_id).then((response) => {
         if (response.data.status === 0) {
-          console.log(response.data.data);
           commit("setDetail", response.data.data);
         }
         if (response.data.status === 1) {
@@ -96,11 +151,16 @@ const mutations = {
   setAll(state, products) {
     state.all = state.products = products;
   },
+  setNewest(state, products) {
+    state.newest = products;
+  },
+  setHottest(state, products) {
+    state.hottest = products;
+  },
   setDetail(state, product) {
     state.deatil = product;
   },
   setSearch(state, products) {
-    console.log(products);
     state.search.like = products.like;
     state.search.not_like = products.not_like;
   },

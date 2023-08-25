@@ -34,7 +34,6 @@ export default {
     });
   },
   checkOutVnpay(total_money) {
-    console.log(total_money);
     return getAxios().post(`${baseUrl}/checkouts/vnpay`, {
       total: total_money
     });

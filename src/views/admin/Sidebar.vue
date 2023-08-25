@@ -220,7 +220,7 @@
 
 <style scoped>
 .logo {
-  width: 200px;
+  width: 250px;
   height: 60px;
 }
 .collapsed {

@@ -197,7 +197,6 @@ const closeModal = (modal) => {
 };
 
 const handleRegister = () => {
-  console.log(account.password + "//" + account.repassword);
   v$.value.$validate();
   if (v$.value.$invalid) {
     toast.error("Vui lòng điền đầy đủ thông tin", {

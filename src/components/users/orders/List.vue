@@ -185,7 +185,6 @@ reload();
 
 const getOrder = (ord) => {
   order.value = ord;
-  console.log(order.value);
 };
 
 const closeModal = (modal) => {

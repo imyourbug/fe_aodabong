@@ -137,11 +137,10 @@ const router = createRouter({ history: createWebHistory(), routes });
 router.beforeEach((to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!user || JWT_TOKEN == null) {
-      next("/login");
+      next("/");
     } else {
       if (to.matched.some((record) => record.meta.isAdmin)) {
         if (user.role == 1) {
-          console.log("admin-home");
           next();
         } else {
           next("/");

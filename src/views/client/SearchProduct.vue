@@ -5,9 +5,7 @@
         <router-link :to="{ name: 'home' }" style="color: #ed1a29"
           >Trang chủ</router-link
         >>>
-        <a style="color: #ed1a29" href="#">
-          Tìm kiếm
-        </a>
+        <a style="color: #ed1a29" href="#"> Tìm kiếm </a>
         >>
         <a style="color: #ed1a29" href="#">
           {{ key_word }}
@@ -42,16 +40,26 @@
                 <p>{{ info.name }}</p>
               </a>
               <p v-html="showPrice(info.price, info.price_sale)"></p>
-              <br />
-              <br />
-              <a class="detail"> Chi tiết</a>
-              <br />&ensp;
+              <div
+                class=""
+                style="
+                  display: flex;
+                  justify-content: space-around;
+                  align-items: center;
+                "
+              >
+                <a class="detail"> Chi tiết</a>
+                <p style="font-size: 12px">Đã bán {{ info.sold }}</p>
+              </div>
             </div>
           </router-link>
         </div>
       </div>
       <div class="row" v-else><SearchEmpty /></div>
-      <div class="block-text-1" v-if="other_products && other_products.length > 0">
+      <div
+        class="block-text-1"
+        v-if="other_products && other_products.length > 0"
+      >
         <div class="block-text-left">
           <a class="btn-left"
             >&ensp;<i class="far fa-futbol"></i>&ensp;Sản phẩm khác&emsp;</a
@@ -76,10 +84,17 @@
                 <p>{{ info.name }}</p>
               </a>
               <p v-html="showPrice(info.price, info.price_sale)"></p>
-              <br />
-              <br />
-              <a class="detail"> Chi tiết</a>
-              <br />&ensp;
+              <div
+                class=""
+                style="
+                  display: flex;
+                  justify-content: space-around;
+                  align-items: center;
+                "
+              >
+                <a class="detail"> Chi tiết</a>
+                <p style="font-size: 12px">Đã bán {{ info.sold }}</p>
+              </div>
             </div>
           </router-link>
         </div>

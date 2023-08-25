@@ -53,7 +53,7 @@
         <div class="btn-logout btn-user" v-else>
           <img class="nav-avatar" :src="user.avatar" />
           &ensp;
-          <div class="user-header"><UserHeader :user="user" /></div>
+          <UserHeader :user="user" />
         </div>
       </div>
     </div>
@@ -110,7 +110,7 @@ const reload = () => {
   if (isLogged.value) {
     user.value = JSON.parse(localStorage.getItem("user"));
   }
-  // console.log(user.value);
+  console.log(user.value);
 };
 
 reload();
@@ -130,18 +130,6 @@ a:hover {
   align-items: center;
 }
 /* user-header */
-.user-header {
-  display: none;
-  top: 90px;
-  right: 200px;
-  border: 1px solid #2e3094;
-  border-radius: 5px;
-  position: absolute;
-  z-index: 9999;
-  background-color: white;
-  padding: 10px 15px;
-  text-align: left;
-}
 .btn-user:hover .user-header {
   display: block;
 }
@@ -188,12 +176,14 @@ sup.cart-quantity {
   padding: 0px 15px 0px 15px;
 }
 .menu-header {
-  padding: 0 15px 15px 15px;
+  padding: 15px 0px;
   text-align: center;
+  align-items: center;
   border-bottom: 1px solid rgb(233, 227, 227);
 }
 .logo {
   width: 200px;
+  height: 40;
 }
 .block-search {
   padding-top: 10px;
