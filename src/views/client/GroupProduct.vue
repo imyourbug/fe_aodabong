@@ -83,10 +83,17 @@
                     <p>{{ product.name }}</p>
                   </a>
                   <p v-html="showPrice(product.price, product.price_sale)"></p>
-                  <br />
-                  <br />
-                  <a class="detail"> Chi tiết</a>
-                  <br />&ensp;
+                  <div
+                      class=""
+                      style="
+                        display: flex;
+                        justify-content: space-around;
+                        align-items: center;
+                      "
+                    >
+                      <a class="detail"> Chi tiết</a>
+                      <p style="font-size: 12px">Đã bán {{ product.sold }}</p>
+                    </div>
                 </div>
               </router-link>
             </div>

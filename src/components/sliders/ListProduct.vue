@@ -2,13 +2,17 @@
   <div class="group-product">
     <div class="album bg-light">
       <div class="container">
-        <div class="block-text-1" style="justify-content: center;">
-          <div class="txt-title btn-left" >{{ title }}</div>
+        <div class="block-text-1" style="justify-content: center">
+          <div class="txt-title btn-left">{{ title }}</div>
         </div>
-        <br/>
+        <br />
         <div class="row">
           <div class="col-12">
-            <carousel :items-to-show="itemsToShow" :autoplay="autoplay" :wrap-around="true">
+            <carousel
+              :items-to-show="itemsToShow"
+              :autoplay="autoplay"
+              :wrap-around="true"
+            >
               <slide v-for="(product, key) in products" :key="key">
                 <router-link :to="`/products/detail/${product.id}`">
                   <div class="block-product">
@@ -28,18 +32,20 @@
                       "
                     >
                       <a class="detail"> Chi tiết</a>
-                      <p style="font-size: 12px;">Đã bán {{ product.sold }}</p>
+                      <p style="font-size: 12px">Đã bán {{ product.sold }}</p>
                     </div>
+                    <br/>
                   </div>
                 </router-link>
               </slide>
+              <br/>
               <!-- <template #addons>
                 <navigation />
               </template> -->
             </carousel>
           </div>
         </div>
-        <br/>
+        <br />
       </div>
     </div>
   </div>
@@ -96,6 +102,7 @@ a {
 .block-product {
   align-items: center;
   text-align: center;
+  margin-bottom: 20px;
 }
 .block-product img {
   width: 100%;
@@ -129,5 +136,4 @@ a.detail:hover {
   color: #ed1a29;
   outline: 2px solid #ed1a29;
 }
-
 </style>
