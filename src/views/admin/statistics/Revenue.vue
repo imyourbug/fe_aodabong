@@ -16,9 +16,9 @@
             <input
               type="date"
               v-model="range.from"
-              @change="changeRange"
+              @change="reloadRevenue"
             />&emsp13; <label>đến</label>&emsp13;
-            <input type="date" v-model="range.to" @change="changeRange" />
+            <input type="date" v-model="range.to" @change="reloadRevenue" />
           </div>
           <div class="card-body">
             <div class="chart-area">
@@ -65,52 +65,115 @@
           </div>
         </div>
       </div>
+      <!-- Donut Chart -->
+      <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+          <!-- Card Header - Dropdown -->
+          <div class="card-header py-3">
+            <h6 class="font-weight-bold text-primary">Sản phẩm</h6>
+          </div>
+          <!-- Card Body -->
+          <div class="card-body">
+            <div class="" v-if="bestSeller">
+              Sản phẩm bán chạy nhất:
+              <router-link
+                :to="{
+                  name: 'product_detail',
+                  params: { id: bestSeller.id },
+                }"
+                >{{ bestSeller.name }}
+              </router-link>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 <script setup>
 import {
-  computed,
   onMounted,
   reactive,
   ref,
-  watch,
 } from 'vue';
 
 import Chart from 'chart.js/auto';
-import { useStore } from 'vuex';
 
-import { formatCash } from '@/helpers/helper';
+import { RepositoryFactory } from '@/api/repositories/RepositoryFactory.js';
 
-const store = useStore();
+const productRepository = RepositoryFactory.get("product");
+const statisticRepository = RepositoryFactory.get("statistic");
 
 const dataQuantity = ref([]);
 const labelsQuantity = ref([]);
+const backgroundColorQuantity = ref([]);
+const backgroundColorRevenue = ref([]);
 const dataRevenue = ref([]);
 const labelsRevenue = ref([]);
+const bestSeller = ref(null);
 const range = reactive({
   from: "",
   to: "",
 });
 
-const products = computed(() => {
-  return store.state.products.all;
-});
-
-const revenue = computed(() => {
-  return store.state.statistics.revenue;
-});
-
 const reload = () => {
-  store.dispatch("products/getAll");
-  products.value.forEach((e) => {
-    labelsQuantity.value.push(e.name);
-    dataQuantity.value.push(getQuantity(e.product_details));
+  reloadQuantity();
+  reloadRevenue();
+};
+
+var chartRevenue = null;
+var chartQuantity = null;
+
+const reloadQuantity = () => {
+  productRepository.getAll().then((response) => {
+    if (response.data.status === 0) {
+      labelsQuantity.value = [];
+      dataQuantity.value = [];
+      backgroundColorQuantity.value = [];
+      products.value = response.data.products;
+      let max = 0;
+      products.value.forEach((e) => {
+        if (max < e.sold) {
+          max = e.sold;
+          bestSeller.value = e;
+          console.log(bestSeller.value.id);
+        }
+        labelsQuantity.value.push(e.name);
+        dataQuantity.value.push(getQuantity(e.product_details));
+        backgroundColorQuantity.value.push(getRandomRGBColor());
+      });
+      if (chartQuantity) {
+        chartQuantity.data.labels = labelsQuantity.value;
+        chartQuantity.data.datasets[0].data = dataQuantity.value;
+        chartQuantity.data.datasets[0].backgroundColor =
+          backgroundColorQuantity.value;
+        chartQuantity.update();
+      }
+    }
+    if (response.data.status === 1) {
+    }
   });
-  store.dispatch("statistics/getRevenue", range);
-  revenue.value.forEach((e) => {
-    labelsRevenue.value.push(`${e.month}/${e.year}`);
-    dataRevenue.value.push(e.revenue);
+};
+
+const reloadRevenue = () => {
+  statisticRepository.getRevenueByMonth(range).then((response) => {
+    if (response.data.status === 0) {
+      labelsRevenue.value = [];
+      dataRevenue.value = [];
+      backgroundColorRevenue.value = [];
+      response.data.data.forEach((e) => {
+        labelsRevenue.value.push(`${e.month}/${e.year}`);
+        backgroundColorRevenue.value.push(getRandomRGBColor());
+        dataRevenue.value.push(e.revenue);
+      });
+      if (chartRevenue) {
+        chartRevenue.data.labels = labelsRevenue.value;
+        chartRevenue.data.datasets[0].data = dataRevenue.value;
+        chartRevenue.data.datasets[0].backgroundColor =
+          backgroundColorRevenue.value;
+        chartRevenue.update();
+      }
+    }
   });
 };
 
@@ -123,11 +186,14 @@ const getQuantity = (product_details) => {
   return rs;
 };
 
-const changeRange = () => {
-  store.dispatch("statistics/getRevenue", range);
-};
-
-const getConfig = (labels, data, label, type, options = { scales: {} }) => {
+const getConfig = (
+  labels,
+  data,
+  label,
+  type,
+  backgroundColor = [],
+  options = { scales: {} }
+) => {
   return {
     type: type,
     data: {
@@ -137,6 +203,7 @@ const getConfig = (labels, data, label, type, options = { scales: {} }) => {
           label: label,
           data: data,
           borderWidth: 1,
+          backgroundColor: backgroundColor,
         },
       ],
     },
@@ -144,31 +211,25 @@ const getConfig = (labels, data, label, type, options = { scales: {} }) => {
   };
 };
 
-watch(
-  () => revenue.value,
-  (newValue, oldValue) => {
-    if (JSON.stringify(newValue) != JSON.stringify(oldValue)) {
-      labelsRevenue.value = [];
-      dataRevenue.value = [];
-      newValue.forEach((e) => {
-        labelsRevenue.value.push(`${e.month}/${e.year}`);
-        dataRevenue.value.push(e.revenue);
-      });
-      chartRevenue.data.labels = labelsRevenue.value;
-      chartRevenue.data.datasets[0].data = dataRevenue.value;
-      chartRevenue.update();
-    }
-  }
-);
+const getRandomRGBColor = () => {
+  const red = Math.floor(Math.random() * 256);
+  const green = Math.floor(Math.random() * 256);
+  const blue = Math.floor(Math.random() * 256);
 
-var chartRevenue = null;
-var chartQuantity = null;
+  return `rgb(${red}, ${green}, ${blue})`;
+};
 
 onMounted(() => {
   reload();
   chartRevenue = new Chart(
     $("#chartRevenue"),
-    getConfig(labelsRevenue.value, dataRevenue.value, "Doanh thu", "bar")
+    getConfig(
+      labelsRevenue.value,
+      dataRevenue.value,
+      "Doanh thu",
+      "bar",
+      backgroundColorRevenue.value
+    )
   );
 
   chartQuantity = new Chart(
@@ -177,7 +238,8 @@ onMounted(() => {
       labelsQuantity.value,
       dataQuantity.value,
       "Số lượng hàng trong kho",
-      "doughnut"
+      "doughnut",
+      backgroundColorQuantity.value
     )
   );
 });

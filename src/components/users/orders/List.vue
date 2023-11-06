@@ -65,7 +65,6 @@
     v-if="order"
     class="modal fade"
     id="modalEdit"
-    :edit="edit"
     :order="order"
     @change-status="changeStatus"
   />
@@ -76,9 +75,7 @@ import 'datatables.net-responsive-bs5';
 
 import {
   computed,
-  inject,
   onMounted,
-  reactive,
   ref,
 } from 'vue';
 
@@ -88,7 +85,6 @@ import ButtonsHtml5 from 'datatables.net-buttons/js/buttons.html5';
 import DataTable from 'datatables.net-vue3';
 import pdfmake from 'pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
 import { RepositoryFactory } from '@/api/repositories/RepositoryFactory.js';
@@ -108,12 +104,9 @@ DataTable.use(ButtonsHtml5);
 
 const toast = useToasted();
 const store = useStore();
-const router = useRouter();
-const emitter = inject("emitter");
 const orderRepository = RepositoryFactory.get("order");
 
 const duration_time = process.env.VUE_APP_DURATION_TOAST ?? 3000;
-const list_order_id = ref([]);
 
 const orders = computed(() => {
   let user = JSON.parse(localStorage.getItem("user"));

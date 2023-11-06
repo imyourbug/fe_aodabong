@@ -370,6 +370,27 @@ const vouchers = computed(() => {
   });
 });
 
+// validate
+const valid_number_phone = helpers.regex(/^0\d{9}$/);
+
+const rules = {
+  name: { required: helpers.withMessage("Không được để trống!", required) },
+  email: {
+    required: helpers.withMessage("Không được để trống!", required),
+    email: helpers.withMessage("Email không hợp lệ!", email),
+  },
+  address: { required: helpers.withMessage("Không được để trống!", required) },
+  phone: {
+    required: helpers.withMessage("Không được để trống!", required),
+    valid_number_phone: helpers.withMessage(
+      "Số điện thoại không hợp lệ!",
+      valid_number_phone
+    ),
+  },
+};
+
+const v$ = useVuelidate(rules, customer);
+
 emitter.on("checkoutSuccess", (total_money) => {
   // insert data to database
   checkOut(total_money);
@@ -439,26 +460,6 @@ const loadCart = () => {
   carts.value = JSON.parse(localStorage.getItem("carts"));
 };
 
-// validate
-const valid_number_phone = helpers.regex(/^0\d{9}$/);
-
-const rules = {
-  name: { required: helpers.withMessage("Không được để trống!", required) },
-  email: {
-    required: helpers.withMessage("Không được để trống!", required),
-    email: helpers.withMessage("Email không hợp lệ!", email),
-  },
-  address: { required: helpers.withMessage("Không được để trống!", required) },
-  phone: {
-    required: helpers.withMessage("Không được để trống!", required),
-    valid_number_phone: helpers.withMessage(
-      "Số điện thoại không hợp lệ!",
-      valid_number_phone
-    ),
-  },
-};
-
-const v$ = useVuelidate(rules, customer);
 // order
 const order = () => {
   v$.value.$validate();

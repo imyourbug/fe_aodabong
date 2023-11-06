@@ -23,4 +23,10 @@ export default {
       status: status,
     });
   },
+  searchOrder(order) {
+    return getAxios().post(`${baseUrl}/search`, {
+      id: order.id,
+      email: order.email,
+    });
+  },
 };

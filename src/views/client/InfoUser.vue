@@ -44,7 +44,6 @@ const clientRepository = RepositoryFactory.get("client");
 const provinceRepository = RepositoryFactory.get("province");
 const emitter = inject("emitter");
 
-const domain = process.env.VUE_APP_DOMAIN_URL;
 const user = ref({});
 const isEdit = ref(false);
 const source = reactive({

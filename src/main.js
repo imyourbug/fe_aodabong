@@ -18,7 +18,7 @@ import router from './routes';
 
 const emitter = mitt();
 const app = createApp(App);
-let gauthClientId = process.env.VUE_APP_GOOGLE_OAUTH_CLIENT_ID;
+const gauthClientId = process.env.VUE_APP_GOOGLE_OAUTH_CLIENT_ID;
 
 app.provide("emitter", emitter);
 app.use(Toasted); // You can pass options as a second parameter

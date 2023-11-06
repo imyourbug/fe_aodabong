@@ -44,7 +44,7 @@
     </div>
     <div class="group-product">
       <div class="album bg-light">
-        <div v-if="category.detail" class="container" >
+        <div v-if="category.detail" class="container">
           <div class="block-text-1">
             <div class="block-text-left">
               <a class="btn-left"
@@ -60,46 +60,119 @@
               ></a>
             </div>
           </div>
-          <div
-            class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3"
-            v-if="
-              category.detail.products && category.detail.products.length > 0
-            "
-          >
-            <div
-              class="col"
-              v-for="(product, key) in category.detail.products"
-              :key="key"
-            >
-              <router-link
-                :to="{
-                  name: 'product_detail',
-                  params: { id: product.id },
-                }"
-              >
-                <div class="block-product">
-                  <a> <img :src="product.thumb" /></a>
-                  <a>
-                    <p>{{ product.name }}</p>
-                  </a>
-                  <p v-html="showPrice(product.price, product.price_sale)"></p>
-                  <div
-                      class=""
-                      style="
-                        display: flex;
-                        justify-content: space-around;
-                        align-items: center;
-                      "
-                    >
-                      <a class="detail"> Chi tiết</a>
-                      <p style="font-size: 12px">Đã bán {{ product.sold }}</p>
-                    </div>
-                </div>
-              </router-link>
+          <div class="row">
+            <div class="col-lg-3 col-md-2">
+              <p class="mt-2">Sắp xếp</p>
+              <div class="form-group">
+                <label for="">Theo tên</label>
+                <select
+                  class="form-select"
+                  v-model="filter.sortAlphabet"
+                  @change="filterProduct(category_id, 'sort-name')"
+                >
+                  <option value="">--Nhập lựa chọn--</option>
+                  <option value="ASC">A - Z</option>
+                  <option value="DESC">Z - A</option>
+                </select>
+              </div>
+              <div class="form-group mt-2">
+                <label for="">Giá</label>
+                <select
+                  class="form-select"
+                  v-model="filter.sortPrice"
+                  @change="filterProduct(category_id, 'sort-price')"
+                >
+                  <option value="">--Nhập lựa chọn--</option>
+                  <option value="ASC">Tăng dần</option>
+                  <option value="DESC">Giảm dần</option>
+                </select>
+              </div>
+              <div class="form-group mt-2">
+                <label for="">Bán chạy</label>
+                <select
+                  class="form-select"
+                  v-model="filter.sortSold"
+                  @change="filterProduct(category_id, 'sort-sold')"
+                >
+                  <option value="">--Nhập lựa chọn--</option>
+                  <option value="ASC">Tăng dần</option>
+                  <option value="DESC">Giảm dần</option>
+                </select>
+              </div>
+              <p class="mt-2">Lọc</p>
+              <div class="form-group">
+                <label for="">Theo giá</label>
+                <select
+                  @change="filterProduct(category_id, 'filter-price')"
+                  class="form-select"
+                  v-model="filter.price"
+                >
+                  <option value="">--Tất cả--</option>
+                  <option value="0-1000000">0 - 1.000.000 VNĐ</option>
+                  <option value="1000000-2000000">
+                    1.000.000 - 2.000.000 VNĐ
+                  </option>
+                  <option value="2000000-3000000">
+                    2.000.000 - 3.000.000 VNĐ
+                  </option>
+                  <option value="3000000-4000000">
+                    3.000.000 - 4.000.000 VNĐ
+                  </option>
+                  <option value="4000000-5000000">
+                    4.000.000 - 5.000.000 VNĐ
+                  </option>
+                  <option value="5000000-99999999999">
+                    5.000.000 VNĐ trở lên
+                  </option>
+                </select>
+              </div>
             </div>
-          </div>
-          <div v-else>
-            <ProductEmpty />
+            <div class="col-lg-9 col-md-8">
+              <div
+                class="row row-cols-1 row-cols-sm-2 row-cols-md-5 g-3"
+                v-if="
+                  category.detail.products &&
+                  category.detail.products.length > 0
+                "
+              >
+                <div
+                  class="col"
+                  v-for="(product, key) in category.detail.products"
+                  :key="key"
+                >
+                  <router-link
+                    :to="{
+                      name: 'product_detail',
+                      params: { id: product.id },
+                    }"
+                  >
+                    <div class="block-product">
+                      <a> <img :src="product.thumb" /></a>
+                      <a>
+                        <p>{{ product.name }}</p>
+                      </a>
+                      <p
+                        v-html="showPrice(product.price, product.price_sale)"
+                      ></p>
+                      <div
+                        class=""
+                        style="
+                          display: flex;
+                          justify-content: space-around;
+                          align-items: center;
+                        "
+                      >
+                        <a class="detail"> Chi tiết</a>
+                        <p style="font-size: 12px">Đã bán {{ product.sold }}</p>
+                      </div>
+                    </div>
+                  </router-link>
+                </div>
+              </div>
+              <div v-else>
+                <ProductEmpty />
+              </div>
+            </div>
           </div>
         </div>
         <br />
@@ -139,6 +212,8 @@
 <script setup>
 import {
   computed,
+  reactive,
+  ref,
   watch,
 } from 'vue';
 
@@ -152,6 +227,13 @@ import ProductEmpty from '../../components/products/ProductEmpty.vue';
 const router = useRouter();
 const store = useStore();
 
+const filter = reactive({
+  sortAlphabet: "",
+  sortSold: "",
+  sortPrice: "",
+  price: "",
+});
+
 const category_id = computed(() => {
   return router.currentRoute.value.params.id_category;
 });
@@ -160,24 +242,40 @@ const category = computed(() => {
   return store.state.categories.detail;
 });
 
-const reload = () => {
-  store.dispatch("categories/getDetailCategory", category_id.value);
-  console.log("error", category.value);
+const reload = (category_id) => {
+  store.dispatch("categories/getDetailCategory", category_id);
 };
 
-reload();
+const filterProduct = (category_id, type) => {
+  switch (type) {
+    case "sort-price":
+      filter.sortAlphabet = filter.sortSold = "";
+      break;
+    case "sort-sold":
+      filter.sortAlphabet = filter.sortPrice = "";
+      break;
+    case "sort-name":
+      filter.sortSold = filter.sortPrice = "";
+      break;
+    default:
+      filter.sortAlphabet = filter.sortPrice = filter.sortSold = "";
+      break;
+  }
+  store.dispatch("categories/filterCategory", [category_id, filter]);
+};
+
+reload(category_id.value);
 
 const reloadGroupProduct = (cate_id) => {
   router.push({
     path: `/categories/${cate_id}`,
   });
-  store.dispatch("categories/getDetailCategory", cate_id);
 };
 
 watch(
   () => category_id.value,
   (newValue) => {
-    store.dispatch("categories/getDetailCategory", newValue);
+    reload(newValue);
   }
 );
 </script>

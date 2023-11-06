@@ -126,6 +126,7 @@ function saveUser(user) {
 }
 
 function getStatusOrder(status) {
+  console.log(status);
   let rs = "";
   switch (parseInt(status)) {
     case 1:
@@ -135,16 +136,20 @@ function getStatusOrder(status) {
       rs = '<span class="btn btn-info btn-rounded">Đang giao</span>';
       break;
     case 3:
-      rs = '<span class="btn btn btn-secondary btn-rounded">Shipper đã giao</span>';
-      break;
-    case 4:
       rs = '<span class="btn btn-dark btn-rounded">Chờ xác nhận hủy</span>';
       break;
-    case 5:
+    case 4:
       rs = '<span class="btn btn-danger btn-rounded">Đã hủy</span>';
       break;
+    case 5:
+      rs =
+        '<span class="btn btn-success btn-rounded">Giao hàng thành công</span>';
+      break;
     case 6:
-      rs = '<span class="btn btn-success btn-rounded">Giao hàng thành công</span>';
+      rs = '<span class="btn btn-warning btn-rounded">Đang trả hàng</span>';
+      break;
+    case 7:
+      rs = '<span class="btn btn-success btn-rounded">Đã trả hàng</span>';
       break;
     default:
       rs = '<span class="btn btn-warning btn-rounded">Chờ xác nhận</span>';

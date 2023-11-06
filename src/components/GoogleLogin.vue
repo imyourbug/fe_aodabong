@@ -15,7 +15,6 @@ import { RepositoryFactory } from '@/api/repositories/RepositoryFactory.js';
 import {
   saveUser,
   setCookie,
-  showToastSuccess,
 } from '@/helpers/helper.js';
 
 const emitter = inject("emitter");

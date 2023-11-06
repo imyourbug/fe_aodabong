@@ -56,11 +56,12 @@
           <div class="mb-3">
             <label class="form-label">Size</label>
             <select class="form-control" v-model="detail_product.size">
-              <option value="S">S</option>
-              <option value="M">M</option>
-              <option value="L">L</option>
-              <option value="XL">XL</option>
-              <option value="XXL">XXL</option>
+              <option value="38">38</option>
+              <option value="39">39</option>
+              <option value="40">40</option>
+              <option value="41">41</option>
+              <option value="42">42</option>
+              <option value="43">43</option>
             </select>
             <div :class="{ error: v$.size.$errors.length }">
               <div

@@ -15,7 +15,7 @@
             >
               <slide v-for="(product, key) in products" :key="key">
                 <router-link :to="`/products/detail/${product.id}`">
-                  <div class="block-product">
+                  <div class="block-product" style="min-height: 100%;">
                     <a> <img :src="product.thumb" /></a>
                     <a>
                       <p>{{ product.name }}</p>

@@ -6,23 +6,45 @@
           <h5 class="modal-title">Chi tiết đơn hàng</h5>
         </div>
         <div class="modal-body">
-          <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">
-              Danh sách sản phẩm
-            </h6>
+          <div class="mb-3">
+            <table class="tbl-info">
+              <tr>
+                <td class="fw-bold">Mã đơn hàng</td>
+                <td>{{ order.id }}</td>
+              </tr>
+              <tr>
+                <td class="fw-bold">Khách hàng</td>
+                <td>{{ order.customer.name }}</td>
+              </tr>
+              <tr>
+                <td class="fw-bold">Số điện thoại</td>
+                <td>{{ order.customer.phone }}</td>
+              </tr>
+              <tr>
+                <td class="fw-bold">Email</td>
+                <td>{{ order.customer.email }}</td>
+              </tr>
+              <tr>
+                <td class="fw-bold">Tổng tiền</td>
+                <td>{{ `${formatCash(order.total_money)} VNĐ` }}</td>
+              </tr>
+              <tr>
+                <td class="fw-bold">Trạng thái</td>
+                <td v-html="getStatusOrder(order.status)"></td>
+              </tr>
+            </table>
           </div>
           <div class="card-body">
             <div class="table-responsive">
-               <DataTable
+              <DataTable
                 :data="order.order_details"
                 :columns="columns"
                 class="display table table-striped table-bordered table-order"
                 :options="{
                   responsive: true,
                   autoWidth: true,
-                  dom: 'BRlftip',
+                  dom: 'BRltip',
                   language: {
-                    search: 'Tìm kiếm',
                     zeroRecords: 'Không có bản ghi nào',
                     info: 'Chi tiết đơn hàng',
                     paginate: {
@@ -53,27 +75,35 @@
                     <th>Giá tiền</th>
                   </tr>
                 </tfoot>
-              </DataTable> 
+              </DataTable>
             </div>
           </div>
           <button
             v-if="order.status == 0"
             id="btn-edit"
             class="btn btn-danger btn-rounded"
-            @click="emit('changeStatus', 4)"
+            @click="emit('changeStatus', 3)"
           >
             Hủy đơn hàng
           </button>
           <button
-            v-if="order.status == 3"
+            v-if="order.status == 2"
             id="btn-edit"
             class="btn btn-success btn-rounded"
+            @click="emit('changeStatus', 5)"
+          >
+            Đã nhận được hàng</button
+          >&emsp13;
+          <button
+            v-if="order.status == 2"
+            id="btn-edit"
+            class="btn btn-warning btn-rounded"
             @click="emit('changeStatus', 6)"
           >
-            Đã nhận được hàng
+            Trả hàng
           </button>
           <button
-            v-if="order.status == 4"
+            v-if="order.status == 3"
             id="btn-edit"
             class="btn btn-success btn-rounded"
             @click="emit('changeStatus', 0)"
@@ -97,8 +127,6 @@ import 'datatables.net-responsive-bs5';
 import {
   defineEmits,
   defineProps,
-  ref,
-  watch,
 } from 'vue';
 
 import DataTablesCore from 'datatables.net';
@@ -108,7 +136,10 @@ import DataTable from 'datatables.net-vue3';
 import pdfmake from 'pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 
-import { formatCash } from '@/helpers/helper';
+import {
+  formatCash,
+  getStatusOrder,
+} from '@/helpers/helper';
 
 pdfmake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -118,7 +149,6 @@ DataTable.use(ButtonsHtml5);
 
 const props = defineProps({
   order: Object,
-  edit: Function,
 });
 
 const emit = defineEmits(["changeStatus"]);
@@ -158,13 +188,7 @@ const columns = [
 </script>
 
 <style scoped>
-.card-header {
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
+.tbl-info th, .tbl-info td {
+  padding: 5px;
 }
-.thumb {
-  width: 50px;
-  height: 50px;
-}
-</style>
+ </style>

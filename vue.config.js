@@ -4,7 +4,7 @@ module.exports = defineConfig({
     entry: "./src/main.js",
     devServer: {
       hot: true,
-      host: 'web_preview.test'
+      host: 'soccer_store.test'
     },
     watch: true,
     watchOptions: {

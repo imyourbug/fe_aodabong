@@ -1,13 +1,13 @@
 <template>
   <div class="user-header">
-    <router-link :to="{ name: 'info_user' }"
-      ><i class="fa-solid fa-user"></i> Tài khoản</router-link
-    >
-    <br />
     <router-link v-if="user?.role == 1" :to="{ name: 'admin-home' }"
       ><i class="fa-solid fa-user"></i> Quản lý</router-link
     >
     <br v-if="user?.role == 1" />
+    <router-link :to="{ name: 'info_user' }"
+      ><i class="fa-solid fa-user"></i> Tài khoản</router-link
+    >
+    <br />
     <a
       data-toggle="modal"
       data-dismiss="modal"

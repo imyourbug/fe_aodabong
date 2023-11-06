@@ -23,7 +23,7 @@
           </div>
         </div>
       </div>
-      <div class="col-8"><Slide :slides="slides" /></div>
+      <div class="col-9"><Slide :slides="slides" /></div>
     </div>
     <br />
     <ListProduct

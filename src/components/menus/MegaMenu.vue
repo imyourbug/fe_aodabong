@@ -29,7 +29,7 @@
             :to="{
               path: getUrlByCategory(category.id),
             }"
-            class="nav-link catogary"
+            class="nav-link category"
             id="navbarDropdown"
             role="button"
             data-toggle="dropdown"
@@ -78,6 +78,21 @@
               </div>
             </div>
           </div>
+        </li>
+        <li
+          class="nav-item dropdown"
+        >
+          <router-link
+            :to="{name: 'order_search'}"
+            class="nav-link category"
+            id="navbarDropdown"
+            role="button"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            <strong>Tra cứu đơn hàng</strong>&ensp;
+      </router-link>
         </li>
       </ul>
     </div>
@@ -150,13 +165,13 @@ a.i {
   color: white;
 }
 
-a.catogary {
+a.category {
   margin-left: -24px;
   color: white;
   padding: 10px 0px;
 }
 .navbar-brand:hover,
-a.catogary:hover {
+a.category:hover {
   background-color: #ed1a29;
 }
 

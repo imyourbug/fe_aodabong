@@ -28,7 +28,7 @@
                 :options="{
                   responsive: true,
                   autoWidth: true,
-                  dom: 'BRlftip',
+                  dom: 'BRltip',
                   language: {
                     search: 'Tìm kiếm',
                     zeroRecords: 'Không có bản ghi nào',
@@ -81,12 +81,20 @@
             Đã lấy hàng
           </button>
           <button
-            v-if="data.status == 4"
+            v-if="data.status == 3"
             id="btn-edit"
             class="btn btn-danger btn-rounded"
-            @click="emit('changeStatus', 5)"
+            @click="emit('changeStatus', 4)"
           >
             Xác nhận hủy
+          </button>
+          <button
+            v-if="data.status == 6"
+            id="btn-edit"
+            class="btn btn-success btn-rounded"
+            @click="emit('changeStatus', 7)"
+          >
+            Đã nhận hàng hoàn
           </button>
         </div>
         <div class="modal-footer">

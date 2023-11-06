@@ -20,11 +20,9 @@ import GroupProduct from '@/views/client/GroupProduct.vue';
 import Home from '@/views/client/Home.vue';
 import InfoUser from '@/views/client/InfoUser.vue';
 import Main from '@/views/client/Main.vue';
+import OrderSearch from '@/views/client/OrderSearch.vue';
 import ProductDetail from '@/views/client/ProductDetail.vue';
 import SearchProduct from '@/views/client/SearchProduct.vue';
-
-const JWT_TOKEN = getCookie("access_token");
-const user = JSON.parse(localStorage.getItem("user"));
 
 const routes = [
   {
@@ -74,6 +72,11 @@ const routes = [
         path: "/categories/:id_category",
         name: "group_product",
         component: GroupProduct,
+      },
+      {
+        path: "/orders/search",
+        name: "order_search",
+        component: OrderSearch,
       },
     ],
   },
@@ -135,6 +138,8 @@ const router = createRouter({ history: createWebHistory(), routes });
 
 // Middleware
 router.beforeEach((to, from, next) => {
+  const JWT_TOKEN = getCookie("access_token");
+  const user = JSON.parse(localStorage.getItem("user"));
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!user || JWT_TOKEN == null) {
       next("/");
