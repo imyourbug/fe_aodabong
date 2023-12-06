@@ -9,29 +9,29 @@ export default {
   getAll() {
     return getAxios().get(`${baseUrl}/list`);
   },
-  getDetail(product_id) {
-    return getAxios().get(`${baseUrl}/detail/${product_id}`);
+  getDetail(supplier_id) {
+    return getAxios().get(`${baseUrl}/detail/${supplier_id}`);
   },
-  create(product) {
+  create(supplier) {
     return getAxios().post(`${baseUrl}/create`, {
-      name: product.name,
-      parent_id: product.parent_id,
-      description: product.description,
-      active: product.active,
+      name: supplier.name,
+      email: supplier.email,
+      address: supplier.address,
+      phone: supplier.phone,
     });
   },
-  remove(product_id) {
+  remove(supplier_id) {
     return getAxios().delete(`${baseUrl}/delete`, {
-      data: { id: product_id },
+      data: { id: supplier_id },
     });
   },
-  edit(product) {
+  edit(supplier) {
     return getAxios().put(`${baseUrl}/update`, {
-      id: product.id,
-      name: product.name,
-      parent_id: product.parent_id,
-      description: product.description,
-      active: product.active,
+      id: supplier.id,
+      name: supplier.name,
+      email: supplier.email,
+      address: supplier.address,
+      phone: supplier.phone,
     });
   },
 };

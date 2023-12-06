@@ -22,26 +22,23 @@
           </div>
           <div class="card-body">
             <div class="chart-area">
+              <table>
+                <tr>
+                  <td>Doanh thu tháng hiện tại:</td>
+                  <td>&emsp13;</td>
+                  <td>{{ formatCash(revenueThisMonth) }} VNĐ</td>
+                </tr>
+                <tr>
+                  <td>Tổng doanh thu:</td>
+                  <td>&emsp13;</td>
+                  <td>{{ formatCash(totalRevenue) }} VNĐ</td>
+                </tr>
+              </table>
               <canvas id="chartRevenue"></canvas>
             </div>
             <hr />
           </div>
         </div>
-
-        <!-- Bar Chart -->
-        <!-- <div class="card shadow mb-4">
-          <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Bar Chart</h6>
-          </div>
-          <div class="card-body">
-            <div class="chart-area">
-              <canvas id="myBarChart"></canvas>
-            </div>
-            <hr />
-            Styling for the bar chart can be found in the
-            <code>/js/demo/chart-bar-demo.js</code> file.
-          </div>
-        </div> -->
       </div>
 
       <!-- Donut Chart -->
@@ -70,11 +67,11 @@
         <div class="card shadow mb-4">
           <!-- Card Header - Dropdown -->
           <div class="card-header py-3">
-            <h6 class="font-weight-bold text-primary">Sản phẩm</h6>
+            <h6 class="font-weight-bold text-primary">Đơn hàng</h6>
           </div>
           <!-- Card Body -->
           <div class="card-body">
-            <div class="" v-if="bestSeller">
+            <!-- <div class="" v-if="bestSeller">
               Sản phẩm bán chạy nhất:
               <router-link
                 :to="{
@@ -83,7 +80,54 @@
                 }"
                 >{{ bestSeller.name }}
               </router-link>
-            </div>
+            </div> -->
+            <table>
+                <tr>
+                  <td>Tổng số đơn đã đặt:</td>
+                  <td>&emsp13;</td>
+                  <td>{{ orders.length }}</td>
+                </tr>
+                <tr>
+                  <td>Tổng số đơn đang chờ xác nhận:</td>
+                  <td>&emsp13;</td>
+                  <td>{{ getTypeOrder(0) }}</td>
+                </tr>
+                <tr>
+                  <td>Tổng số đơn đang chờ lấy hàng:</td>
+                  <td>&emsp13;</td>
+                  <td>{{ getTypeOrder(1) }}</td>
+                </tr>
+                <tr>
+                  <td>Tổng số đơn đang giao:</td>
+                  <td>&emsp13;</td>
+                  <td>{{ getTypeOrder(2) }}</td>
+                </tr>
+                <tr>
+                  <td>Tổng số đơn đang chờ hủy:</td>
+                  <td>&emsp13;</td>
+                  <td>{{ getTypeOrder(3) }}</td>
+                </tr>
+                <tr>
+                  <td>Tổng số đơn đã hủy:</td>
+                  <td>&emsp13;</td>
+                  <td>{{ getTypeOrder(4) }}</td>
+                </tr>
+                <tr>
+                  <td>Tổng số đơn đã giao thành công:</td>
+                  <td>&emsp13;</td>
+                  <td>{{ getTypeOrder(5) }}</td>
+                </tr>
+                <tr>
+                  <td>Tổng số đơn đang trả hàng:</td>
+                  <td>&emsp13;</td>
+                  <td>{{ getTypeOrder(6) }}</td>
+                </tr>
+                <tr>
+                  <td>Tổng số đơn đã trả hàng:</td>
+                  <td>&emsp13;</td>
+                  <td>{{ getTypeOrder(7) }}</td>
+                </tr>
+              </table>
           </div>
         </div>
       </div>
@@ -91,18 +135,15 @@
   </div>
 </template>
 <script setup>
-import {
-  onMounted,
-  reactive,
-  ref,
-} from 'vue';
+import { onMounted, reactive, ref } from "vue";
+import { formatCash } from "@/helpers/helper";
+import Chart from "chart.js/auto";
 
-import Chart from 'chart.js/auto';
-
-import { RepositoryFactory } from '@/api/repositories/RepositoryFactory.js';
+import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
 
 const productRepository = RepositoryFactory.get("product");
 const statisticRepository = RepositoryFactory.get("statistic");
+const orderRepository = RepositoryFactory.get("order");
 
 const dataQuantity = ref([]);
 const labelsQuantity = ref([]);
@@ -111,14 +152,32 @@ const backgroundColorRevenue = ref([]);
 const dataRevenue = ref([]);
 const labelsRevenue = ref([]);
 const bestSeller = ref(null);
+const orders = ref([]);
+const totalRevenue = ref(0);
+const revenueThisMonth = ref(0);
 const range = reactive({
   from: "",
   to: "",
 });
 
 const reload = () => {
+  getAllOrder();
   reloadQuantity();
   reloadRevenue();
+};
+
+const getTypeOrder = (status) => {
+  return orders.value.filter((i) => {
+    return i.status === status;
+  }).length;
+};
+
+const getAllOrder = () => {
+  orderRepository.getAllOrders().then((response) => {
+    if (response.data.status === 0) {
+      orders.value = response.data.orders;
+    }
+  });
 };
 
 var chartRevenue = null;
@@ -161,10 +220,19 @@ const reloadRevenue = () => {
       labelsRevenue.value = [];
       dataRevenue.value = [];
       backgroundColorRevenue.value = [];
+      totalRevenue.value = 0;
+      let date = new Date();
       response.data.data.forEach((e) => {
+        revenueThisMonth.value += parseInt(
+          e.month == date.getMonth() && e.year == date.getFullYear()
+            ? e.revenue
+            : 0
+        );
         labelsRevenue.value.push(`${e.month}/${e.year}`);
         backgroundColorRevenue.value.push(getRandomRGBColor());
         dataRevenue.value.push(e.revenue);
+        console.log(e.revenue);
+        totalRevenue.value += parseInt(e.revenue);
       });
       if (chartRevenue) {
         chartRevenue.data.labels = labelsRevenue.value;

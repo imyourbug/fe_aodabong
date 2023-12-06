@@ -3,6 +3,7 @@ import {
   createStore,
 } from 'vuex';
 
+import accounts from '@/store/modules/accounts';
 import carts from '@/store/modules/carts';
 import categories from '@/store/modules/categories';
 import comments from '@/store/modules/comments';
@@ -20,6 +21,7 @@ const debug = process.env.NODE_ENV !== "production";
 export default createStore({
   modules: {
     products,
+    accounts,
     categories,
     suppliers,
     detail_products,

@@ -24,6 +24,7 @@ import VoucherRepository from '@/api/repositories/vouchers/VoucherRepository';
 
 const repositories = {
   color: ColorRepository,
+  account: AccountRepository,
   size: SizeRepository,
   category: CategoryRepository,
   supplier: SupplierRepository,

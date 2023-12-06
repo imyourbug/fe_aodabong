@@ -33,6 +33,30 @@
       <a
         class="nav-link collapsed"
         data-toggle="collapse"
+        data-target="#accounts"
+        aria-expanded="true"
+        aria-controls="collapseTwo"
+      >
+        <i class="fas fa-fw fa-cog"></i>
+        <span>Tài khoản</span>
+      </a>
+      <div
+        id="accounts"
+        class="collapse"
+        aria-labelledby="headingTwo"
+        data-parent="#accordionSidebar"
+      >
+        <div class="bg-white py-2 collapse-inner rounded">
+          <router-link class="collapse-item" :to="{ name: 'list-account' }"
+            >Danh sách</router-link
+          >
+        </div>
+      </div>
+    </li>
+    <li class="nav-item">
+      <a
+        class="nav-link collapsed"
+        data-toggle="collapse"
         data-target="#categories"
         aria-expanded="true"
         aria-controls="collapseTwo"
@@ -48,6 +72,30 @@
       >
         <div class="bg-white py-2 collapse-inner rounded">
           <router-link class="collapse-item" :to="{ name: 'list-category' }"
+            >Danh sách</router-link
+          >
+        </div>
+      </div>
+    </li>
+    <li class="nav-item">
+      <a
+        class="nav-link collapsed"
+        data-toggle="collapse"
+        data-target="#suppliers"
+        aria-expanded="true"
+        aria-controls="collapseTwo"
+      >
+        <i class="fas fa-fw fa-cog"></i>
+        <span>Nhà cung cấp</span>
+      </a>
+      <div
+        id="suppliers"
+        class="collapse"
+        aria-labelledby="headingTwo"
+        data-parent="#accordionSidebar"
+      >
+        <div class="bg-white py-2 collapse-inner rounded">
+          <router-link class="collapse-item" :to="{ name: 'list-supplier' }"
             >Danh sách</router-link
           >
         </div>
@@ -179,7 +227,9 @@
         data-parent="#accordionSidebar"
       >
         <div class="bg-white py-2 collapse-inner rounded">
-          <router-link class="collapse-item" :to="{ name: 'statistics-revenue' }"
+          <router-link
+            class="collapse-item"
+            :to="{ name: 'statistics-revenue' }"
             >Doanh thu</router-link
           >
         </div>

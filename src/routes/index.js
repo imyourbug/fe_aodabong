@@ -6,6 +6,7 @@ import {
 
 import Checkout from '@/components/checkouts/PaypalCheckout.vue';
 import { getCookie } from '@/helpers/helper.js';
+import ListAccount from '@/views/admin/accounts/List.vue';
 import ListCategory from '@/views/admin/categories/List.vue';
 import AdminHome from '@/views/admin/Home.vue';
 import ListOrder from '@/views/admin/orders/List.vue';
@@ -14,6 +15,7 @@ import ListProduct from '@/views/admin/products/list/Index.vue';
 import ListShipment from '@/views/admin/shipments/List.vue';
 import ListSlide from '@/views/admin/slides/List.vue';
 import StatisticsRevenue from '@/views/admin/statistics/Revenue.vue';
+import ListSupplier from '@/views/admin/suppliers/List.vue';
 import ListVoucher from '@/views/admin/vouchers/List.vue';
 import Cart from '@/views/client/Cart.vue';
 import GroupProduct from '@/views/client/GroupProduct.vue';
@@ -91,9 +93,19 @@ const routes = [
     },
     children: [
       {
+        path: "accounts/list",
+        name: "list-account",
+        component: ListAccount,
+      },
+      {
         path: "categories/list",
         name: "list-category",
         component: ListCategory,
+      },
+      {
+        path: "suppliers/list",
+        name: "list-supplier",
+        component: ListSupplier,
       },
       {
         path: "products/list",
