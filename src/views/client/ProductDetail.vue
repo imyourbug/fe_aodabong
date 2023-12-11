@@ -483,7 +483,7 @@ a {
   height: 100%;
 }
 .img-detail {
-  width: 400px;
+  width: 100%;
   height: 400px;
 }
 /* .block-content */
