@@ -51,7 +51,7 @@
           <div class="mb-3">
             <label class="form-label">Ảnh</label>
             <input @change="uploadImage" type="file" class="form-control" />
-            <img :src="product.thumb" />
+            <img style="width: 100px; height: 100px" :src="product.thumb" />
           </div>
           <div class="mb-3">
             <label class="form-label">Danh mục</label>
@@ -126,13 +126,9 @@
   </div>
 </template>
 <script setup>
-import {
-  defineProps,
-  onMounted,
-  reactive,
-} from 'vue';
+import { defineProps, onMounted, reactive } from "vue";
 
-import { useVuelidate } from '@vuelidate/core';
+import { useVuelidate } from "@vuelidate/core";
 
 const props = defineProps({
   product: Object,

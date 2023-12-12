@@ -15,8 +15,12 @@
             >
               <slide v-for="(product, key) in products" :key="key">
                 <router-link :to="`/products/detail/${product.id}`">
-                  <div class="block-product" style="min-height: 100%;">
-                    <a> <img :src="product.thumb" /></a>
+                  <div class="block-product" style="min-height: 100%">
+                    <a>
+                      <img
+                        style="width: 200px; height: 200px"
+                        :src="product.thumb"
+                    /></a>
                     <a>
                       <p>{{ product.name }}</p>
                     </a>
@@ -34,11 +38,11 @@
                       <a class="detail"> Chi tiết</a>
                       <p style="font-size: 12px">Đã bán {{ product.sold }}</p>
                     </div>
-                    <br/>
+                    <br />
                   </div>
                 </router-link>
               </slide>
-              <br/>
+              <br />
               <!-- <template #addons>
                 <navigation />
               </template> -->
@@ -52,17 +56,13 @@
 </template>
 
 <script setup>
-import 'vue3-carousel/dist/carousel.css';
+import "vue3-carousel/dist/carousel.css";
 
-import { defineProps } from 'vue';
+import { defineProps } from "vue";
 
-import {
-  Carousel,
-  Navigation,
-  Slide,
-} from 'vue3-carousel';
+import { Carousel, Navigation, Slide } from "vue3-carousel";
 
-import { showPrice } from '@/helpers/helper.js';
+import { showPrice } from "@/helpers/helper.js";
 
 const props = defineProps({
   products: Array,

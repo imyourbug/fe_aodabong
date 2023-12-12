@@ -74,17 +74,14 @@ a:hover {
 }
 .user-header {
   display: none;
-  top: 90px;
-  right: 200px;
-  border: 1px solid #2e3094;
-  border-radius: 5px;
   position: absolute;
   z-index: 9999;
+  width: max-content;
   background-color: white;
+  text-align: left; 
+  top: 30px;
+  border: 1px solid #2e3094;
+  border-radius: 5px;
   padding: 10px 15px;
-  text-align: left;
-}
-.btn-user:hover .user-header {
-  display: block;
 }
 </style>

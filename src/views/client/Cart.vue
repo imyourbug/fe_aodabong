@@ -35,7 +35,7 @@
           <tbody>
             <tr v-for="(product, key) in carts" :key="key">
               <td class="col-img">
-                <img :src="product.thumb" />&emsp;
+                <img style="width: 100px; height: 100px" :src="product.thumb" />&emsp;
                 {{ product.name }}
               </td>
               <td class="col-dongia">

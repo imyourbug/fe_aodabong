@@ -93,7 +93,7 @@
           <div class="mb-3">
             <label class="form-label">Ảnh</label>
             <input @change="uploadImage" type="file" class="form-control" />
-            <img :src="detail_product.thumb" />
+            <img style="width: 100px;height: 100px;" :src="detail_product.thumb" />
             <div :class="{ error: v$.thumb.$errors.length }">
               <div
                 class="input-errors"

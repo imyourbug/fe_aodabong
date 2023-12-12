@@ -30,13 +30,13 @@
       title="SẢN PHẨM MỚI NHẤT"
       :products="newestProducts"
       itemsToShow="5"
-      autoplay="10000000"
+      autoplay="10000"
     />
     <ListProduct
       title="SẢN PHẨM NỔI BẬT"
       :products="hottestProducts"
       itemsToShow="5"
-      autoplay="10000000"
+      autoplay="10000"
     />
     <main v-if="categories && categories.length > 0">
       <div
@@ -81,7 +81,11 @@
               >
                 <router-link :to="`/products/detail/${product.id}`">
                   <div class="block-product">
-                    <a> <img :src="product.thumb" /></a>
+                    <a>
+                      <img
+                        style="width: 200px; height: 200px"
+                        :src="product.thumb"
+                    /></a>
                     <a>
                       <p>{{ product.name }}</p>
                     </a>
@@ -140,13 +144,13 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed } from "vue";
 
-import { useStore } from 'vuex';
+import { useStore } from "vuex";
 
-import ListProduct from '@/components/sliders/ListProduct.vue';
-import Slide from '@/components/sliders/Slide.vue';
-import { showPrice } from '@/helpers/helper.js';
+import ListProduct from "@/components/sliders/ListProduct.vue";
+import Slide from "@/components/sliders/Slide.vue";
+import { showPrice } from "@/helpers/helper.js";
 
 const store = useStore();
 

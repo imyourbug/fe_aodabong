@@ -10,7 +10,10 @@
             >>
             <router-link
               v-if="data.category"
-              :to="{ name: 'group_product', params: { id_category: data.category.id } }"
+              :to="{
+                name: 'group_product',
+                params: { id_category: data.category.id },
+              }"
               style="color: #ed1a29"
             >
               {{ data.category.name }}
@@ -24,7 +27,10 @@
       <div class="row">
         <div class="col-6">
           <div class="detail-pro">
-            <img class="img-detail" :src="data.thumb" />
+            <img
+              class="img-detail"
+              :src="choice.image ? choice.image : data.thumb"
+            />
             <div class="block-khuyenmai">
               <div class="khuyenmai">
                 <i class="far fa-star"></i> Tặng ngay quả bóng đá, giày bóng đá,
@@ -202,19 +208,14 @@
 </template>
 
 <script setup>
-import {
-  inject,
-  reactive,
-  ref,
-  watch,
-} from 'vue';
+import { inject, reactive, ref, watch } from "vue";
 
-import { useRouter } from 'vue-router';
+import { useRouter } from "vue-router";
 
-import { RepositoryFactory } from '@/api/repositories/RepositoryFactory.js';
-import Rating from '@/components/rates/Rating.vue';
-import { formatCash } from '@/helpers/helper';
-import { useToasted } from '@hoppscotch/vue-toasted';
+import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
+import Rating from "@/components/rates/Rating.vue";
+import { formatCash } from "@/helpers/helper";
+import { useToasted } from "@hoppscotch/vue-toasted";
 
 const toast = useToasted();
 const router = useRouter();
@@ -239,6 +240,7 @@ const choice = reactive({
   new_color: "",
   price: 0,
   quantity: unit_in_stock.value === 0 ? 0 : 1,
+  image: "",
 });
 
 const user = ref(null);
@@ -317,6 +319,7 @@ const getUnitInStock = () => {
   choice.quantity = 1;
   let correctItem;
   data.value.product_details.forEach((item) => {
+    console.log(item);
     if (
       item.code_color === choice.new_color &&
       item.code_size === choice.new_size
@@ -326,6 +329,7 @@ const getUnitInStock = () => {
   });
   if (correctItem) {
     choice.detail_id = correctItem.id;
+    choice.image = correctItem.thumb;
     unit_in_stock.value = correctItem.unit_in_stock;
   } else {
     unit_in_stock.value = 0;

@@ -129,20 +129,19 @@ a:hover {
   justify-content: center;
   align-items: center;
 }
-/* user-header */
-.btn-user:hover .user-header {
-  display: block;
-}
+
 /* cart header */
+.cart {
+  position: relative;
+}
 .cart:hover .cart-header {
   display: block;
 }
 .cart-header {
   display: none;
-  width: 25%;
+  width: 400px;
+  right: 0px;
   height: max-content;
-  top: 80px;
-  right: 300px;
   position: absolute;
   z-index: 9999;
 }
@@ -209,5 +208,12 @@ sup.cart-quantity {
 .btn-login:hover {
   cursor: pointer;
   color: #ed1a29;
+}
+/* user-header */
+.btn-user:hover .user-header {
+  display: block;
+}
+.btn-user {
+  position: relative;
 }
 </style>

@@ -147,7 +147,11 @@
                     }"
                   >
                     <div class="block-product">
-                      <a> <img :src="product.thumb" /></a>
+                      <a>
+                        <img
+                          style="width: 100%; height: 100%"
+                          :src="product.thumb"
+                      /></a>
                       <a>
                         <p>{{ product.name }}</p>
                       </a>
@@ -210,19 +214,14 @@
 </template>
 
 <script setup>
-import {
-  computed,
-  reactive,
-  ref,
-  watch,
-} from 'vue';
+import { computed, reactive, ref, watch } from "vue";
 
-import { useRouter } from 'vue-router';
-import { useStore } from 'vuex';
+import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 
-import { showPrice } from '@/helpers/helper.js';
+import { showPrice } from "@/helpers/helper.js";
 
-import ProductEmpty from '../../components/products/ProductEmpty.vue';
+import ProductEmpty from "../../components/products/ProductEmpty.vue";
 
 const router = useRouter();
 const store = useStore();
