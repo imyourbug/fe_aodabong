@@ -28,6 +28,7 @@ export default {
   },
   edit(product_detail) {
     return getAxios().put(`${baseUrl}/update`, {
+      id: product_detail.id,
       product_id: product_detail.product_id,
       code_color: product_detail.color,
       code_size: product_detail.size,

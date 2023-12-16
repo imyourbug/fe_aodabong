@@ -1,23 +1,23 @@
 <template>
   <div class="row block-head">
-    <div class="col-6 block-head-left">
+    <div class="col-lg-6 col-sm-12 col-md-12 block-head-left">
       <router-link :to="{ name: 'home' }">Trang chủ</router-link>&emsp;
       <a href="#">Giới thiệu</a>&emsp;
       <a href="#">Dịch vụ in ấn</a>
     </div>
-    <div class="col-6 block-head-right">
+    <div class="col-lg-6 col-sm-12 col-md-12 block-head-right">
       <a href="#"><i class="fas fa-envelope"></i> Mail</a>&emsp;
       <span class="time"><i class="fas fa-clock"></i> 06:30 - 21:00</span>&emsp;
       <span><i class="fas fa-phone-alt"></i> 0368822642</span>
     </div>
   </div>
   <div class="row menu-header">
-    <div class="col-4">
+    <div class="col-lg-4 col-sm-6 col-md-6">
       <router-link class="text-menu-header" :to="{ name: 'home' }"
         ><img class="logo" src="@/assets/logo.png" /></router-link
       >&emsp;
     </div>
-    <div class="col-4 d-flex block-search">
+    <div class="col-lg-4 d-flex block-search">
       <input
         type="text"
         class="form-control me-2"
@@ -29,7 +29,7 @@
         <i class="fa-solid fa-magnifying-glass"></i>
       </button>
     </div>
-    <div class="col-4 block-user">
+    <div class="col-lg-4 col-sm-6 col-md-6 block-user">
       <div class="block-left-header">
         <router-link class="cart" to="/carts"
           ><i class="fa-solid fa-cart-shopping"></i
@@ -215,5 +215,17 @@ sup.cart-quantity {
 }
 .btn-user {
   position: relative;
+}
+
+@media (max-width: 620px){
+  .block-head, .block-search {
+    display: none !important;
+  }
+  .logo {
+    max-width: 100%;
+  }.menu-header {
+    /* margin: 0px; */
+  }
+
 }
 </style>

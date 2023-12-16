@@ -320,4 +320,5 @@ label.star:before {
 .fa-star {
   color: orange;
 }
+
 </style>

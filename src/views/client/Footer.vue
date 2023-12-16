@@ -80,4 +80,13 @@ div .text-head {
   color: rgb(150, 140, 140);
   padding: 5px 0px 5px 0px;
 }
+
+@media (max-width: 620px) {
+  .about-left, .about-mid, .text-head {
+    display: none;
+  }
+  .block-about {
+    text-align: center;
+  }
+}
 </style>

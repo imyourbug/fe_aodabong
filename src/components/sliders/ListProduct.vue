@@ -15,10 +15,13 @@
             >
               <slide v-for="(product, key) in products" :key="key">
                 <router-link :to="`/products/detail/${product.id}`">
-                  <div class="block-product" style="min-height: 100%">
+                  <div
+                    class="block-product"
+                    style="min-height: 100%; padding: 0px 10px"
+                  >
                     <a>
                       <img
-                        style="width: 200px; height: 200px"
+                        style="max-width: 200px; max-height: 200px"
                         :src="product.thumb"
                     /></a>
                     <a>
@@ -135,5 +138,20 @@ a.detail {
 a.detail:hover {
   color: #ed1a29;
   outline: 2px solid #ed1a29;
+}
+
+@media (max-width: 620px) {
+  .album {
+    margin: 0px;
+  }
+  .txt-title {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 880px) {
+   .carousel__slide {
+  width: 100% !important;
+}
 }
 </style>

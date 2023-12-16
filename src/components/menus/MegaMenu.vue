@@ -212,4 +212,13 @@ a.navbar-brand {
 span.navbar-toggler.icon {
   color: black;
 }
+
+@media (max-width: 620px){
+ .navbar-brand {
+    display: none !important;
+  }
+  .navbar {
+    padding: 0px;
+  }
+}
 </style>

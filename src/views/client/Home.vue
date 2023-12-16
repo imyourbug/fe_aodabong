@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="row slider">
-      <div class="list-danhmuc col-3">
+      <div class="list-danhmuc col-lg-3 col-md-6 col-sm-12">
         <div class="danhmuc">
           <div class="text-top">
             <i class="fas fa-bars"></i>&ensp;DANH MỤC SẢN PHẨM
@@ -23,7 +23,9 @@
           </div>
         </div>
       </div>
-      <div class="col-9"><Slide :slides="slides" /></div>
+      <div class="col-lg-9 col-md-6 col-sm-12">
+        <Slide :slides="slides" :autoplay="2000" />
+      </div>
     </div>
     <br />
     <ListProduct
@@ -38,6 +40,7 @@
       itemsToShow="5"
       autoplay="10000"
     />
+    <Slide :slides="slides" :autoplay="3000" />
     <main v-if="categories && categories.length > 0">
       <div
         class="group-product"
@@ -80,10 +83,10 @@
                 :key="key"
               >
                 <router-link :to="`/products/detail/${product.id}`">
-                  <div class="block-product">
+                  <div class="block-product" style="padding: 0px 10px">
                     <a>
                       <img
-                        style="width: 200px; height: 200px"
+                        style="max-width: 200px; max-height: 200px"
                         :src="product.thumb"
                     /></a>
                     <a>
@@ -112,25 +115,25 @@
         </div>
       </div>
       <div class="block-feature">
-        <div class="features">
-          <div class="feature">
-            <div class="in-feature"><i class="fas fa-tshirt"></i></div>
+        <div class="row features">
+          <div class="col-lg-4 col-md-4 col-sm-4 feature">
+            <div class=""><i class="logo-feature fas fa-tshirt"></i></div>
             &ensp;
             <div class="in-feature">
               <div class="text-top">SẢN PHẨM ĐA DẠNG</div>
               <div class="text-bot">Cung cấp nhiều mẫu mã đẹp</div>
             </div>
           </div>
-          <div class="feature">
-            <div class="in-feature"><i class="fas fa-dolly-flatbed"></i></div>
+          <div class="col-lg-4 col-md-4 col-sm-4 feature">
+            <div class=""><i class="logo-feature fas fa-dolly-flatbed"></i></div>
             &ensp;
             <div class="in-feature">
               <div class="text-top">GIAO HÀNG SIÊU TỐC</div>
               <div class="text-bot">Giao hàng ngay sau khi đặt mua</div>
             </div>
           </div>
-          <div class="feature">
-            <div class="in-feature"><i class="fas fa-handshake"></i></div>
+          <div class="col-lg-4 col-md-4 col-sm-4 feature">
+            <div class=""><i class="logo-feature fas fa-handshake"></i></div>
             &ensp;
             <div class="in-feature">
               <div class="text-top">CHÍNH SÁCH ƯU ÁI</div>
@@ -300,18 +303,36 @@ a.detail:hover {
 }
 .block-feature .features,
 .features .feature {
-  justify-content: space-between;
+  justify-content: center;
   display: flex;
 }
-.in-feature i {
+.logo-feature {
   color: white;
   font-size: 30px;
   border-radius: 50%;
-  padding: 10px 7px 10px 7px;
+  padding: 12px 10px;
   background-color: red;
 }
 .in-feature .text-top {
   font-weight: bold;
   font-size: 18px;
+}
+@media (max-width: 620px) {
+  .slider,
+  .album {
+    margin: 0px;
+  }
+  .block-feature {
+    padding: 0px;
+  }
+  .block-text-right {
+    display: none;
+  }
+}
+
+@media (max-width: 440px) {
+  .in-feature {
+    display: none;
+  }
 }
 </style>

@@ -25,7 +25,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-6">
+        <div class="col-lg-6 col-md-12 col-sm-12">
           <div class="detail-pro">
             <img
               class="img-detail"
@@ -43,7 +43,7 @@
             </div>
           </div>
         </div>
-        <div class="col-6">
+        <div class="col-lg-6 col-md-12 col-sm-12">
           <p class="text-1"></p>
           <div class="block-soluong">
             <h3>{{ data.name }}</h3>
@@ -152,7 +152,7 @@
       </div>
       <br />
       <div class="row">
-        <div class="table-size col-6">
+        <div class="table-size col-lg-6 col-md-12 col-sm-12">
           <table class="tbl-size" cellspacing="0">
             <th colspan="5">BẢNG SIZE ÁO BÓNG ĐÁ</th>
             <tr class="txt-head">
@@ -191,7 +191,7 @@
             </tr>
           </table>
         </div>
-        <div class="col-6">
+        <div class="col-lg-6 col-md-12 col-sm-12">
           <img class="img-size" src="../../assets/bang_size_giay.png" />
         </div>
         <br />
@@ -533,7 +533,7 @@ a {
 .text-3 {
   font-weight: bold;
   border: 1px dashed #ed1a29;
-  width: 450px;
+  max-width: 450px;
   margin: 10px 15%;
   padding: 10px;
 }
@@ -620,4 +620,5 @@ label.radio input:checked + span {
   box-shadow: 0 3px 3px rgb(6, 5, 5);
   color: #fff;
 }
+
 </style>

@@ -12,8 +12,9 @@
       <div class="content-top">
         <div class="out-texthead">
           <div class="text-head">
-            <i class="fas fa-shopping-basket"></i>&ensp;THÔNG TIN GIỎ HÀNG CỦA
-            BẠN
+            <i class="fas fa-shopping-basket"></i>&ensp;<span class="txt-home"
+              >THÔNG TIN GIỎ HÀNG CỦA BẠN</span
+            >
           </div>
         </div>
         <table
@@ -23,31 +24,34 @@
         >
           <thead class="tbl-text-head">
             <tr>
-              <th>Sản phẩm</th>
-              <th>Đơn giá</th>
-              <th>Size</th>
-              <th>Màu</th>
-              <th>Số lượng</th>
-              <th>Thành tiền</th>
-              <th>Thao tác</th>
+              <th class="">Sản phẩm</th>
+              <th class="col-lg col-md col-sm">Đơn giá</th>
+              <th class="col-lg col-md col-sm">Size</th>
+              <th class="col-lg col-md col-sm">Màu</th>
+              <th class="col-md col-sm">Số lượng</th>
+              <th class="col-lg col-md col-sm">Thành tiền</th>
+              <th class="">Thao tác</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(product, key) in carts" :key="key">
               <td class="col-img">
-                <img style="width: 100px; height: 100px" :src="product.thumb" />&emsp;
+                <img
+                  style="width: 100px; height: 100px"
+                  :src="product.thumb"
+                />&emsp;
                 {{ product.name }}
               </td>
-              <td class="col-dongia">
+              <td class="col-dongia col-lg col-md col-sm">
                 {{ formatCash(product.unit_price) }}<sup>đ</sup>
               </td>
-              <td class="col-size">
+              <td class="col-size col-lg col-md col-sm">
                 {{ product.code_size }}
               </td>
-              <td class="col-color">
+              <td class="col-color col-lg col-md col-sm">
                 {{ getNameByHexColor(product.code_color) }}
               </td>
-              <td class="col-soluong">
+              <td class="col-soluong col-md col-sm">
                 <input
                   @click="decreaseQuantity(product.detail_id, product.quantity)"
                   type="button"
@@ -62,26 +66,23 @@
                   class="button"
                 />
               </td>
-              <td class="col-thanhtien">
+              <td class="col-thanhtien col-lg col-md col-sm">
                 {{ formatCash(product.unit_price * product.quantity)
                 }}<sup>đ</sup>
               </td>
               <td class="col-thaotac">
-                <div class="in-thaotac">
-                  <button class="delete-product">
-                    <i
-                      @click="removeProduct(product.detail_id)"
-                      class="fas fa-trash-alt"
-                    ></i>
-                  </button>
-                  &emsp;
-                  <router-link
-                    :to="`/products/detail/${product.product_id}`"
-                    class="info-product"
-                  >
-                    <i class="fas fa-info-circle"></i>
-                  </router-link>
+                <div class="">
+                  <i
+                    @click="removeProduct(product.detail_id)"
+                    class="delete-product fas fa-trash-alt"
+                  ></i>
                 </div>
+                <router-link
+                  :to="`/products/detail/${product.product_id}`"
+                  class="info-product"
+                >
+                  <i class="fas fa-info-circle"></i>
+                </router-link>
               </td>
             </tr>
             <tr style="border: none">
@@ -98,7 +99,8 @@
         </div>
         <div class="button-home" v-if="carts && carts.length > 0">
           <router-link class="btn-home" :to="{ name: 'home' }">
-            <i class="fas fa-arrow-left"></i> Tiếp tục mua hàng
+            <i class="fas fa-arrow-left"></i
+            ><span class="txt-home"> Tiếp tục mua hàng</span>
           </router-link>
         </div>
       </div>
@@ -108,15 +110,19 @@
     </div>
     <div class="content-bot" v-if="carts && carts.length > 0">
       <div class="out-texthead">
-        <div class="text-head">
-          <i class="fas fa-dolly-flatbed"></i>&ensp;THÔNG TIN GIAO HÀNG
+        <div class="text-head text-head-left">
+          <i class="fas fa-dolly-flatbed"></i>&ensp;<span class="txt-home"
+            >THÔNG TIN GIAO HÀNG</span
+          >
         </div>
-        <div class="text-head">
-          <i class="fas fa-dollar-sign"></i>&ensp;THANH TOÁN
+        <div class="text-head text-head-right">
+          <i class="fas fa-dollar-sign"></i>&ensp;<span class="txt-home"
+            >THANH TOÁN</span
+          >
         </div>
       </div>
       <div class="row">
-        <div class="information col-7">
+        <div class="information col-lg-7 col-md-12 col-sm-12">
           <div class="text-hint">
             * Vui lòng nhập đầy đủ thông tin để chúng tôi giao hàng được chính
             xác, cảm ơn!
@@ -223,57 +229,47 @@
           ></textarea>
           <br />
         </div>
-        <div class="information col-5">
+        <div class="information col-lg-5 col-md-12 col-sm-12">
           <br />
-          <table class="table-payment">
-            <tr>
-              <td><label>Voucher</label></td>
-              <td class="col-voucher">
-                <Select2
-                  v-model="voucher"
-                  :options="vouchers"
-                  :settings="{ settingOption: value, settingOption: value }"
-                  @select="selectVoucher($event)"
-                />
-                <h4>{{ value }}</h4>
-              </td>
-            </tr>
-            <tr>
-              <td>Phí vận chuyển</td>
-              <td class="col-infor2">
-                {{ formatCash(shipment.fee ?? 30000) }}<sup>đ</sup>
-              </td>
-            </tr>
-            <tr>
-              <td>Mã giảm giá</td>
-              <td class="col-infor2">
-                {{
-                  voucherSelected.discount
-                    ? formatCash(
-                        parseInt(
-                          (voucherSelected.discount / 100) * totalMoney()
-                        )
+          <label for="">Voucher</label>
+          <Select2
+            style="width: 100%"
+            v-model="voucher"
+            :options="vouchers"
+            :settings="{ settingOption: value, settingOption: value }"
+            @select="selectVoucher($event)"
+          />
+          <h4>{{ value }}</h4>
+          <div class="" style="display: flex; justify-content: space-between">
+            <label for="">Phí vận chuyển</label>
+            <p>{{ formatCash(shipment.fee ?? 30000) }}<sup>đ</sup></p>
+          </div>
+          <div class="" style="display: flex; justify-content: space-between">
+            <label for="">Mã giảm giá</label>
+            <p>
+              {{
+                voucherSelected.discount
+                  ? formatCash(
+                      parseInt((voucherSelected.discount / 100) * totalMoney())
+                    )
+                  : 0
+              }}<sup>đ</sup>
+            </p>
+          </div>
+          <div class="" style="display: flex; justify-content: space-between">
+            <label>Tổng thanh toán</label>
+            <p>
+              {{
+                formatCash(
+                  (voucherSelected.discount
+                    ? parseInt(
+                        (1 - voucherSelected.discount / 100) * totalMoney()
                       )
-                    : 0
-                }}<sup>đ</sup>
-              </td>
-            </tr>
-            <tr class="tongtien">
-              <td><label>Tổng thanh toán</label></td>
-              <td class="col-infor2 total-money">
-                {{
-                  formatCash(
-                    (voucherSelected.discount
-                      ? parseInt(
-                          (1 - voucherSelected.discount / 100) * totalMoney()
-                        )
-                      : parseInt(totalMoney())) + shipment.fee
-                  )
-                }}<sup>đ</sup>
-              </td>
-            </tr>
-          </table>
-          <br />
+                    : parseInt(totalMoney())) + shipment.fee
+                )
+              }}<sup>đ</sup>
+            </p>
+          </div>
           <button
             data-target="#modalConfirm"
             data-toggle="modal"
@@ -303,28 +299,18 @@
 </template>
 
 <script setup>
-import {
-  computed,
-  inject,
-  reactive,
-  ref,
-  watch,
-} from 'vue';
+import { computed, inject, reactive, ref, watch } from "vue";
 
-import ntc from 'ntc-hi-js';
-import { useStore } from 'vuex';
+import ntc from "ntc-hi-js";
+import { useStore } from "vuex";
 
-import { RepositoryFactory } from '@/api/repositories/RepositoryFactory.js';
-import CartEmpty from '@/components/carts/CartEmpty.vue';
-import ModalConfirm from '@/components/carts/ModalConfirm.vue';
-import { formatCash } from '@/helpers/helper.js';
-import { useToasted } from '@hoppscotch/vue-toasted';
-import { useVuelidate } from '@vuelidate/core';
-import {
-  email,
-  helpers,
-  required,
-} from '@vuelidate/validators';
+import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
+import CartEmpty from "@/components/carts/CartEmpty.vue";
+import ModalConfirm from "@/components/carts/ModalConfirm.vue";
+import { formatCash } from "@/helpers/helper.js";
+import { useToasted } from "@hoppscotch/vue-toasted";
+import { useVuelidate } from "@vuelidate/core";
+import { email, helpers, required } from "@vuelidate/validators";
 
 const toast = useToasted();
 const store = useStore();
@@ -584,9 +570,25 @@ const totalMoney = () => {
 </script>
 
 <style scoped>
-.row button {
-  border: none;
-  border-radius: 5px;
+@media (max-width: 1000px) {
+  .col-lg {
+    display: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .col-md,
+  .text-head-right {
+    display: none;
+  }
+}
+
+@media (max-width: 440px) {
+  .col-md,
+  .txt-home,
+  .col-sm {
+    display: none;
+  }
 }
 .table-payment {
   width: 100%;
@@ -689,8 +691,9 @@ td button {
   padding: 40px 0px;
 }
 
-button.delete-product {
-  padding: 0px 8px;
+.delete-product {
+  padding: 8px 8px;
+  border-radius: 10px;
   background-color: #ed1a29;
   color: white;
 }
@@ -785,5 +788,24 @@ textarea {
   border: 1px solid rgb(208, 212, 216);
   width: 80%;
   padding: 10px 10px;
+}
+
+@media (max-width: 800px) {
+  .col-lg {
+    display: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .col-md {
+    display: none;
+  }
+}
+
+@media (max-width: 440px) {
+  .col-md,
+  .col-sm {
+    display: none;
+  }
 }
 </style>

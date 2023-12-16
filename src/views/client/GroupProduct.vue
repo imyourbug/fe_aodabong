@@ -149,7 +149,7 @@
                     <div class="block-product">
                       <a>
                         <img
-                          style="width: 100%; height: 100%"
+                          style="max-width: 200px; max-height: 200px"
                           :src="product.thumb"
                       /></a>
                       <a>
@@ -183,33 +183,33 @@
       </div>
     </div>
     <div class="block-feature">
-      <div class="features">
-        <div class="feature">
-          <div class="in-feature"><i class="fas fa-tshirt"></i></div>
-          &ensp;
-          <div class="in-feature">
-            <div class="text-top">SẢN PHẨM ĐA DẠNG</div>
-            <div class="text-bot">Cung cấp nhiều mẫu mã đẹp</div>
+        <div class="row features">
+          <div class="col-lg-4 col-md-4 col-sm-4 feature">
+            <div class=""><i class="logo-feature fas fa-tshirt"></i></div>
+            &ensp;
+            <div class="in-feature">
+              <div class="text-top">SẢN PHẨM ĐA DẠNG</div>
+              <div class="text-bot">Cung cấp nhiều mẫu mã đẹp</div>
+            </div>
           </div>
-        </div>
-        <div class="feature">
-          <div class="in-feature"><i class="fas fa-dolly-flatbed"></i></div>
-          &ensp;
-          <div class="in-feature">
-            <div class="text-top">GIAO HÀNG SIÊU TỐC</div>
-            <div class="text-bot">Giao hàng ngay sau khi đặt mua</div>
+          <div class="col-lg-4 col-md-4 col-sm-4 feature">
+            <div class=""><i class="logo-feature fas fa-dolly-flatbed"></i></div>
+            &ensp;
+            <div class="in-feature">
+              <div class="text-top">GIAO HÀNG SIÊU TỐC</div>
+              <div class="text-bot">Giao hàng ngay sau khi đặt mua</div>
+            </div>
           </div>
-        </div>
-        <div class="feature">
-          <div class="in-feature"><i class="fas fa-handshake"></i></div>
-          &ensp;
-          <div class="in-feature">
-            <div class="text-top">CHÍNH SÁCH ƯU ÁI</div>
-            <div class="text-bot">Chính sách bảo hành dài hạn</div>
+          <div class="col-lg-4 col-md-4 col-sm-4 feature">
+            <div class=""><i class="logo-feature fas fa-handshake"></i></div>
+            &ensp;
+            <div class="in-feature">
+              <div class="text-top">CHÍNH SÁCH ƯU ÁI</div>
+              <div class="text-bot">Chính sách bảo hành dài hạn</div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
   </div>
 </template>
 
@@ -307,32 +307,6 @@ a {
   text-decoration: none;
 }
 
-.slider {
-  margin: 10px 145px 10px 145px;
-}
-
-.list-danhmuc {
-  border: 1px solid rgb(218, 209, 209);
-  padding: 0px;
-  margin: 0px 96px 0px 11px;
-}
-.danhmuc .text-top {
-  color: white;
-  background-color: #ed1a29;
-  padding: 10px;
-  font-size: 17px;
-  font-weight: bold;
-}
-.option a {
-  font-size: 16px;
-  color: #2e3094;
-  width: 100%;
-  padding: 10px;
-}
-.option a:hover {
-  color: #ed1a29;
-}
-
 .album {
   margin: 0px 145px;
 }
@@ -417,18 +391,37 @@ a.detail:hover {
 }
 .block-feature .features,
 .features .feature {
-  justify-content: space-between;
+  justify-content: center;
   display: flex;
 }
-.in-feature i {
+.logo-feature {
   color: white;
   font-size: 30px;
   border-radius: 50%;
-  padding: 10px 7px 10px 7px;
+  padding: 12px 10px;
   background-color: red;
 }
 .in-feature .text-top {
   font-weight: bold;
   font-size: 18px;
+}
+
+@media (max-width: 620px) {
+  .slider,
+  .album {
+    margin: 0px;
+  }
+  .block-feature {
+    padding: 0px;
+  }
+  .block-text-right {
+    display: none;
+  }
+}
+
+@media (max-width: 440px) {
+  .in-feature {
+    display: none;
+  }
 }
 </style>
