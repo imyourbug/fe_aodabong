@@ -37,7 +37,7 @@
               </option>
             </select>
           </div>
-          <div class="mb-3">
+          <!-- <div class="mb-3">
             <label class="form-label">Màu sắc</label>
             <input
               type="color"
@@ -73,7 +73,7 @@
                 <div class="error-msg">{{ error.$message }}</div>
               </div>
             </div>
-          </div>
+          </div> -->
           <div class="mb-3">
             <label class="form-label">Số lượng trong kho</label>
             <input
