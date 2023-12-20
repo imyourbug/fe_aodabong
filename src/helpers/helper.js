@@ -143,7 +143,7 @@ function getStatusOrder(status) {
       break;
     case 5:
       rs =
-        '<span class="btn btn-success btn-rounded">Giao hàng thành công</span>';
+        '<span class="btn btn-success btn-rounded">Đã giao</span>';
       break;
     case 6:
       rs = '<span class="btn btn-warning btn-rounded">Đang trả hàng</span>';

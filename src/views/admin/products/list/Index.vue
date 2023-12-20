@@ -420,6 +420,7 @@ const remove = () => {
             },
           ],
         });
+        $("#btn-remove").prop("disabled", false);
       }
       if (response.data.status === 1) {
         $("#btn-remove").prop("disabled", false);

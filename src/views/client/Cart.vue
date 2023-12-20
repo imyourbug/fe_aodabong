@@ -24,7 +24,8 @@
         >
           <thead class="tbl-text-head">
             <tr>
-              <th class="">Sản phẩm</th>
+              <th class="">Hình ảnh</th>
+              <th class="col-sm">Tên sản phẩm</th>
               <th class="col-lg col-md col-sm">Đơn giá</th>
               <th class="col-lg col-md col-sm">Size</th>
               <th class="col-lg col-md col-sm">Màu</th>
@@ -40,6 +41,8 @@
                   style="width: 100px; height: 100px"
                   :src="product.thumb"
                 />&emsp;
+              </td>
+              <td class="col-sm" style="min-width: 150px;">
                 {{ product.name }}
               </td>
               <td class="col-dongia col-lg col-md col-sm">
@@ -58,7 +61,13 @@
                   value="-"
                   class="button"
                 />
-                {{ product.quantity }}
+                <input
+                  @input="updateQuantity(product.detail_id, product.quantity)"
+                  style="width: 50px"
+                  type="number"
+                  min="1"
+                  v-model="product.quantity"
+                />
                 <input
                   @click="increaseQuantity(product.detail_id, product.quantity)"
                   type="button"
@@ -86,7 +95,7 @@
               </td>
             </tr>
             <tr style="border: none">
-              <td colspan="6">
+              <td colspan="7">
                 <div class="total">
                   Tổng tiền: {{ formatCash(totalMoney()) }}<sup>đ</sup>
                 </div>
@@ -518,6 +527,37 @@ const increaseQuantity = (detail_id, quantity) => {
   localStorage.setItem("carts", JSON.stringify(carts.value));
 };
 
+// update quantity
+const updateQuantity = (detail_id, quantity) => {
+  if (quantity < getQuantity(detail_id)) {
+    carts.value.forEach((item) => {
+      if (item.detail_id === detail_id) {
+        item.quantity =
+          quantity < 0 || !Number.isInteger(quantity) ? 1 : quantity;
+      }
+    });
+  } else {
+    carts.value.forEach((item) => {
+      if (item.detail_id === detail_id) {
+        item.quantity = getQuantity(detail_id);
+      }
+    });
+    toast.error("Bạn đã đạt mức tối đa số lượng sản phẩm này", {
+      duration: duration_time,
+      action: [
+        {
+          text: `OK`,
+          onClick: (_, toastObject) => {
+            toastObject.goAway(0);
+          },
+        },
+      ],
+    });
+  }
+  console.log(detail_id, quantity);
+  localStorage.setItem("carts", JSON.stringify(carts.value));
+};
+
 // get name color
 const getNameByHexColor = (hexCode) => {
   return ntc.name(hexCode, "en").color.name;
@@ -656,8 +696,6 @@ td img {
   align-items: center;
 }
 .col-img {
-  width: 320px;
-  padding-left: 30px;
 }
 .col-thanhtien,
 .col-dongia {

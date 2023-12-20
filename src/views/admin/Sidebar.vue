@@ -270,8 +270,8 @@
 
 <style scoped>
 .logo {
-  width: 250px;
-  height: 60px;
+  width: 100%;
+  max-height: 60px;
 }
 .collapsed {
   cursor: pointer;

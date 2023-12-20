@@ -99,10 +99,11 @@
                   />
                   <input
                     class="soluong"
-                    type="text"
-                    :value="choice.quantity"
+                    type="number"
+                    @input="updateQuantity"
+                    v-model="choice.quantity"
                     id="quantity"
-                    readonly
+                    min="1"
                     name="quantity"
                   />
                   <input
@@ -342,6 +343,17 @@ const decreaseQuantity = () => {
     choice.quantity--;
   }
 };
+
+// update quantity
+const updateQuantity = () => {
+  if (choice.quantity < 0 || !Number.isInteger(choice.quantity)) {
+    choice.quantity = 1;
+  }
+  if (choice.quantity > unit_in_stock.value) {
+    choice.quantity = unit_in_stock.value;
+  }
+};
+
 // increase quantity
 const increaseQuantity = () => {
   if (unit_in_stock.value > 0 && choice.quantity < unit_in_stock.value) {
@@ -564,7 +576,7 @@ input.button {
 }
 
 .soluong {
-  width: 20px;
+  width: 50px;
   border: none;
 }
 
@@ -620,5 +632,4 @@ label.radio input:checked + span {
   box-shadow: 0 3px 3px rgb(6, 5, 5);
   color: #fff;
 }
-
 </style>

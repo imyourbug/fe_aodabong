@@ -169,7 +169,7 @@ const columns = [
   {
     data: null,
     render: function (data, type, row, meta) {
-      return `<img class="thumb" src="${data.product_detail.thumb}" />`;
+      return `<img class="thumb" style="max-width:100px;max-height:100px" src="${data.product_detail.thumb}" />`;
     },
   },
   {
