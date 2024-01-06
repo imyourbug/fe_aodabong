@@ -85,13 +85,18 @@ const routes = [
   //
   {
     path: "/admin",
-    name: "admin-home",
+    // name: "admin-home",
     component: AdminHome,
     meta: {
       requiresAuth: true,
       isAdmin: true,
     },
     children: [
+      {
+        path: "home",
+        name: "admin-home",
+        component: StatisticsRevenue,
+      },
       {
         path: "accounts/list",
         name: "list-account",

@@ -7,134 +7,136 @@
         </div>
         <div class="modal-body login-block">
           <div class="form-login">
-      <div class="md-float-material form-material">
-        <div class="card-block">
-          <div class="row">
-            <div class="col-md-12">
-              <h3 class="text-center heading">ĐĂNG KÝ</h3>
-            </div>
-          </div>
-          <div class="form-group form-primary">
-            <input
-              required
-              type="text"
-              v-model="account.name"
-              class="form-control"
-              placeholder="Tên hiển thị"
-            />
-            <div :class="{ error: v$.name.$error.length }">
-              <div
-                class="input-errors"
-                v-for="error of v$.name.$errors"
-                :key="error.$uid"
-              >
-                <div class="error-msg">{{ error.$message }}</div>
-              </div>
-            </div>
-          </div>
-          <div class="form-group form-primary">
-            <input
-              required
-              type="text"
-              v-model="account.email"
-              class="form-control"
-              placeholder="Email"
-            />
-            <div :class="{ error: v$.email.$error.length }">
-              <div
-                class="input-errors"
-                v-for="error of v$.email.$errors"
-                :key="error.$uid"
-              >
-                <div class="error-msg">{{ error.$message }}</div>
-              </div>
-            </div>
-          </div>
+            <div class="md-float-material form-material">
+              <div class="card-block">
+                <div class="row">
+                  <div class="col-md-12">
+                    <h3 class="text-center heading">ĐĂNG KÝ</h3>
+                  </div>
+                </div>
+                <div class="form-group form-primary">
+                  <input
+                    required
+                    type="text"
+                    v-model="account.name"
+                    class="form-control"
+                    placeholder="Tên hiển thị"
+                  />
+                  <div :class="{ error: v$.name.$error.length }">
+                    <div
+                      class="input-errors"
+                      v-for="error of v$.name.$errors"
+                      :key="error.$uid"
+                    >
+                      <div class="error-msg">{{ error.$message }}</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group form-primary">
+                  <input
+                    required
+                    type="text"
+                    v-model="account.email"
+                    class="form-control"
+                    placeholder="Email"
+                  />
+                  <div :class="{ error: v$.email.$error.length }">
+                    <div
+                      class="input-errors"
+                      v-for="error of v$.email.$errors"
+                      :key="error.$uid"
+                    >
+                      <div class="error-msg">{{ error.$message }}</div>
+                    </div>
+                  </div>
+                </div>
 
-          <div class="form-group form-primary">
-            <input
-              type="password"
-              v-model="account.password"
-              class="form-control"
-              placeholder="Mật khẩu"
-            />
-            <div :class="{ error: v$.password.$error.length }">
-              <div
-                class="input-errors"
-                v-for="error of v$.password.$errors"
-                :key="error.$uid"
-              >
-                <div class="error-msg">{{ error.$message }}</div>
-              </div>
-            </div>
-          </div>
-          <div class="form-group form-primary">
-            <input
-              type="password"
-              class="form-control"
-              v-model="account.repassword"
-              placeholder="Nhập lại mật khẩu"
-            />
-            <div :class="{ error: v$.repassword.$error.length }">
-              <div
-                class="input-errors"
-                v-for="error of v$.repassword.$errors"
-                :key="error.$uid"
-              >
-                <div class="error-msg">{{ error.$message }}</div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-12 block-btn">
-              <input
-                class="btn btn-primary btn-md btn-block waves-effect text-center m-b-20"
-                readonly
-                value="Đăng ký"
-                @click="handleRegister"
-              />
-            </div>
-          </div>
+                <div class="form-group form-primary">
+                  <input
+                    type="password"
+                    v-model="account.password"
+                    class="form-control"
+                    placeholder="Mật khẩu"
+                  />
+                  <div :class="{ error: v$.password.$error.length }">
+                    <div
+                      class="input-errors"
+                      v-for="error of v$.password.$errors"
+                      :key="error.$uid"
+                    >
+                      <div class="error-msg">{{ error.$message }}</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group form-primary">
+                  <input
+                    type="password"
+                    class="form-control"
+                    v-model="account.repassword"
+                    placeholder="Nhập lại mật khẩu"
+                  />
+                  <div :class="{ error: v$.repassword.$error.length }">
+                    <div
+                      class="input-errors"
+                      v-for="error of v$.repassword.$errors"
+                      :key="error.$uid"
+                    >
+                      <div class="error-msg">{{ error.$message }}</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12 block-btn">
+                    <input
+                      class="btn btn-primary btn-md btn-block waves-effect text-center m-b-20"
+                      readonly
+                      value="Đăng ký"
+                      @click="handleRegister"
+                    />
+                  </div>
+                </div>
 
-          <div class="or-container">
-            <div class="line-separator"></div>
-            <div class="or-label">or</div>
-            <div class="line-separator"></div>
+                <div class="or-container">
+                  <div class="line-separator"></div>
+                  <div class="or-label">or</div>
+                  <div class="line-separator"></div>
+                </div>
+                <GoogleButton class="GoogleLogin" />
+                <br />
+                <div class="text-inverse text-center">
+                  Đã có tài khoản?
+                  <div
+                    data-toggle="modal"
+                    data-target="#modalLogin"
+                    data-dismiss="modal"
+                  >
+                    Đăng nhập
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <GoogleButton class="GoogleLogin" />
-          <br />
-          <p class="text-inverse text-center">
-            Đã có tài khoản?
-            <p to="/login"  
-            data-toggle="modal"
-            data-target="#modalLogin"
-            data-dismiss="modal"
-            >Đăng nhập</p>
-          </p>
-        </div>
-      </div>
-    </div>
         </div>
       </div>
     </div>
   </div>
 </template>
 <script setup>
-import { reactive } from 'vue';
+import { computed, reactive } from "vue";
 
-import { useRouter } from 'vue-router';
+import { useRouter } from "vue-router";
 
-import { RepositoryFactory } from '@/api/repositories/RepositoryFactory.js';
-import GoogleButton from '@/components/GoogleLogin.vue';
-import { useToasted } from '@hoppscotch/vue-toasted';
-import { useVuelidate } from '@vuelidate/core';
+import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
+import GoogleButton from "@/components/GoogleLogin.vue";
+import { useToasted } from "@hoppscotch/vue-toasted";
+import { useVuelidate } from "@vuelidate/core";
 import {
   email,
   helpers,
   minLength,
   required,
   sameAs,
-} from '@vuelidate/validators';
+} from "@vuelidate/validators";
 
 const toast = useToasted();
 const router = useRouter();
@@ -180,10 +182,10 @@ const rules = {
       "Mật khẩu tối thiểu gồm 8 ký tự!",
       minLength(8)
     ),
-    // sameAs: helpers.withMessage(
-    //   "Mật khẩu nhập lại phải trùng khớp!",
-    //   sameAs(account.password)
-    // ),
+    sameAs: helpers.withMessage(
+      "Mật khẩu nhập lại phải trùng khớp!",
+      sameAs(computed(() => account.password))
+    ),
   },
 };
 
@@ -194,51 +196,58 @@ const closeModal = (modal) => {
   $("body").removeClass("modal-open");
   $(".modal-backdrop").remove();
   v$.value.$reset();
+  reset();
+};
+
+const reset = () => {
+  account.name = "";
+  account.email = "";
+  account.password = "";
+  account.repassword = "";
 };
 
 const handleRegister = () => {
   v$.value.$validate();
   if (v$.value.$invalid) {
     toast.error("Vui lòng điền đầy đủ thông tin", {
-            duration: duration_time,
-            action: [
-              {
-                text: `OK`,
-                onClick: (_, toastObject) => {
-                  toastObject.goAway(0);
-                },
-              },
-            ],
-          });
+      duration: duration_time,
+      action: [
+        {
+          text: `OK`,
+          onClick: (_, toastObject) => {
+            toastObject.goAway(0);
+          },
+        },
+      ],
+    });
   } else {
     accountRepository.register(account).then((response) => {
       if (response.data.status === 0) {
-        closeModal('modalRegister');
+        closeModal("modalRegister");
         toast.success("Đăng ký thành công", {
-            duration: duration_time,
-            action: [
-              {
-                text: `OK`,
-                onClick: (_, toastObject) => {
-                  toastObject.goAway(0);
-                },
+          duration: duration_time,
+          action: [
+            {
+              text: `OK`,
+              onClick: (_, toastObject) => {
+                toastObject.goAway(0);
               },
-            ],
-          });
-        
+            },
+          ],
+        });
       }
       if (response.data.status === 1) {
         toast.error(response.data.error.message, {
-            duration: duration_time,
-            action: [
-              {
-                text: `OK`,
-                onClick: (_, toastObject) => {
-                  toastObject.goAway(0);
-                },
+          duration: duration_time,
+          action: [
+            {
+              text: `OK`,
+              onClick: (_, toastObject) => {
+                toastObject.goAway(0);
               },
-            ],
-          });
+            },
+          ],
+        });
       }
       if (response.data.status !== 1 && response.data.status !== 0) {
         console.log("Throw exception");

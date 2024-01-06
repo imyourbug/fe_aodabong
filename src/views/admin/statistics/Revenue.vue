@@ -56,6 +56,23 @@
               <canvas id="chartQuantity"></canvas>
             </div>
             <hr />
+            <table>
+              <tr>
+                <td>Số sản phẩm:</td>
+                <td>&emsp13;</td>
+                <td>{{ products.length }}</td>
+              </tr>
+              <tr>
+                <td>Số hàng tồn trong kho:</td>
+                <td>&emsp13;</td>
+                <td>{{ dataQuantity.reduce((a, b) => a + b, 0) }}</td>
+              </tr>
+              <tr>
+                <td>Sản phẩm bán chạy nhất:</td>
+                <td>&emsp13;</td>
+                <td v-if="bestSeller">{{ bestSeller.name }}</td>
+              </tr>
+            </table>
             <router-link class="collapse-item" :to="{ name: 'import-product' }"
               >Quản lý kho hàng</router-link
             >
@@ -82,52 +99,52 @@
               </router-link>
             </div> -->
             <table>
-                <tr>
-                  <td>Tổng số đơn đã đặt:</td>
-                  <td>&emsp13;</td>
-                  <td>{{ orders.length }}</td>
-                </tr>
-                <tr>
-                  <td>Tổng số đơn đang chờ xác nhận:</td>
-                  <td>&emsp13;</td>
-                  <td>{{ getTypeOrder(0) }}</td>
-                </tr>
-                <tr>
-                  <td>Tổng số đơn đang chờ lấy hàng:</td>
-                  <td>&emsp13;</td>
-                  <td>{{ getTypeOrder(1) }}</td>
-                </tr>
-                <tr>
-                  <td>Tổng số đơn đang giao:</td>
-                  <td>&emsp13;</td>
-                  <td>{{ getTypeOrder(2) }}</td>
-                </tr>
-                <tr>
-                  <td>Tổng số đơn đang chờ hủy:</td>
-                  <td>&emsp13;</td>
-                  <td>{{ getTypeOrder(3) }}</td>
-                </tr>
-                <tr>
-                  <td>Tổng số đơn đã hủy:</td>
-                  <td>&emsp13;</td>
-                  <td>{{ getTypeOrder(4) }}</td>
-                </tr>
-                <tr>
-                  <td>Tổng số đơn đã giao thành công:</td>
-                  <td>&emsp13;</td>
-                  <td>{{ getTypeOrder(5) }}</td>
-                </tr>
-                <tr>
-                  <td>Tổng số đơn đang trả hàng:</td>
-                  <td>&emsp13;</td>
-                  <td>{{ getTypeOrder(6) }}</td>
-                </tr>
-                <tr>
-                  <td>Tổng số đơn đã trả hàng:</td>
-                  <td>&emsp13;</td>
-                  <td>{{ getTypeOrder(7) }}</td>
-                </tr>
-              </table>
+              <tr>
+                <td>Tổng số đơn đã đặt:</td>
+                <td>&emsp13;</td>
+                <td>{{ orders.length }}</td>
+              </tr>
+              <tr>
+                <td>Tổng số đơn đang chờ xác nhận:</td>
+                <td>&emsp13;</td>
+                <td>{{ getTypeOrder(0) }}</td>
+              </tr>
+              <tr>
+                <td>Tổng số đơn đang chờ lấy hàng:</td>
+                <td>&emsp13;</td>
+                <td>{{ getTypeOrder(1) }}</td>
+              </tr>
+              <tr>
+                <td>Tổng số đơn đang giao:</td>
+                <td>&emsp13;</td>
+                <td>{{ getTypeOrder(2) }}</td>
+              </tr>
+              <tr>
+                <td>Tổng số đơn đang chờ hủy:</td>
+                <td>&emsp13;</td>
+                <td>{{ getTypeOrder(3) }}</td>
+              </tr>
+              <tr>
+                <td>Tổng số đơn đã hủy:</td>
+                <td>&emsp13;</td>
+                <td>{{ getTypeOrder(4) }}</td>
+              </tr>
+              <tr>
+                <td>Tổng số đơn đã giao thành công:</td>
+                <td>&emsp13;</td>
+                <td>{{ getTypeOrder(5) }}</td>
+              </tr>
+              <tr>
+                <td>Tổng số đơn đang trả hàng:</td>
+                <td>&emsp13;</td>
+                <td>{{ getTypeOrder(6) }}</td>
+              </tr>
+              <tr>
+                <td>Tổng số đơn đã trả hàng:</td>
+                <td>&emsp13;</td>
+                <td>{{ getTypeOrder(7) }}</td>
+              </tr>
+            </table>
           </div>
         </div>
       </div>
@@ -155,6 +172,7 @@ const bestSeller = ref(null);
 const orders = ref([]);
 const totalRevenue = ref(0);
 const revenueThisMonth = ref(0);
+const products = ref([]);
 const range = reactive({
   from: "",
   to: "",
@@ -195,12 +213,12 @@ const reloadQuantity = () => {
         if (max < e.sold) {
           max = e.sold;
           bestSeller.value = e;
-          console.log(bestSeller.value.id);
         }
         labelsQuantity.value.push(e.name);
         dataQuantity.value.push(getQuantity(e.product_details));
         backgroundColorQuantity.value.push(getRandomRGBColor());
       });
+      console.log(bestSeller.value);
       if (chartQuantity) {
         chartQuantity.data.labels = labelsQuantity.value;
         chartQuantity.data.datasets[0].data = dataQuantity.value;

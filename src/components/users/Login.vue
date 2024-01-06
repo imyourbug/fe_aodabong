@@ -68,7 +68,12 @@
                   <div class="or-label">or</div>
                   <div class="line-separator"></div>
                 </div>
-                <GoogleButton class="GoogleLogin" :close-modal="closeModal" :toast="toast" :duration_time="duration_time"/>
+                <GoogleButton
+                  class="GoogleLogin"
+                  :close-modal="closeModal"
+                  :toast="toast"
+                  :duration_time="duration_time"
+                />
                 <br />
                 <br />
                 <FacebookSignin
@@ -83,28 +88,27 @@
                 </FacebookSignin>
                 <br />
                 <!-- <router-link>Đăng ký</router-link> -->
-                <div
-                  class="btn-register"
-                >
-                Chưa có tài khoản?
-                  <p data-target="#modalRegister"
-                  data-toggle="modal"
-                  data-dismiss="modal"
-                  >Đăng ký</p>
+                <div class="btn-register">
+                  Chưa có tài khoản?
+                  <p
+                    data-target="#modalRegister"
+                    data-toggle="modal"
+                    data-dismiss="modal"
+                  >
+                    Đăng ký
+                  </p>
                 </div>
-                <p class="text-inverse text-center">
-                  Quên mật khẩu?
-                  <div
+                <p class="text-inverse text-center">Quên mật khẩu?</p>
+                <div
                   class="btn-forget"
                   data-dismiss="modal"
                   data-target="#modalForgetPass"
                   data-toggle="modal"
                 >
-                Nhấn vào đây
+                  Nhấn vào đây
                 </div>
-                  <!-- <router-link :to="{ name: 'recover-password' }"
+                <!-- <router-link :to="{ name: 'recover-password' }"
                     >Nhấn vào đây</router-link> -->
-                </p>
               </div>
             </div>
           </div>
@@ -114,27 +118,17 @@
   </div>
 </template>
 <script setup>
-import {
-  inject,
-  reactive,
-} from 'vue';
+import { inject, reactive } from "vue";
 
-import { useRouter } from 'vue-router';
-import { FacebookSignin } from 'vue3-google-facebook-signin';
+import { useRouter } from "vue-router";
+import { FacebookSignin } from "vue3-google-facebook-signin";
 
-import { RepositoryFactory } from '@/api/repositories/RepositoryFactory';
-import GoogleButton from '@/components/GoogleLogin.vue';
-import {
-  saveUser,
-  setCookie,
-} from '@/helpers/helper.js';
-import { useToasted } from '@hoppscotch/vue-toasted';
-import { useVuelidate } from '@vuelidate/core';
-import {
-  email,
-  helpers,
-  required,
-} from '@vuelidate/validators';
+import { RepositoryFactory } from "@/api/repositories/RepositoryFactory";
+import GoogleButton from "@/components/GoogleLogin.vue";
+import { saveUser, setCookie } from "@/helpers/helper.js";
+import { useToasted } from "@hoppscotch/vue-toasted";
+import { useVuelidate } from "@vuelidate/core";
+import { email, helpers, required } from "@vuelidate/validators";
 
 const toast = useToasted();
 const router = useRouter();
@@ -166,11 +160,17 @@ const onSignInErrorFacebook = (error) => {
   console.log(error);
 };
 
+const reset = () => {
+  account.email = "";
+  account.password = "";
+};
+
 const closeModal = (modal) => {
   $("#" + modal).hide();
   $("body").removeClass("modal-open");
   $(".modal-backdrop").remove();
   v$.value.$reset();
+  reset();
 };
 
 const onSignInSuccessFacebook = (res) => {
@@ -232,16 +232,16 @@ const handleLogin = () => {
   v$.value.$validate();
   if (v$.value.$invalid) {
     toast.error("Vui lòng điền đầy đủ thông tin", {
-            duration: duration_time,
-            action: [
-              {
-                text: `OK`,
-                onClick: (_, toastObject) => {
-                  toastObject.goAway(0);
-                },
-              },
-            ],
-          });
+      duration: duration_time,
+      action: [
+        {
+          text: `OK`,
+          onClick: (_, toastObject) => {
+            toastObject.goAway(0);
+          },
+        },
+      ],
+    });
   } else {
     try {
       authRepository.login(account).then((response) => {

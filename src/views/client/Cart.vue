@@ -42,7 +42,7 @@
                   :src="product.thumb"
                 />&emsp;
               </td>
-              <td class="col-sm" style="min-width: 150px;">
+              <td class="col-sm" style="min-width: 150px">
                 {{ product.name }}
               </td>
               <td class="col-dongia col-lg col-md col-sm">
@@ -312,14 +312,13 @@ import { computed, inject, reactive, ref, watch } from "vue";
 
 import ntc from "ntc-hi-js";
 import { useStore } from "vuex";
-
 import { RepositoryFactory } from "@/api/repositories/RepositoryFactory.js";
 import CartEmpty from "@/components/carts/CartEmpty.vue";
 import ModalConfirm from "@/components/carts/ModalConfirm.vue";
 import { formatCash } from "@/helpers/helper.js";
-import { useToasted } from "@hoppscotch/vue-toasted";
 import { useVuelidate } from "@vuelidate/core";
 import { email, helpers, required } from "@vuelidate/validators";
+import { useToasted } from "@hoppscotch/vue-toasted";
 
 const toast = useToasted();
 const store = useStore();
